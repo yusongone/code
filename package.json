@@ -1,0 +1,14 @@
+{
+  "name": "application-name"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+      	"express": ">=0.0.1"
+      	,"serialport": ">=0.0.1"
+	, "ejs":">= 0.0.1"
+	, "socket.io":">=0.0.1"
+	, "mysql":">=0.0.1"
+	, "connect":">=0.0.2"
+	,"canvas":">=0.0.2"
+  }
+}
