@@ -6,9 +6,11 @@ function router(app){
           res.send('hello world');
           console.log("fddf");
     });
-    app.get('/test', function(req, res){
-          //res.send('hello world');
-        res.render("a",{"title":"li test","li":[1,2,3,4]});
+    app.get('/login', function(req, res){
+        res.render("login",{
+            "title":"login",
+            "list":"ab"
+        });
     });
 }
 exports.init=function(app){
