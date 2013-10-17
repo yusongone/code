@@ -11,6 +11,7 @@ app.configure(function(){
     app.use("/images",express.static(__dirname + '/public/images'));
     app.use("/js",express.static(__dirname + '/public/js'));
     app.use("/css",express.static(__dirname + '/public/css'));
+    app.use(express.bodyParser());
 
     app.engine("html",require("ejs").renderFile);
     app.set('view engine', 'html');
