@@ -1,5 +1,7 @@
 var express=require("express"),
-    router=require("./router");
+    format=require("util").format,
+    router=require("./router"),
+    config=require("./config.json");
 
 var app = express();
 
@@ -13,7 +15,7 @@ app.configure(function(){
     app.engine("html",require("ejs").renderFile);
     app.set('view engine', 'html');
     app.set('views', __dirname + '/template');
-})
+});
 
 router.init(app);
 
