@@ -47,6 +47,7 @@ function router(app){
     app.post('/upload', function(req, res){
         var file=req.files.dfile;
         db.putImage(file);
+        res.send("ok");
 
     });
 }
