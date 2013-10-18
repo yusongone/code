@@ -4,6 +4,15 @@ var js_version=config.js_version,
     css_version=config.css_version;
     var fs=require("fs");
     var db=require("../db/client");
+    var ctrl=require("../control");
+
+function checkLogind(req){
+    if(req.session.username){
+        return true;
+    }else{
+        return false;
+    }
+}
 
 
 function router(app){
@@ -26,6 +35,13 @@ function router(app){
             "js_version":js_version,
             "css_version":css_version,
             "title":"注册",
+        });
+    });
+    app.get('/image_library', function(req, res){
+        res.render("image_library",{
+            "js_version":js_version,
+            "css_version":css_version,
+            "title":"图片库",
         });
     });
     app.get('/uploadImage', function(req, res){
@@ -56,10 +72,31 @@ function router(app){
         db.putImage(file);
         res.send("ok");
     });
+    app.post('/ajax_createImageLibs', function(req, res){
+        if(checkLogind(req)){
+            console.log("effe");
+            ctrl.ImageLibs.createImageLibs({
+                "username":req.session.username,
+                "libname":req.body.libname
+            },function(json){
+                res.send(json);
+            });
+        }else{
+            res.send({"status":"sorry","message":"用户登录已经超时，请重新登录！"});
+        };
+    });
+    app.post('/ajax_getImageLibs', function(req, res){
+        if(checkLogind(req)){
+            ctrl.ImageLibs.getImageLibs(req.session.username,function(json){
+                res.send(json);
+            });
+        }else{
+            res.send({"status":"sorry","message":"用户登录已经超时，请重新登录！"});
+        };
+    });
 
     app.post('/ajax_login', function(req, res){
-               console.log("sessin",req.session);
-        db.compareNameAndPass({
+        db.users.compareNameAndPass({
             "userName":req.body.username,
             "pass":req.body.pass
         },function(json){
@@ -70,7 +107,7 @@ function router(app){
         });
     });
     app.post('/ajax_register', function(req, res){
-        db.insertUserName({
+        db.users.insertUserName({
             userName:req.body.username,
             pass:req.body.pass
         },function(json){
