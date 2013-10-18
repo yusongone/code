@@ -1,0 +1,9 @@
+.infoBox{width:240px;height:300px;margin:90px auto;}
+.infoBox label{line-height:30px;height:22px;display:block;}
+.infoBox .text{border:1px solid #ddd;width:240px;}
+.infoBox p{margin-top:5px;}
+.infoBox .btnBox{margin-top:15px;text-align:center;}
+.infoBox .btnSmall{margin-top:5px;}
+
+.register{}
+.login{}
