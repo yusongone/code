@@ -31,15 +31,16 @@ function putImage(file){
     });
 }
 
-function getImage(){
+function get(callback){
     mongoClient.connect("mongodb://127.0.0.1/test",function(err,db){
-        var gs=new gridStore(db,"test.png");
-
+        var gs=new gridStore(db,"test.png","r");
         gs.open(function(err,gs){
-            gs.red(file.path,function(err,doc){
-             console.log(doc);
+            gs.read(function(err,doc){
+             callback(doc);
             });
         });
+            /*
+        */
 
     });
 }
@@ -47,4 +48,4 @@ function getImage(){
 
 
 exports.putImage=putImage;
-exports.getImage=getImage;
+exports.get=get;
