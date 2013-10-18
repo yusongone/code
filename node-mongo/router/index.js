@@ -14,11 +14,18 @@ function router(app){
     app.get('/read', function(req, res){
         db.getImage();
     });
-    app.get('/login', function(req, res){
+    app.get('/login', function(req, res,next){
         res.render("login",{
             "js_version":js_version,
             "css_version":css_version,
-            "title":"login",
+            "title":"登录",
+        });
+    });
+    app.get('/register', function(req, res){
+        res.render("register",{
+            "js_version":js_version,
+            "css_version":css_version,
+            "title":"注册",
         });
     });
     app.get('/uploadImage', function(req, res){
@@ -48,7 +55,27 @@ function router(app){
         var file=req.files.dfile;
         db.putImage(file);
         res.send("ok");
+    });
 
+    app.post('/ajax_login', function(req, res){
+               console.log("sessin",req.session);
+        db.compareNameAndPass({
+            "userName":req.body.username,
+            "pass":req.body.pass
+        },function(json){
+            if("ok"==json.status){
+                req.session.username=req.body.username;
+            }
+            res.send(json); 
+        });
+    });
+    app.post('/ajax_register', function(req, res){
+        db.insertUserName({
+            userName:req.body.username,
+            pass:req.body.pass
+        },function(json){
+            res.send(json); 
+        });
     });
 }
 exports.init=function(app){

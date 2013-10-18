@@ -2,11 +2,20 @@
 <html>
     <head>
         <% include lib/header %>
+        <link rel="stylesheet" href="/css/login_register.css" />
+        <script src="/js/login_register.js"></script>
     </head>
-    <body>
-        <div>
-            
-        </div>
+    <body class="login">
+        <form class="infoBox" >
+            <p><label>用户名</label></p>
+            <p><input id="username" class="text"/></p>
+            <p><label>密码</label></p>
+            <p><input id="pass" class="text" type="password" /></p>
+            <p class="btnBox">
+                <input class="btnSmall" type="button" id="login" value="登 录" />
+                <input class="btnSmall" type="button" id="cancel" value="取 消" />
+            </p>
+        </form>
         <% include lib/footer %>
     </body>
 </html>
