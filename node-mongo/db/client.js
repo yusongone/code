@@ -3,6 +3,8 @@ var mongodb=require("mongodb"),
     crypto=require("crypto");
     mongoClient=mongodb.MongoClient,
     objectId=mongodb.ObjectID,
+    Db=mongodb.Db,
+    Server=mongodb.Server,
     gridStore=mongodb.GridStore;
 var db_ip=require("../config.json").db.ip;
 
@@ -70,10 +72,17 @@ exports.get=get;
 //user collection;
 var users={
     insertUserName:function(json,callback){
-        var db_path=format("mongodb://%s/%s",db_ip,"picOnline");
-        mongoClient.connect(db_path,function(err,db){
-            var col=db.collection("users");
+        var db_path=format("mongodb://song:song@%s/%s",db_ip,"picOnline");
+        console.log(db_path);
+        var db= new Db("picOnline", new Server(db_ip, 27017, {auto_reconnect: true}, {w:1}));
+       // mongoClient.connect(db_path,function(err,db){
+                // callback
+        db.open(function(err,database){
+            database.authenticate("song","song",function(err,db){
+                var col=database.collection("users");
                 col.find({"name":json.userName},{"name":1}).toArray(function(err,item){
+                    console.dir(err);
+                    if(err){return callback({"status":"sorry","message":err})}
                     var count=item.length;
                     if(count>0){
                         callback({"status":"sorry","message":"用户名已经存在!"});
@@ -82,13 +91,16 @@ var users={
                         var md5=crypto.createHash("md5");
                         var md5Pass=md5.update(json.pass).digest("base64");
                         col.insert({"name":json.userName,"pass":md5Pass},function(err,res){
-                            if(err){return callback({"status":"sorry","message":"db error"});}
+                            console.dir(err);
+                            if(err){return callback({"status":"sorry","message":err});}
                             callback({"status":"ok"});
                             db.close();
                         });
                     }
                 });
-        });
+            });
+            //});
+            });
     },
     compareNameAndPass:function(json,callback){
         var db_path=format("mongodb://%s/%s",db_ip,"picOnline");
