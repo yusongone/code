@@ -56,10 +56,12 @@ function router(app){
         });
     });
     app.get('/images/*', function(req, res){
-        ctrl.ImageLibs.getImage(req.params[0],function(data){
-            res.writeHead(200, {'Content-Type': 'image/gif' });
-            res.end(data, 'binary');
-        });
+        if(checkLogind(req,res,"get")){
+            ctrl.ImageLibs.getImage(req.params[0],function(data){
+                res.writeHead(200, {'Content-Type': 'image/gif' });
+                res.end(data, 'binary');
+            });
+        }
     });
 
 
@@ -67,7 +69,7 @@ function router(app){
         if(checkLogind(req,res)){
             var file=req.files.dfile,
                 lib_id=req.body.lib_id;
-            ctrl.ImageLibs.uploadImage({file:file,libId:lib_id},function(json){
+            ctrl.ImageLibs.uploadImage({file:file,libId:lib_id,username:req.session.username},function(json){
                 res.send(json);
             });
         };
@@ -97,7 +99,6 @@ function router(app){
             });
         }
     });
-
     app.post('/ajax_login', function(req, res){
         db.users.compareNameAndPass({
             "userName":req.body.username,

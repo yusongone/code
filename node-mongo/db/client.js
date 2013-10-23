@@ -157,7 +157,7 @@ var imageLibs={
                         //将图片 id 存入到 相应图片库下；
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
-                            col.update({"_id":new objectId(json.strId)},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
+                            col.update({"_id":new objectId(json.strId),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
                                 callback({"status":"ok"});
                                 database.close();
                             });

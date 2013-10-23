@@ -21,9 +21,15 @@ var imageLibs={
     }
     ,uploadImage:function(json,callback){
         json.strId=parse.base64ToStr(json.libId);
-        console.log("cc",json.strId);
-        db.ImageLibs.uploadImage(json,function(data){
-            callback(data);
+        //判断此 图片库 是否属于当前登录人
+        db.ImageLibs.getDatasByLibId(json.strId,function(item){
+            if(json.username==item.username){
+                db.ImageLibs.uploadImage(json,function(data){
+                    callback(data);
+                });
+            }else{
+                callback("您的名下不存在此图片库ID");
+            }
         });
     }
     ,getImage:function(id,callback){

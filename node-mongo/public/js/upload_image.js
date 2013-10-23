@@ -13,6 +13,7 @@ var ajax_get=function(libId){
         "datatype":"json",
         "data":{"libId":libId},
         "success":function(json){
+            if("sorry"==json.status){alert(json.message);return false;};
             var data=json.data;
             for(var i=0,l=data.length;i<l;i++){
                 var id=data[i].fileId; 
@@ -62,7 +63,7 @@ pageSpace=pageSpace||(function(){
                 var fd=new FormData();
                         fd.append("dfile",this.file,true);
                         fd.append("lib_id",$("#lib_id").attr("value"));
-                        fd.append("fileName",this.file.name;
+                        fd.append("filename",this.file.name);
                 this.xhr.open("POST","/uploadImage");
                 this.xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
                 this.xhr.send(fd);
