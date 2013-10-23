@@ -60,12 +60,32 @@ page.ajax_getImageLibs=function(json){
 page.Lib=(function(){
     function lib(json){
         this.initUI(json);
+        this.createBar(json);
     }
     lib.prototype.initUI=function(json){
         var li=$("<li/>",{"class":"lib","text":json.name}); 
         this.body=li;
     }
+    lib.prototype.createBar=function(json){
+        var bar=page.LibBar;
+            this.bar=new bar(this.body,json);
+    }
     return lib;
+})();
+page.LibBar=(function(){
+    function bar(tage,libJson){
+        this.initUI(tage,libJson);
+    }
+    bar.prototype.initUI=function(tage,libJson){
+        var div=$("<div/>",{"class":"bar"});
+        var share=$("<a/>",{"class":"btnSmall publish","text":"公开"});
+        var remove=$("<a/>",{"class":"btnSmall remove","text":"删除"});
+        var setModle=$("<a/>",{"href":"/uploadImage?id="+libJson.id,"class":"btnSmall setModle","text":"添加模板"});
+        var setImage=$("<a/>",{"class":"btnSmall upImage","text":"上传图片"});
+            tage.append(div.append(share,remove,setModle,setImage));
+            
+    }
+    return bar;
 })();
 
 

@@ -6,10 +6,10 @@ var mongodb=require("mongodb"),
     Db=mongodb.Db,
     Server=mongodb.Server,
     gridStore=mongodb.GridStore;
-var db_ip=require("../config.json").db.ip;
+var db_conf=require("../config.json").db;
 
 function insertData(){
-    var db_path=format("mongodb://%s/%s",db_ip,"test");
+    var db_path=format("mongodb://%s/%s",db_conf.ip,"test");
     mongoClient.connect(db_path,function(err,db){
         var col=db.collection("one");
         col.find().toArray(function(err,result){
@@ -17,68 +17,14 @@ function insertData(){
         });
     });
 }
-var fileId; 
-function putImage(file){
-    var db_path=format("mongodb://%s/%s",db_ip,"test");
-    mongoClient.connect(db_path,function(err,db){
-           // fileId=new objectId();
-        var gs=new gridStore(db,"fefe.aaa","w",{
-            content_type:"image/png",
-            metadata:{
-                "author":"me!"
-            }
-        });
 
-        gs.open(function(err,gs){
-            gs.writeFile(file.path,function(err,doc){
-                var fff=doc.fileId;
-                var col=db.collection("one");
-                    col.insert({"fileId":fff,"name":"cd"},function(err,result){
-                        console.log(result);
-                    });
-
-            });
-        });
-    });
-}
-
-function get(callback){
-    var fff;
-    var db_path=format("mongodb://%s/%s",db_ip,"test");
-    mongoClient.connect(db_path,function(err,db){
-        var col=db.collection("one");
-            col.findOne({"name":"cd"},function(err,result){
-                fff=result.fileId;
-                console.log(fff);
-        var gs=new gridStore(db,fff,"r");
-        gs.open(function(err,gs){
-            gs.read(function(err,doc){
-             callback(doc);
-            });
-        });
-        });
-        
-            /*
-        */
-
-    });
-}
-
-
-
-exports.putImage=putImage;
-exports.get=get;
 
 //user collection;
 var users={
     insertUserName:function(json,callback){
-        var db_path=format("mongodb://song:song@%s/%s",db_ip,"picOnline");
-        console.log(db_path);
-        var db= new Db("picOnline", new Server(db_ip, 27017, {auto_reconnect: true}, {w:1}));
-       // mongoClient.connect(db_path,function(err,db){
-                // callback
+        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
-            database.authenticate("song","song",function(err,db){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("users");
                 col.find({"name":json.userName},{"name":1}).toArray(function(err,item){
                     console.dir(err);
@@ -86,7 +32,7 @@ var users={
                     var count=item.length;
                     if(count>0){
                         callback({"status":"sorry","message":"用户名已经存在!"});
-                        db.close();
+                        database.close();
                     }else{
                         var md5=crypto.createHash("md5");
                         var md5Pass=md5.update(json.pass).digest("base64");
@@ -94,65 +40,139 @@ var users={
                             console.dir(err);
                             if(err){return callback({"status":"sorry","message":err});}
                             callback({"status":"ok"});
-                            db.close();
+                            database.close();
                         });
                     }
                 });
             });
-            //});
-            });
+        });
     },
     compareNameAndPass:function(json,callback){
-        var db_path=format("mongodb://%s/%s",db_ip,"picOnline");
-        mongoClient.connect(db_path,function(err,db){
-            var col=db.collection("users");
-            var md5=crypto.createHash("md5");
-            var md5Pass=md5.update(json.pass).digest("base64");
-            col.find({"name":json.userName,"pass":md5Pass}).toArray(function(err,item){
-                console.log(item);
-                if(item.length>0){
-                    callback({"status":"ok"});
-                    db.close();
-                }else{
-                    callback({"status":"sorry","message":"用户名或密码不正确！"});
-                    db.close();
-                }
-            })
+        var db = new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                var col=database.collection("users");
+                var md5=crypto.createHash("md5");
+                var md5Pass=md5.update(json.pass).digest("base64");
+                col.find({"name":json.userName,"pass":md5Pass}).toArray(function(err,item){
+                    if(item.length>0){
+                        callback({"status":"ok"});
+                        database.close();
+                    }else{
+                        callback({"status":"sorry","message":"用户名或密码不正确！"});
+                        database.close();
+                    }
+                })
+            });
         });
     }
 }
 
+/*
+    var z=(new objectId(item[0]._id.toString()));
+    col.find({"_id":z},{}).toArray(function(err,i){
+        console.log("ff");
+        console.log("ii",i);
+    });
+    */
 
 //images libs
 var imageLibs={
-    getImageLibs:function(json,callback){
-        var db_path=format("mongodb://%s/%s",db_ip,"picOnline");
-        mongoClient.connect(db_path,function(err,db){
-            var col=db.collection("image_libs");
-            col.find({"name":json.userName},{"_id":0}).toArray(function(err,item){
-                if(item.length>0){
-                    callback({"status":"ok","data":item});
-                    db.close();
-                }else{
-                    callback({"status":"sorry","message":"目前数据为空"});
-                    db.close();
-                }
-            })
+    //通过用户名 查找名下所有图片库
+    getImageLibs:function(username,callback){
+        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                var col=database.collection("image_libs");
+                col.find({"username":username},{}).toArray(function(err,item){
+                    if(item.length>0){
+                        callback({"status":"ok","data":item});
+                        database.close();
+                    }else{
+                        callback({"status":"sorry","message":"目前数据为空"});
+                        database.close();
+                    }
+                })
+            });
         });
-        
     },
+    //创建一个图片文件夹（库）
     createImageLibs:function(json,callback){
-        var db_path=format("mongodb://%s/%s",db_ip,"picOnline");
-        mongoClient.connect(db_path,function(err,db){
-            var col=db.collection("image_libs");
+        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                var col=database.collection("image_libs");
                 col.insert({"name":json.libname,"username":json.username},function(err,result){
                     if(err){return callback({"status":"sorry","message":"db error"});}
-                    console.log("ok");
                     callback({"status":"ok"});
-                    db.close();
+                    database.close();
                 });
+            });
         });
-        
+    },
+    //通过图片库Id查找此 库下所有信息
+    getDatasByLibId:function(id,callback){
+        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                var col=database.collection("image_libs");
+                col.findOne({"_id":new objectId(id)},{},function(err,item){
+                    callback(item);
+                });
+
+            });
+        });
+
+    },
+    //读取图片
+    getImage:function(fileId,callback){
+        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                var gs=new gridStore(database,new objectId(fileId),"r");
+                    gs.open(function(err,gs){
+                        gs.read(function(err,doc){
+                            callback(doc);
+                        });
+                    });
+            });
+        });
+    },
+    //上传图片，并且把图片ID存放到相应 图片库文件夹下
+    uploadImage:function(json,callback){
+    var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                // fileId=new objectId();
+                var gs=new gridStore(database,new objectId(),"w",{
+                    content_type:"image/png",
+                    metadata:{
+                        "author":"me!"
+                    }
+                });
+                gs.open(function(err,gs){
+                    //写入图片
+                    gs.writeFile(json.file.path,function(err,doc){
+                        var fff=doc.fileId;
+                        //将图片 id 存入到 相应图片库下；
+                        var col=database.collection("image_libs");
+                        //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
+                            col.update({"_id":new objectId(json.strId)},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
+                                callback({"status":"ok"});
+                                database.close();
+                            });
+                            /*
+                            col.findOne({"_id":new objectId(json.strId)},function(err,result){
+                                console.dir("rs",result);
+                            });
+                            col.insert({"fileId":fff,"name":"cd"},function(err,result){
+                                console.log(result);
+                            });
+                            */
+                    });
+                });
+            });
+        });
     }
 }
 exports.users=users;

@@ -4,8 +4,24 @@ $(document).ready(function(){
         pageSpace.con=$("#picList");
         pageSpace._btn_fileUp=$("#fileUp");
         pageSpace.bindEvent();
+        ajax_get($("#lib_id").attr("value"));
 });
-
+var ajax_get=function(libId){
+    $.ajax({
+        "type":"post",
+        "url":"/getImagesByLibId",
+        "datatype":"json",
+        "data":{"libId":libId},
+        "success":function(json){
+            var data=json.data;
+            for(var i=0,l=data.length;i<l;i++){
+                var id=data[i].fileId; 
+                var img=$("<img/>",{"src":"/images/"+id});
+                $("body").append(img);
+            };
+        }
+    })
+}
 pageSpace=pageSpace||(function(){
         var pageSpaceTemp={};
         /*
@@ -45,7 +61,9 @@ pageSpace=pageSpace||(function(){
         FileUpload.prototype.send=function(){
                 var fd=new FormData();
                         fd.append("dfile",this.file,true);
-                this.xhr.open("POST","/upload");
+                        fd.append("lib_id",$("#lib_id").attr("value"));
+                        fd.append("fileName",this.file.name;
+                this.xhr.open("POST","/uploadImage");
                 this.xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
                 this.xhr.send(fd);
         }

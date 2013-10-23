@@ -6,11 +6,17 @@ var js_version=config.js_version,
     var db=require("../db/client");
     var ctrl=require("../control");
 
-function checkLogind(req){
+function checkLogind(req,res,type){
     if(req.session.username){
         return true;
     }else{
-        return false;
+        if("get"==type){
+            res.send("用户登录已经超时，请重新登录！");
+            return false;
+        }else{
+            res.send({"status":"sorry","message":"用户登录已经超时，请重新登录！"});
+            return false;
+        }
     }
 }
 
@@ -19,9 +25,6 @@ function router(app){
     app.get('/', function(req, res){
           res.send('hello world');
           console.log("fddf");
-    });
-    app.get('/read', function(req, res){
-        db.getImage();
     });
     app.get('/login', function(req, res,next){
         res.render("login",{
@@ -44,55 +47,55 @@ function router(app){
             "title":"图片库",
         });
     });
-    app.get('/uploadImage', function(req, res){
-        res.render("uploadImage",{
+    app.get('/manage_image', function(req, res){
+        res.render("manage_image",{
             "js_version":js_version,
             "css_version":css_version,
-            "title":"uploadImage"
+            "title":"uploadImage",
+            "id":req.query.id
         });
     });
-    app.get('/getImage', function(req, res){
-        db.get(function(data){
-             res.writeHead(200, {'Content-Type': 'image/gif' });
+    app.get('/images/*', function(req, res){
+        ctrl.ImageLibs.getImage(req.params[0],function(data){
+            res.writeHead(200, {'Content-Type': 'image/gif' });
             res.end(data, 'binary');
-        
         });
-        /*
-        res.render("uploadImage",{
-            "js_version":js_version,
-            "css_version":css_version,
-            "title":"uploadImage"
-        });
-        */
     });
 
 
-    app.post('/upload', function(req, res){
-        var file=req.files.dfile;
-        db.putImage(file);
-        res.send("ok");
+    app.post('/uploadImage', function(req, res){
+        if(checkLogind(req,res)){
+            var file=req.files.dfile,
+                lib_id=req.body.lib_id;
+            ctrl.ImageLibs.uploadImage({file:file,libId:lib_id},function(json){
+                res.send(json);
+            });
+        };
+    });
+    app.post('/getImagesByLibId', function(req, res){
+        if(checkLogind(req,res)){
+            var id=req.body.libId;
+            ctrl.ImageLibs.getImagesByLibId(id,function(ary){
+                res.send({"status":"ok","data":ary});
+            });
+        };
     });
     app.post('/ajax_createImageLibs', function(req, res){
-        if(checkLogind(req)){
-            console.log("effe");
+        if(checkLogind(req,res)){
             ctrl.ImageLibs.createImageLibs({
                 "username":req.session.username,
                 "libname":req.body.libname
             },function(json){
                 res.send(json);
             });
-        }else{
-            res.send({"status":"sorry","message":"用户登录已经超时，请重新登录！"});
-        };
+        }
     });
     app.post('/ajax_getImageLibs', function(req, res){
-        if(checkLogind(req)){
+        if(checkLogind(req,res)){
             ctrl.ImageLibs.getImageLibs(req.session.username,function(json){
                 res.send(json);
             });
-        }else{
-            res.send({"status":"sorry","message":"用户登录已经超时，请重新登录！"});
-        };
+        }
     });
 
     app.post('/ajax_login', function(req, res){
