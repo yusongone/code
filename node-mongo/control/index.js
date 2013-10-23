@@ -24,7 +24,7 @@ var imageLibs={
         //判断此 图片库 是否属于当前登录人
         db.ImageLibs.getDatasByLibId(json.strId,function(item){
             if(json.username==item.username){
-                db.ImageLibs.uploadImage(json,function(data){
+                db.ImageLibs.uploadImageFile(json,function(data){
                     callback(data);
                 });
             }else{

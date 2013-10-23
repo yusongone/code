@@ -6,6 +6,8 @@ var js_version=config.js_version,
     var db=require("../db/client");
     var ctrl=require("../control");
 
+    var test=require("../test/canvas_test");
+
 function checkLogind(req,res,type){
     if(req.session.username){
         return true;
@@ -20,11 +22,15 @@ function checkLogind(req,res,type){
     }
 }
 
-
+var data;
 function router(app){
     app.get('/', function(req, res){
-          res.send('hello world');
-          console.log("fddf");
+        res.writeHead(200, {'Content-Type': 'image/png' });
+        console.log(data);
+        res.end(data, 'binary');
+    });
+    app.get('/test', function(req, res){
+        db.test();
     });
     app.get('/login', function(req, res,next){
         res.render("login",{
@@ -58,7 +64,7 @@ function router(app){
     app.get('/images/*', function(req, res){
         if(checkLogind(req,res,"get")){
             ctrl.ImageLibs.getImage(req.params[0],function(data){
-                res.writeHead(200, {'Content-Type': 'image/gif' });
+                res.writeHead(200, {'Content-Type': 'image/png' });
                 res.end(data, 'binary');
             });
         }

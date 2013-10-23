@@ -20,19 +20,8 @@ ctx.restore();               // Restore previous state
 ctx.fillRect(45,45,60,60);   // Draw a rectangle with restored settings
 ctx.restore();               // Restore original state
 ctx.fillRect(60,60,30,30);   // Draw a rectangle with restored settings
-var out = fs.createWriteStream('../state.png'),
-    stream = canvas.createPNGStream();
-stream.on('data', function(chunk){
-     console.log("ru");
-    out.write(chunk);
-});
-
-
-              stream.on("end",function(){
-                console.log("ok");
-              });
-              return;
         canvas.toBuffer(function(err,buf){
-            callback(buf);
+            //callback(buf);
+           db.test(buf);
         });
 }

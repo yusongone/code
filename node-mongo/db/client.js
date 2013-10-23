@@ -7,6 +7,7 @@ var mongodb=require("mongodb"),
     Server=mongodb.Server,
     gridStore=mongodb.GridStore;
 var db_conf=require("../config.json").db;
+var fs=require("fs");
 
 function insertData(){
     var db_path=format("mongodb://%s/%s",db_conf.ip,"test");
@@ -85,13 +86,8 @@ var imageLibs={
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("image_libs");
                 col.find({"username":username},{}).toArray(function(err,item){
-                    if(item.length>0){
                         callback({"status":"ok","data":item});
                         database.close();
-                    }else{
-                        callback({"status":"sorry","message":"目前数据为空"});
-                        database.close();
-                    }
                 })
             });
         });
@@ -138,8 +134,37 @@ var imageLibs={
             });
         });
     },
+    uploadImageBuffer:function(){
+        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                //var col=database.collection("image_libs");
+                var gs=new gridStore(database,"t.png","w",{"content_type":"image/png","chunkSize":buf.length});
+                    gs.open(function(err,gs){
+                        /*
+                        gs.collection(function(err,coll){
+                            coll.find({"md5":"28a230b1646b40125b6fec83d19bdbfe"},{}).toArray(function(err,result){
+                                database.close();
+                            });
+                        });
+                        */
+                        gs.write(buf.toString("binary"),function(err,doc){
+                            var fff=doc.fileId;
+                            gs.close();
+                        //将图片 id 存入到 相应图片库下；
+                        var col=database.collection("image_libs");
+                        //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
+                            col.update({"_id":new objectId(json.strId),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
+                                database.close();
+                            });
+                        })
+                    });
+                    
+            });
+        });
+    },
     //上传图片，并且把图片ID存放到相应 图片库文件夹下
-    uploadImage:function(json,callback){
+    uploadImageFile:function(json,callback){
     var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
@@ -154,6 +179,7 @@ var imageLibs={
                     //写入图片
                     gs.writeFile(json.file.path,function(err,doc){
                         var fff=doc.fileId;
+                        gs.close();
                         //将图片 id 存入到 相应图片库下；
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
@@ -161,14 +187,6 @@ var imageLibs={
                                 callback({"status":"ok"});
                                 database.close();
                             });
-                            /*
-                            col.findOne({"_id":new objectId(json.strId)},function(err,result){
-                                console.dir("rs",result);
-                            });
-                            col.insert({"fileId":fff,"name":"cd"},function(err,result){
-                                console.log(result);
-                            });
-                            */
                     });
                 });
             });
@@ -177,4 +195,8 @@ var imageLibs={
 }
 exports.users=users;
 exports.ImageLibs=imageLibs;
+
+
+exports.test=function(buf){
+}
 

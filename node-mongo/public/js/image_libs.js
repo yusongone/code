@@ -3,14 +3,16 @@ $(document).ready(function(){
     page.bindEvent();
     page.ajax_getImageLibs();
     return false;
-    page.ajax_createImageLibs({
-        "name":"tefad"
-    });
 });
 
 
 
 page.bindEvent=function(){
+    $("#create_lib").click(function(){
+        page.ajax_createImageLibs({
+            "name":"tefad"
+        });
+    });
 }
 
 page.ajax_createImageLibs=function(json){
@@ -80,8 +82,8 @@ page.LibBar=(function(){
         var div=$("<div/>",{"class":"bar"});
         var share=$("<a/>",{"class":"btnSmall publish","text":"公开"});
         var remove=$("<a/>",{"class":"btnSmall remove","text":"删除"});
-        var setModle=$("<a/>",{"href":"/uploadImage?id="+libJson.id,"class":"btnSmall setModle","text":"添加模板"});
-        var setImage=$("<a/>",{"class":"btnSmall upImage","text":"上传图片"});
+        var setModle=$("<a/>",{"class":"btnSmall setModle","text":"添加模板"});
+        var setImage=$("<a/>",{"href":"/manage_image?id="+libJson.id,"target":"_blank","class":"btnSmall upImage","text":"管理图片"});
             tage.append(div.append(share,remove,setModle,setImage));
             
     }

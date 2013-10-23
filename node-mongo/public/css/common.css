@@ -3,5 +3,5 @@ body{color:#444;font-size:14px;font-family:'Open Sans', 'lucida grande', 'Segoe 
 img{border:none;}
 .hand{cursor:pointer;}
 input{color:#444;}
-.text{height:24px;text-indent:5px;line-height:24px;}
-.btnSmall{width:70px;height:30px;line-height:30px;cursor:pointer;}
+.text{height:24px;text-indent:5px;line-height:24px;border:1px solid #ddd;}
+.btnSmall{width:70px;height:30px;line-height:30px;cursor:pointer;text-align:center;border:1px solid #ddd;}

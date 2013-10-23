@@ -71,8 +71,13 @@ pageSpace=pageSpace||(function(){
         FileUpload.prototype.bindEvent=function(fun){
                 var that=this;
                 var xhr=this.xhr;
-                xhr.addEventListener("load",fun,false);        
+                xhr.addEventListener("load",function(data){
+                    alert("dd");
+                    $("body").append(data);
+                    
+                },false);        
                 xhr.addEventListener("error",fun,false);        
+                xhr.addEventListener("cpm",fun,false);        
                 xhr.addEventListener("abort",function(){
                         alert(that.file.name);
                 },false);        
