@@ -10,7 +10,7 @@ $(document).ready(function(){
 page.bindEvent=function(){
     $("#create_lib").click(function(){
         page.ajax_createImageLibs({
-            "name":"tefad"
+            "name":$("#lib_name").val()
         });
     });
 }

@@ -6,6 +6,14 @@ var mongodb=require("mongodb"),
     gridStore=mongodb.GridStore;
 var db_conf=require("../../config.json").db;
 
+function _createObjectId(str){
+        try{
+            return  new objectId(id);
+        }catch(err){
+            return false;
+        }
+};
+
 //images libs
     //通过用户名 查找名下所有图片库
     var _getImageLibs=function(username,callback){
@@ -40,7 +48,9 @@ var db_conf=require("../../config.json").db;
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("image_libs");
-                col.findOne({"_id":new objectId(id)},{},function(err,item){
+                var id= _createObjectId(id);
+                if(!id){return callback("err")};
+                col.findOne({"_id":id},{},function(err,item){
                     callback(item);
                 });
 
@@ -53,7 +63,9 @@ var db_conf=require("../../config.json").db;
         var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
-                var gs=new gridStore(database,new objectId(fileId),"r");
+                var id= _createObjectId(fileId);
+                if(!id){return callback("err")};
+                var gs=new gridStore(database,id,"r");
                     gs.open(function(err,gs){
                         gs.read(function(err,doc){
                             callback(doc);
@@ -79,10 +91,12 @@ var db_conf=require("../../config.json").db;
                         gs.write(buf.toString("binary"),function(err,doc){
                             var fff=doc.fileId;
                             gs.close();
+                            var id= _createObjectId(json.strId);
+                            if(!id){return callback("err")};
                         //将图片 id 存入到 相应图片库下；
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
-                            col.update({"_id":new objectId(json.strId),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
+                            col.update({"_id":new objectId(id),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
                                 database.close();
                             });
                         })
@@ -106,12 +120,14 @@ var db_conf=require("../../config.json").db;
                 gs.open(function(err,gs){
                     //写入图片
                     gs.writeFile(json.file.path,function(err,doc){
-                        var fff=doc.fileId;
+                        var fileId=doc.fileId;
+                        var id= _createObjectId(json.strId);
+                        if(!id){return callback("err")};
                         gs.close();
                         //将图片 id 存入到 相应图片库下；
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
-                            col.update({"_id":new objectId(json.strId),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
+                            col.update({"_id":new objectId(id),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
                                 callback({"status":"ok"});
                                 database.close();
                             });

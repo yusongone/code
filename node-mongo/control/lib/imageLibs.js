@@ -22,12 +22,13 @@ var parse=require("./common").parse;
         json.strId=parse.base64ToStr(json.libId);
         //判断此 图片库 是否属于当前登录人
         db.ImageLibs.getDatasByLibId(json.strId,function(item){
+            console.dir(item);
             if(json.username==item.username){
                 db.ImageLibs.uploadImageFile(json,function(data){
                     callback(data);
                 });
             }else{
-                callback("您的名下不存在此图片库ID");
+                callback("sorry,您的名下不存在此图片库ID");
             }
         });
     };
@@ -40,8 +41,11 @@ var parse=require("./common").parse;
     var _getImagesByLibId=function(id,callback){
         var strId=parse.base64ToStr(id);
         db.ImageLibs.getDatasByLibId(strId,function(item){
-            console.log(item);
-            callback(item.images);
+            if(item&&item.images){
+                callback(item.images);
+            }else{
+                callback({"status":"sorry"});
+            }
         });
     };
 
