@@ -1,6 +1,6 @@
 var Canvas=require("canvas"),
     fs=require("fs"),
-    db=require("../db/client"),
+    db=require("../db"),
     Image=Canvas.Image;
 
 

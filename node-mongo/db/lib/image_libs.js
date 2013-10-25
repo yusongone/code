@@ -1,86 +1,14 @@
 var mongodb=require("mongodb"),
-    format=require("util").format,
     crypto=require("crypto");
-    mongoClient=mongodb.MongoClient,
     objectId=mongodb.ObjectID,
     Db=mongodb.Db,
     Server=mongodb.Server,
     gridStore=mongodb.GridStore;
-var db_conf=require("../config.json").db;
-var fs=require("fs");
-
-function insertData(){
-    var db_path=format("mongodb://%s/%s",db_conf.ip,"test");
-    mongoClient.connect(db_path,function(err,db){
-        var col=db.collection("one");
-        col.find().toArray(function(err,result){
-            console.log(result);
-        });
-    });
-}
-
-
-//user collection;
-var users={
-    insertUserName:function(json,callback){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
-        db.open(function(err,database){
-            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
-                var col=database.collection("users");
-                col.find({"name":json.userName},{"name":1}).toArray(function(err,item){
-                    console.dir(err);
-                    if(err){return callback({"status":"sorry","message":err})}
-                    var count=item.length;
-                    if(count>0){
-                        callback({"status":"sorry","message":"ç”¨æˆ·åå·²ç»å­˜åœ¨!"});
-                        database.close();
-                    }else{
-                        var md5=crypto.createHash("md5");
-                        var md5Pass=md5.update(json.pass).digest("base64");
-                        col.insert({"name":json.userName,"pass":md5Pass},function(err,res){
-                            console.dir(err);
-                            if(err){return callback({"status":"sorry","message":err});}
-                            callback({"status":"ok"});
-                            database.close();
-                        });
-                    }
-                });
-            });
-        });
-    },
-    compareNameAndPass:function(json,callback){
-        var db = new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
-        db.open(function(err,database){
-            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
-                var col=database.collection("users");
-                var md5=crypto.createHash("md5");
-                var md5Pass=md5.update(json.pass).digest("base64");
-                col.find({"name":json.userName,"pass":md5Pass}).toArray(function(err,item){
-                    if(item.length>0){
-                        callback({"status":"ok"});
-                        database.close();
-                    }else{
-                        callback({"status":"sorry","message":"ç”¨æˆ·åæˆ–å¯†ç ä¸æ­£ç¡®ï¼"});
-                        database.close();
-                    }
-                })
-            });
-        });
-    }
-}
-
-/*
-    var z=(new objectId(item[0]._id.toString()));
-    col.find({"_id":z},{}).toArray(function(err,i){
-        console.log("ff");
-        console.log("ii",i);
-    });
-    */
+var db_conf=require("../../config.json").db;
 
 //images libs
-var imageLibs={
-    //é€šè¿‡ç”¨æˆ·å æŸ¥æ‰¾åä¸‹æ‰€æœ‰å›¾ç‰‡åº“
-    getImageLibs:function(username,callback){
+    //Í¨¹ıÓÃ»§Ãû ²éÕÒÃûÏÂËùÓĞÍ¼Æ¬¿â
+    var _getImageLibs=function(username,callback){
         var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
@@ -91,9 +19,9 @@ var imageLibs={
                 })
             });
         });
-    },
-    //åˆ›å»ºä¸€ä¸ªå›¾ç‰‡æ–‡ä»¶å¤¹ï¼ˆåº“ï¼‰
-    createImageLibs:function(json,callback){
+    };
+    //´´½¨Ò»¸öÍ¼Æ¬ÎÄ¼ş¼Ğ£¨¿â£©
+    var _createImageLibs=function(json,callback){
         var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
@@ -105,9 +33,9 @@ var imageLibs={
                 });
             });
         });
-    },
-    //é€šè¿‡å›¾ç‰‡åº“IdæŸ¥æ‰¾æ­¤ åº“ä¸‹æ‰€æœ‰ä¿¡æ¯
-    getDatasByLibId:function(id,callback){
+    };
+    //Í¨¹ıÍ¼Æ¬¿âId²éÕÒ´Ë ¿âÏÂËùÓĞĞÅÏ¢
+    var _getDatasByLibId=function(id,callback){
         var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
@@ -119,9 +47,9 @@ var imageLibs={
             });
         });
 
-    },
-    //è¯»å–å›¾ç‰‡
-    getImage:function(fileId,callback){
+    };
+    //¶ÁÈ¡Í¼Æ¬
+    var _getImage=function(fileId,callback){
         var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
@@ -133,8 +61,8 @@ var imageLibs={
                     });
             });
         });
-    },
-    uploadImageBuffer:function(){
+    };
+    var _uploadImageBuffer=function(){
         var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
@@ -151,7 +79,7 @@ var imageLibs={
                         gs.write(buf.toString("binary"),function(err,doc){
                             var fff=doc.fileId;
                             gs.close();
-                        //å°†å›¾ç‰‡ id å­˜å…¥åˆ° ç›¸åº”å›¾ç‰‡åº“ä¸‹ï¼›
+                        //½«Í¼Æ¬ id ´æÈëµ½ ÏàÓ¦Í¼Æ¬¿âÏÂ£»
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
                             col.update({"_id":new objectId(json.strId),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
@@ -162,10 +90,10 @@ var imageLibs={
                     
             });
         });
-    },
-    //ä¸Šä¼ å›¾ç‰‡ï¼Œå¹¶ä¸”æŠŠå›¾ç‰‡IDå­˜æ”¾åˆ°ç›¸åº” å›¾ç‰‡åº“æ–‡ä»¶å¤¹ä¸‹
-    uploadImageFile:function(json,callback){
-    var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+    };
+    //ÉÏ´«Í¼Æ¬£¬²¢ÇÒ°ÑÍ¼Æ¬ID´æ·Åµ½ÏàÓ¦ Í¼Æ¬¿âÎÄ¼ş¼ĞÏÂ
+    var _uploadImageFile=function(json,callback){
+        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 // fileId=new objectId();
@@ -176,11 +104,11 @@ var imageLibs={
                     }
                 });
                 gs.open(function(err,gs){
-                    //å†™å…¥å›¾ç‰‡
+                    //Ğ´ÈëÍ¼Æ¬
                     gs.writeFile(json.file.path,function(err,doc){
                         var fff=doc.fileId;
                         gs.close();
-                        //å°†å›¾ç‰‡ id å­˜å…¥åˆ° ç›¸åº”å›¾ç‰‡åº“ä¸‹ï¼›
+                        //½«Í¼Æ¬ id ´æÈëµ½ ÏàÓ¦Í¼Æ¬¿âÏÂ£»
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
                             col.update({"_id":new objectId(json.strId),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
@@ -191,12 +119,14 @@ var imageLibs={
                 });
             });
         });
-    }
-}
-exports.users=users;
-exports.ImageLibs=imageLibs;
+    };
 
 
-exports.test=function(buf){
-}
+exports.getImageLibs=_getImageLibs;
+exports.createImageLibs=_createImageLibs;
+exports.getDatasByLibId=_getDatasByLibId;
+exports.getImage=_getImage;
+exports.uploadImageBuffer=_uploadImageBuffer;
+exports.uploadImageFile=_uploadImageFile;
+
 

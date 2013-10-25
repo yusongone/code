@@ -3,7 +3,7 @@ var ejs=require("ejs");
 var js_version=config.js_version,
     css_version=config.css_version;
     var fs=require("fs");
-    var db=require("../db/client");
+    var db=require("../db");
     var ctrl=require("../control");
 
     var test=require("../test/canvas_test");
