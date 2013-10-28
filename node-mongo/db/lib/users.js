@@ -54,6 +54,18 @@ var db_conf=require("../../config.json").db;
         });
     }
 
+function _searchUser(json,callback){
+        var db = new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                var col=database.collection("users");
+                col.find({$or:[{"name":json.keyword},{"qqId":json.keyword},{"email":json.keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
+                    callback(item);
+                })
+            });
+        });
+}
+
 exports.insertUserName=_insertUserName;
 exports.compareNameAndPass=_compareNameAndPass;
-
+exports.searchUser=_searchUser;

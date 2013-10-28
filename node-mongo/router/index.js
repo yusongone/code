@@ -64,7 +64,7 @@ function router(app){
             res.render("customer",{
                 "js_version":js_version,
                 "css_version":css_version,
-                "title":"uploadImage",
+                "title":"客户管理",
                 "id":req.query.id
             });
         }
@@ -93,6 +93,14 @@ function router(app){
         }
     });
 
+    //查找用户 user
+    app.post('/ajax_searchUser', function(req, res){
+        if(checkLogind(req,res)){
+            ctrl.Users.searchUser({keyword:req.body.keyword},function(json){
+                res.send(json);
+            });
+        };
+    });
 
     //添加客户
     app.post('/ajax_addCustomer', function(req, res){
@@ -107,8 +115,7 @@ function router(app){
         if(checkLogind(req,res)){
             var file=req.files.dfile,
                 lib_id=req.body.lib_id;
-                return ;
-            ctrl.customer.uploadImage({file:file,libId:lib_id,username:req.session.username},function(json){
+            ctrl.Customer.getCustomerList({username:req.session.username},function(json){
                 res.send(json);
             });
         };
@@ -153,7 +160,7 @@ function router(app){
     });
     //登录
     app.post('/ajax_login', function(req, res){
-        db.users.compareNameAndPass({
+        db.Users.compareNameAndPass({
             "userName":req.body.username,
             "pass":req.body.pass
         },function(json){
@@ -166,7 +173,7 @@ function router(app){
     });
     //注册
     app.post('/ajax_register', function(req, res){
-        db.users.insertUserName({
+        db.Users.insertUserName({
             userName:req.body.username,
             pass:req.body.pass
         },function(json){

@@ -6,30 +6,23 @@ function _addCustomer(json,callback){
         "username":json.username,
         "cusUsername":json.cusUsername
     };
-   db.Customer.getCustomerList(json,function(json){
-       if(0==json.length){
-           db.Customer.createCustomeRow(json,function(){
-                _add(json,callback);    
-           });
-       }else{
-            _add(json);    
-       }
-   }); 
 
-   function _add(json,callback){
-       db.Customer.addCustomer(json,function(json){
-             callback(json);
-       }); 
-   }
+    //假设customeer表中不存在登陆者的客户关系，将创建，如果存在，将插入数据；
+   db.Customer.createCustomerRow(json,function(data){
+       if(data!="err"){
+           db.Customer.addCustomer(json,function(json){
+                 callback(json);
+           }); 
+       }
+   });
 }
 
-function _getCustomer(){
-   db.Customer.getCustomerList(json,function(json){
-       if(json.length>0)
-         callback(json);
+function _getCustomer(json,callback){
+    db.Customer.getCustomerList(json,function(json){
+        callback(json);
    }); 
 
 }
 
 exports.addCustomer=_addCustomer;
-exports.getCustomer=_getCustomer;
+exports.getCustomerList=_getCustomer;

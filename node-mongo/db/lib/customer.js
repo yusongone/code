@@ -25,19 +25,42 @@ function _addCustomer(json,callback){
                 });
             });
         });
-    };
-function _getCustomeList(json,callback){
+};
+
+function _getCustomerList(json,callback){
+    var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+    db.open(function(err,database){
+        database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+            var col=database.collection("customer");
+            // maybe use findOne function; need overwrite
+            col.find({username:json.username}).toArray(function(err,item){
+                callback(item[0].customerList);
+            });
+        });
+    });
+}
+
+function _createCustomerRow(json,callback){
     var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
     db.open(function(err,database){
         database.authenticate(db_conf.user,db_conf.pass,function(err,db){
             var col=database.collection("customer");
             col.find({username:json.username}).toArray(function(err,item){
-                callback(item);
+                if(0==item.length){
+                    col.insert({username:json.username},function(err,item){
+                        if(err){return callback("err")}
+                        callback("create Ok");
+                    });
+                }else{
+                    callback("already exists");
+                };
             });
         });
     });
 }
 
 exports.addCustomer=_addCustomer;
+exports.getCustomerList=_getCustomerList;
+exports.createCustomerRow=_createCustomerRow;
 
 
