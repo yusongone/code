@@ -8,13 +8,14 @@ var js_version=config.js_version,
 
     var test=require("../test/canvas_test");
 
-function checkLogind(req,res,type){
+
+function checkLogind(req,res,type,path){
     if(req.session.username){
         return true;
     }else{
         if("get"==type){
-            res.send("用户登录已经超时，请重新登录！");
-            return false;
+            var path=path?"?path="+path:"";
+            res.redirect("/login"+path);
         }else{
             res.send({"status":"sorry","message":"用户登录已经超时，请重新登录！"});
             return false;
@@ -25,13 +26,50 @@ function checkLogind(req,res,type){
 var data;
 function router(app){
     app.get('/', function(req, res){
+        if(checkLogind(req,res,"get","")){
+            res.redirect("/image_library");
+        }
+        /*
         res.writeHead(200, {'Content-Type': 'image/png' });
         console.log(data);
         res.end(data, 'binary');
+        */
     });
     app.get('/test', function(req, res){
         db.test();
     });
+
+    //b
+    app.get('/b/image_library', function(req, res){
+        if(checkLogind(req,res,"get","/b/image_library")){
+            res.render("image_library",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "title":"图片库",
+            });
+        }
+    });
+    app.get('/b/manage_image', function(req, res){
+        if(checkLogind(req,res,"get","/b/manage_image")){
+            res.render("manage_image",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "title":"uploadImage",
+                "id":req.query.id
+            });
+        }
+    });
+    app.get('/b/customer', function(req, res){
+        if(checkLogind(req,res,"get","/b/customer")){
+            res.render("customer",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "title":"uploadImage",
+                "id":req.query.id
+            });
+        }
+    });
+
     app.get('/login', function(req, res,next){
         res.render("login",{
             "js_version":js_version,
@@ -46,21 +84,6 @@ function router(app){
             "title":"注册",
         });
     });
-    app.get('/image_library', function(req, res){
-        res.render("image_library",{
-            "js_version":js_version,
-            "css_version":css_version,
-            "title":"图片库",
-        });
-    });
-    app.get('/manage_image', function(req, res){
-        res.render("manage_image",{
-            "js_version":js_version,
-            "css_version":css_version,
-            "title":"uploadImage",
-            "id":req.query.id
-        });
-    });
     app.get('/images/*', function(req, res){
         if(checkLogind(req,res,"get")){
             ctrl.ImageLibs.getImage(req.params[0],function(data){
@@ -71,6 +94,26 @@ function router(app){
     });
 
 
+    //添加客户
+    app.post('/ajax_addCustomer', function(req, res){
+        if(checkLogind(req,res)){
+            ctrl.Customer.addCustomer({username:req.session.username,cusUsername:req.body.cusUsername},function(json){
+                res.send(json);
+            });
+        };
+    });
+    //获取客户列表
+    app.post('/ajax_getCustomer', function(req, res){
+        if(checkLogind(req,res)){
+            var file=req.files.dfile,
+                lib_id=req.body.lib_id;
+                return ;
+            ctrl.customer.uploadImage({file:file,libId:lib_id,username:req.session.username},function(json){
+                res.send(json);
+            });
+        };
+    });
+    //上传图片
     app.post('/uploadImage', function(req, res){
         if(checkLogind(req,res)){
             var file=req.files.dfile,
@@ -80,6 +123,7 @@ function router(app){
             });
         };
     });
+    //根据图片库Id获取图片列表
     app.post('/getImagesByLibId', function(req, res){
         if(checkLogind(req,res)){
             var id=req.body.libId;
@@ -88,6 +132,7 @@ function router(app){
             });
         };
     });
+    //创建图片库
     app.post('/ajax_createImageLibs', function(req, res){
         if(checkLogind(req,res)){
             ctrl.ImageLibs.createImageLibs({
@@ -98,6 +143,7 @@ function router(app){
             });
         }
     });
+    //获取图片库列表
     app.post('/ajax_getImageLibs', function(req, res){
         if(checkLogind(req,res)){
             ctrl.ImageLibs.getImageLibs(req.session.username,function(json){
@@ -105,6 +151,7 @@ function router(app){
             });
         }
     });
+    //登录
     app.post('/ajax_login', function(req, res){
         db.users.compareNameAndPass({
             "userName":req.body.username,
@@ -112,10 +159,12 @@ function router(app){
         },function(json){
             if("ok"==json.status){
                 req.session.username=req.body.username;
+                req.session.userId=json.userId;
             }
             res.send(json); 
         });
     });
+    //注册
     app.post('/ajax_register', function(req, res){
         db.users.insertUserName({
             userName:req.body.username,

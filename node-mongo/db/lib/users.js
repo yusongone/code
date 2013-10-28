@@ -43,7 +43,7 @@ var db_conf=require("../../config.json").db;
                 var md5Pass=md5.update(json.pass).digest("base64");
                 col.find({"name":json.userName,"pass":md5Pass}).toArray(function(err,item){
                     if(item.length>0){
-                        callback({"status":"ok"});
+                        callback({"status":"ok","userId":item[0]["_id"]});
                         database.close();
                     }else{
                         callback({"status":"sorry","message":"用户名或密码不正确！"});

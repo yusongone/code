@@ -1,3 +1,4 @@
 var imageLibs=require("./lib/imageLibs");
+var customer=require("./lib/customer");
 
-exports.ImageLibs=imageLibs;
+exports.Customer=customer;
