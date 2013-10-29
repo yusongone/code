@@ -60,11 +60,14 @@ function router(app){
         }
     });
     app.get('/b/customer', function(req, res){
-        if(checkLogind(req,res,"get","/b/customer")){
+        if(1||checkLogind(req,res,"get","/b/customer")){
             res.render("customer",{
                 "js_version":js_version,
                 "css_version":css_version,
+                "P_css":"customer_page",
+                "P_js":"customer_page",
                 "title":"客户管理",
+                "user":{"name":"song","qq":"20126162"},
                 "id":req.query.id
             });
         }

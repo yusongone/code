@@ -1,0 +1,7 @@
+.toolBar .search{
+    float:right;
+    margin:4px 10px 0 0;
+    width:200px;
+    height:20px;
+    line-height:20px;
+}

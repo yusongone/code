@@ -1,7 +1,7 @@
 var page={};
 $(document).ready(function(){
     page.bindEvent();
-    page.ajax_getCusList();
+   // page.ajax_getCusList();
 });
 
 page.bindEvent=function(){
