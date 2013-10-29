@@ -8,8 +8,9 @@ var db_conf=require("../../config.json").db;
 
 function _createObjectId(str){
         try{
-            return  new objectId(id);
+            return  new objectId(str);
         }catch(err){
+            console.log(err);
             return false;
         }
 };
@@ -48,9 +49,9 @@ function _createObjectId(str){
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("image_libs");
-                var id= _createObjectId(id);
-                if(!id){return callback("err")};
-                col.findOne({"_id":id},{},function(err,item){
+                var oid= _createObjectId(id);
+                if(!oid){return callback("image_libs line 52 id err")};
+                col.findOne({"_id":oid},{},function(err,item){
                     callback(item);
                 });
 
@@ -91,12 +92,12 @@ function _createObjectId(str){
                         gs.write(buf.toString("binary"),function(err,doc){
                             var fff=doc.fileId;
                             gs.close();
-                            var id= _createObjectId(json.strId);
-                            if(!id){return callback("err")};
+                            var userId= _createObjectId(json.strId);
+                            if(!UserId){return callback("err")};
                         //将图片 id 存入到 相应图片库下；
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
-                            col.update({"_id":new objectId(id),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
+                            col.update({"_id":userId,"username":json.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
                                 database.close();
                             });
                         })
@@ -121,13 +122,13 @@ function _createObjectId(str){
                     //写入图片
                     gs.writeFile(json.file.path,function(err,doc){
                         var fileId=doc.fileId;
-                        var id= _createObjectId(json.strId);
-                        if(!id){return callback("err")};
+                        var userId= _createObjectId(json.strId);
+                        if(!userId){return callback("err")};
                         gs.close();
                         //将图片 id 存入到 相应图片库下；
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
-                            col.update({"_id":new objectId(id),"username":json.username},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
+                            col.update({"_id":userId,"username":json.username},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
                                 callback({"status":"ok"});
                                 database.close();
                             });

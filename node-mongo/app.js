@@ -11,7 +11,7 @@ var store=new MongoStore({
             username:session_conf.user, // optional
             password:session_conf.pass, // optional
             collection:session_conf.collection,// optional, default: sessions
-            clear_interval:600
+//            clear_interval:600
         });
 
 var app = express();
@@ -19,14 +19,16 @@ var app = express();
 
 app.configure(function(){
     app.set("title","what");
-    app.use("/images",express.static(__dirname + '/public/images'));
-    app.use("/js",express.static(__dirname + '/public/js'));
-    app.use("/css",express.static(__dirname + '/public/css'));
+    app.use(express.static(__dirname + '/public'));
+//    app.use("/images",express.static(__dirname + '/public/images'));
+ //   app.use("/js",express.static(__dirname + '/public/js'));
+    app.use("/js/vendor",express.static(__dirname + '/public/js/vendor'));
+  //  app.use("/css",express.static(__dirname + '/public/css'));
     app.use(express.cookieParser("keyboard cat"));
     app.use(express.session({
         "secret":"secret",
         "cookie":{
-            maxAge:5*60*1000
+            maxAge:30*60*1000
         },
         "store":store
     }));

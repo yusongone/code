@@ -1,10 +1,12 @@
 var db=require("../../db");
 var parse=require("./common").parse;
 
+var d=null;
     var _getImageLibs=function(username,callback){
         db.ImageLibs.getImageLibs(username,function(json){
             var da=json.data;
             var tempAry=[];
+            d=da[0]._id.toString();
             for(var i=0,l=da.length;i<l;i++){
                 var z={
                     "name":da[i].name,
@@ -15,14 +17,30 @@ var parse=require("./common").parse;
             callback({"status":"ok","data":tempAry});
         }); 
     };
+    //创建一个图片库
     var _createImageLibs=function(json,callback){
         db.ImageLibs.createImageLibs(json,callback); 
     };
+    //判断图片库是否属于登陆用户
+    var _checkLibsBelong=function(json,callback){
+        var libId=parse.base64ToStr(json.libId);
+        var username=json.username;
+        db.ImageLibs.getDatasByLibId(libId,function(item){
+            if(username==item.username){
+                callback(true);
+            }else{
+                callback(false);
+            }
+        });
+    }
+
+
+
+//Images function
     var _uploadImage=function(json,callback){
         json.strId=parse.base64ToStr(json.libId);
         //判断此 图片库 是否属于当前登录人
         db.ImageLibs.getDatasByLibId(json.strId,function(item){
-            console.dir(item);
             if(json.username==item.username){
                 db.ImageLibs.uploadImageFile(json,function(data){
                     callback(data);
@@ -54,3 +72,4 @@ exports.createImageLibs=_createImageLibs;
 exports.uploadImage=_uploadImage;
 exports.getImage=_getImage;
 exports.getImagesByLibId=_getImagesByLibId;
+exports.checkLibsBelong=_checkLibsBelong;

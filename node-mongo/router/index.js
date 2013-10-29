@@ -36,8 +36,6 @@ function router(app){
         */
     });
     app.get('/test', function(req, res){
-        console.dir("req",req);
-        console.log("fd");
         //db.test();
     });
 
@@ -54,13 +52,25 @@ function router(app){
             });
         }
     });
-    app.get('/b/manage_image', function(req, res){
+    app.get('/b/manage_image/:id', function(req, res){
+        if(!req.params.id){ res.redirect("/404"); };
         if(checkLogind(req,res,"get","/b/manage_image")){
-            res.render("manage_image",{
-                "js_version":js_version,
-                "css_version":css_version,
-                "title":"uploadImage",
-                "id":req.query.id
+            var json={
+                "libId":req.params.id,
+                "username":req.session.username
+            };
+            //验证登陆用户是否存在此id 图片库
+            ctrl.ImageLibs.checkLibsBelong(json,function(bool){
+                if(bool){
+                    res.render("manage_image",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "title":"uploadImage",
+                        "id":req.params.id
+                    });
+                }else{
+                    res.redirect("/404"); 
+                }
             });
         }
     });
@@ -175,7 +185,6 @@ function router(app){
             if("ok"==json.status){
                 req.session.username=req.body.username;
                 req.session.userId=json.userId;
-                console.log(req.session);
             }
             res.send(json); 
         });

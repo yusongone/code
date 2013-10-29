@@ -2,13 +2,35 @@
 <html>
     <head>
         <% include lib/header %>
-        <link href="/css/upload_image.css?v=<%=css_version%>" rel="stylesheet" />
-        <script src="/js/upload_image.js?v=<%=js_version%>"></script>
-        <meta id="lib_id" value="<%=id%>">
+        <link href="/css/manage_image.css?v=<%=css_version%>" rel="stylesheet" />
+        <script src="/js/manage_image.js?v=<%=js_version%>"></script>
+        <script src="/js/vendor/jquery.ui.widget.js"></script>  
+        <script src="/js/vendor/jquery.iframe-transport.js"></script>  
+        <script src="/js/vendor/jquery.fileupload.js"></script>  
     </head>
-    <body>
-        <div>
-            <input type="file" id="fileUp" accept="image/jpeg,image/png" multiple="multiple" > 
+    <body class="page manage_image">
+        <input type="hidden" id="lib_id" value="<%=id%>">
+        <% include lib/toplink%>
+        <% include lib/nav %>
+        <div class="right_area">
+            <div class="topBox">
+                <div class="logoBox">LOGO</div>
+                <div class="buttonBox">
+                    <input class="text search" placeholder="搜索客户">
+                    <div class="btnBlue">添加客户</div>
+                </div>
+            </div>
+            <div class="toolBar">
+            </div>
+            <div class="bottom_line"></div>
+            <div class="content">
+                <div>
+                    <input type="file" id="fileUp" accept="image/jpeg,image/png" multiple="multiple" > 
+                </div>
+                <ul class="list imageList">
+                     
+                </ul>
+            </div>
         </div>
         <% include lib/footer %>
     </body>

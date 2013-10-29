@@ -18,7 +18,8 @@ var ajax_get=function(libId){
             for(var i=0,l=data.length;i<l;i++){
                 var id=data[i].fileId; 
                 var img=$("<img/>",{"src":"/images/"+id});
-                $("body").append(img);
+                var thu=$("<li/>",{"class":"thu"});
+                $(".imageList").append(thu.append(img));
             };
         }
     })

@@ -65,12 +65,18 @@ page.Lib=(function(){
         this.createBar(json);
     }
     lib.prototype.initUI=function(json){
-        var li=$("<li/>",{"class":"lib","text":json.name}); 
+        var li=$("<li/>",{}); 
+            var name=$("<div/>",{"class":"td name","text":json.name});
+            var cus=$("<div/>",{"class":"td cus","text":"--"});
+            var date=$("<div/>",{"class":"td date","text":"--"});
+            var play=$("<div/>",{"class":"td play"});
+            li.append(name,cus,date,play);
         this.body=li;
+        this.playBox=play;
     }
     lib.prototype.createBar=function(json){
         var bar=page.LibBar;
-            this.bar=new bar(this.body,json);
+            this.bar=new bar(this.playBox,json);
     }
     return lib;
 })();
@@ -79,12 +85,11 @@ page.LibBar=(function(){
         this.initUI(tage,libJson);
     }
     bar.prototype.initUI=function(tage,libJson){
-        var div=$("<div/>",{"class":"bar"});
-        var share=$("<a/>",{"class":"btnSmall publish","text":"公开"});
-        var remove=$("<a/>",{"class":"btnSmall remove","text":"删除"});
-        var setModle=$("<a/>",{"class":"btnSmall setModle","text":"添加模板"});
-        var setImage=$("<a/>",{"href":"/manage_image?id="+libJson.id,"target":"_blank","class":"btnSmall upImage","text":"管理图片"});
-            tage.append(div.append(share,remove,setModle,setImage));
+        var share=$("<a/>",{"text":"公开"});
+        var remove=$("<a/>",{"text":"删除"});
+        var setModle=$("<a/>",{"text":"添加模板"});
+        var setImage=$("<a/>",{"href":"/b/manage_image/"+libJson.id,"target":"_blank","text":"管理图片"});
+            tage.append(share,remove,setModle,setImage);
             
     }
     return bar;
