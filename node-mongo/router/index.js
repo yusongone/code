@@ -36,7 +36,9 @@ function router(app){
         */
     });
     app.get('/test', function(req, res){
-        db.test();
+        console.dir("req",req);
+        console.log("fd");
+        //db.test();
     });
 
     //b
@@ -45,7 +47,10 @@ function router(app){
             res.render("image_library",{
                 "js_version":js_version,
                 "css_version":css_version,
-                "title":"图片库",
+                "P_css":"image_libs",
+                "P_js":"image_libs",
+                "user":{"name":"song","qq":"20126162"},
+                "title":"图片库"
             });
         }
     });
@@ -60,7 +65,7 @@ function router(app){
         }
     });
     app.get('/b/customer', function(req, res){
-        if(1||checkLogind(req,res,"get","/b/customer")){
+        if(checkLogind(req,res,"get","/b/customer")){
             res.render("customer",{
                 "js_version":js_version,
                 "css_version":css_version,
@@ -170,6 +175,7 @@ function router(app){
             if("ok"==json.status){
                 req.session.username=req.body.username;
                 req.session.userId=json.userId;
+                console.log(req.session);
             }
             res.send(json); 
         });

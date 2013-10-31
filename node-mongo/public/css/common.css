@@ -1,6 +1,6 @@
 *{padding:0;margin:0;list-style:none;}
 body{color:#666;font-size:14px;font-family:'Open Sans', 'lucida grande', 'Segoe UI', arial, verdana, 'lucida sans unicode', tahoma, sans-serif;}
-.page{width:980px;margin:0 auto;}
+.page{width:980px;margin:0 auto;padding:0 10px;}
 img{border:none;}
 .hand{cursor:pointer;}
 input{color:#444;}
@@ -39,21 +39,25 @@ a{cursor:pointer;}
 }
 
 .nav{
-    width:180px;
+    width:150px;
     height:100%;
     float:left;
     -webkit-box-shadow: 7px -7px 7px -8px;
     box-shadow: 7px -7px 7px -8px;
     min-height:800px;
 }
+.nav .on{
+    display:none;
+}
 .nav .page_title{
-    margin-top:80px;
+    margin-top:75px;
     height: 30px;
     line-height:32px;
     padding-right:10px;
     text-align:right;
     font-size:18px;
     border-right:15px solid #fc0;
+    font-weight:bold;
 }
 .nav .nav_list{
     float:left;
@@ -76,15 +80,17 @@ a{cursor:pointer;}
     height:18px;
     display:block;
     padding-right:5px;
+    color:#666;
+    text-decoration:none;
 }
 .bottom_line{
     width: 100%;
     height:1px;
     background: #DDD;
-    margin-top: 2px;
+    margin-top: 1px;
     float:left;
 }
-.right_area{float:right;width:800px;}
+.right_area{float:right;width:830px;}
 
 .right_area .toolBar{
     float:left;
@@ -99,7 +105,7 @@ a{cursor:pointer;}
     margin-top:30px;
 }
 .right_area .buttonBox{
-    float:left;
+    float:right;
     width:690px;
     height:30px;
     margin-top:20px;

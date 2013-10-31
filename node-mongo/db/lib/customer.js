@@ -34,7 +34,11 @@ function _getCustomerList(json,callback){
             var col=database.collection("customer");
             // maybe use findOne function; need overwrite
             col.find({username:json.username}).toArray(function(err,item){
-                callback(item[0].customerList);
+                if(0<item.length){
+                    callback(item[0].customerList);
+                }else{
+                    callback(null);
+                }
             });
         });
     });
