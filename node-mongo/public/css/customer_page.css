@@ -34,6 +34,7 @@
     margin-top:5px;
 }
 .toolBar .td{
+    width:20%;
     color:#fff;
     cursor:default;
 }
@@ -44,6 +45,7 @@
     line-height:30px;
 }
 .content .td{
+    width:120px;
     height:35px;
     line-height:35px;
 }
@@ -52,20 +54,24 @@
 }
 .toolBar .name,
 .content .name{
-    width:150px;
+    width:100px;
     padding-left:20px;
+}
+.toolBar .qq,
+.content .qq{
+    width:120px;
 }
 .toolBar .tel,
 .content .tel{
-    width:200px;
+    width:150px;
 }
-.toolBar .other,
-.content .other{
-    width:200px;
+.toolBar .email,
+.content .email{
+    width:150px;
 }
 .toolBar .play,
 .content .play{
-    width:200px;
+    width:180px;
 }
 .content .play a{
     font-size:12px;
@@ -76,10 +82,11 @@
 }
 .content .list{
     float:left;
-    width:780px;
+    width:800px;
     min-height:300px;
 }
 .list li{
+    width:100%;
     float:left;
     line-height:35px;
     border-bottom:1px solid #ddd;
@@ -87,3 +94,6 @@
 .list li:hover{
     background:#f5f5f5;
 }
+
+.inputBox{position:relative;}
+.typeTab{position:absolute;right:3px;height:24px;line-height:24px;font-size:14px;color:#888;}

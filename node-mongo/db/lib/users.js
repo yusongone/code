@@ -16,7 +16,7 @@ var createDb=require("./common").createDb;
                 var col=database.collection("users");
                 col.find({"name":json.userName},{"name":1}).toArray(function(err,item){
                     console.dir(err);
-                    if(err){return callback({"status":"sorry","message":err})}
+                    if(err){database.close();return callback({"status":"sorry","message":err})}
                     var count=item.length;
                     if(count>0){
                         callback({"status":"sorry","message":"用户名已经存在!"});
@@ -63,6 +63,7 @@ function _searchUser(json,callback){
                 var col=database.collection("users");
                 col.find({$or:[{"name":json.keyword},{"qqId":json.keyword},{"email":json.keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
                     callback(item);
+                    database.close();
                 })
             });
         });

@@ -52,7 +52,7 @@ page.ajax_getCusList=function(){
         "url":"/ajax_getCustomer",
         "dataType":"json",
         "success":function(data){
-            if(data.length>0){
+            if(data&&data.length>0){
                 var Lib=page.Lib
                 for(var i=0;i<data.length;i++){
                     var lib=new Lib(data[i]);
@@ -74,10 +74,11 @@ page.Lib=(function(){
     lib.prototype.initUI=function(json){
         var li=$("<li/>",{}); 
             var name=$("<div/>",{"class":"td name","text":json.username});
-            var cus=$("<div/>",{"class":"td tel","text":"--"});
-            var date=$("<div/>",{"class":"td other","text":"--"});
+            var cus=$("<div/>",{"class":"td qq","text":json.qq||"--"});
+            var date=$("<div/>",{"class":"td email","text":json.email||"--"});
+            var tel=$("<div/>",{"class":"td tel","text":json.mobile||"--"});
             var play=$("<div/>",{"class":"td play"});
-            li.append(name,cus,date,play);
+            li.append(name,cus,date,tel,play);
         this.body=li;
         this.playBox=play;
     }
@@ -121,18 +122,20 @@ page.customer=(function(){
 
     var _initCustomerAddDialog=function(){
         var box=$("<div/>",{"class":"addCustomerBox"});
-        var inputBox=$("<div/>");
+        var inputBox=$("<div/>",{"class":"inputBox"});
         var select=$("<select/>",{ "class":"select"});
             var Ousername=$("<option/>",{value:"用户名","text":"用户名"});
             var Oemail=$("<option/>",{value:"Email","text":"Email"});
             var Oqq=$("<option/>",{value:"QQ账号","text":"QQ账号"});
             select.append(Ousername,Oemail,Oqq);
         var input=$("<input/>",{"class":"text searchCusInput","placeholder":"用户名/邮箱/第三方账号"});
+        var typeTab=$("<div/>",{"class":"typeTab"}); 
         var add=$("<div/>",{"class":"btnBlue add","text":"添加"});
-            inputBox.append(input,add);
+            inputBox.append(input,typeTab);
+        var barBox=$("<div/>",{});
         var progressBar=$("<div/>",{class:"progress"});
         var ul=$("<div/>",{class:"searchList"});
-        box.append(inputBox,progressBar,ul);
+        box.append(barBox.append(inputBox,add),progressBar,ul);
         box.dialog({
              autoOpen:false,
              resizable:false,
@@ -142,17 +145,20 @@ page.customer=(function(){
         var interval=null;
         
         //input bind event
+        var json={"email":"邮件","qq":"QQ帐号","mobile":"手机","err":"用户名"};
         input.bind("keyup",function(){
+            var val=input.val();
             interval?clearTimeout(interval):"";
             interval=setTimeout(function(){
-                page.ajax_searchUser(input.val(),function(data){
+                clearTimeout(interval);
+                typeTab.html(json[Common.Type.getType(val)]);
+                page.ajax_searchUser(val,function(data){
                     var l=data.length; 
                     ul.html("");
                     if(l>0){
                         _createSearchList(data,ul);
                     }
                 });
-                clearTimeout(interval);
             },500);
         });
 

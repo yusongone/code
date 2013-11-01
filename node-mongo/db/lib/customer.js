@@ -7,6 +7,7 @@ var mongodb=require("mongodb"),
 var db_conf=require("../../config.json").db;
 var createDb=require("./common").createDb;
 
+
 function _createObjectId(str){
         try{
             return  new objectId(id);
@@ -16,14 +17,19 @@ function _createObjectId(str){
 };
 
 function _addCustomer(json,callback){
+        var hash={"qq":"qq","email":"email","mobile":"mobile"};
+        var type=json.type;
+        if(!hash[type]){return callback("type error")};
         var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("customer");
-                col.update({"username":json.username},{$addToSet:{customerList:{$each:[{"username":json.cusUsername}]}}},{w:1},function(err){
-                    callback({"status":"ok"});
-                    database.close();
-                });
+                var dd={};
+                dd[hash[type]]=json.cusUsername;
+                    col.update({"username":json.username},{$addToSet:{customerList:{$each:[dd]}}},{w:1},function(err){
+                        callback({"status":"ok"});
+                        database.close();
+                    });
             });
         });
 };
@@ -40,6 +46,7 @@ function _getCustomerList(json,callback){
                 }else{
                     callback(null);
                 }
+                database.close();
             });
         });
     });
@@ -59,6 +66,7 @@ function _createCustomerRow(json,callback){
                 }else{
                     callback("already exists");
                 };
+                database.close();
             });
         });
     });
@@ -70,6 +78,7 @@ function _searchCustomer(json,callback){
                 var col=database.collection("customer");
                 col.find({$or:[{"name":json.keyword},{"qqId":json.keyword},{"email":json.keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
                     callback(item);
+                    database.close();
                 })
             });
         });
