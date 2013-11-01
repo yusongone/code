@@ -141,9 +141,11 @@ function router(app){
     //上传图片
     app.post('/uploadImage', function(req, res){
         if(checkLogind(req,res)){
-            var file=req.files.dfile,
+            var files=req.files,
                 lib_id=req.body.lib_id;
-            ctrl.ImageLibs.uploadImage({file:file,libId:lib_id,username:req.session.username},function(json){
+                res.send({"status":"tt"});
+                return false;
+            ctrl.ImageLibs.uploadImage({files:files.files,libId:lib_id,username:req.session.username},function(json){
                 res.send(json);
             });
         };

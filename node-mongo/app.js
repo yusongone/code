@@ -11,6 +11,7 @@ var store=new MongoStore({
             username:session_conf.user, // optional
             password:session_conf.pass, // optional
             collection:session_conf.collection,// optional, default: sessions
+            safe:true
 //            clear_interval:600
         });
 
@@ -28,7 +29,7 @@ app.configure(function(){
     app.use(express.session({
         "secret":"secret",
         "cookie":{
-            maxAge:30*60*1000
+            maxAge:60*60*1000
         },
         "store":store
     }));

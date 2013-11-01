@@ -5,6 +5,7 @@ var mongodb=require("mongodb"),
     Server=mongodb.Server,
     gridStore=mongodb.GridStore;
 var db_conf=require("../../config.json").db;
+var createDb=require("./common").createDb;
 
 function _createObjectId(str){
         try{
@@ -18,7 +19,7 @@ function _createObjectId(str){
 //images libs
     //通过用户名 查找名下所有图片库
     var _getImageLibs=function(username,callback){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("image_libs");
@@ -31,7 +32,7 @@ function _createObjectId(str){
     };
     //创建一个图片文件夹（库）
     var _createImageLibs=function(json,callback){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("image_libs");
@@ -45,7 +46,7 @@ function _createObjectId(str){
     };
     //通过图片库Id查找此 库下所有信息
     var _getDatasByLibId=function(id,callback){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("image_libs");
@@ -53,6 +54,7 @@ function _createObjectId(str){
                 if(!oid){return callback("image_libs line 52 id err")};
                 col.findOne({"_id":oid},{},function(err,item){
                     callback(item);
+                    database.close();
                 });
 
             });
@@ -61,7 +63,7 @@ function _createObjectId(str){
     };
     //读取图片
     var _getImage=function(fileId,callback){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var id= _createObjectId(fileId);
@@ -70,13 +72,14 @@ function _createObjectId(str){
                     gs.open(function(err,gs){
                         gs.read(function(err,doc){
                             callback(doc);
+                            database.close();
                         });
                     });
             });
         });
     };
     var _uploadImageBuffer=function(){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 //var col=database.collection("image_libs");
@@ -108,35 +111,50 @@ function _createObjectId(str){
     };
     //上传图片，并且把图片ID存放到相应 图片库文件夹下
     var _uploadImageFile=function(json,callback){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
-                // fileId=new objectId();
-                var gs=new gridStore(database,new objectId(),"w",{
-                    content_type:"image/png",
-                    metadata:{
-                        "author":"me!"
+            var files=json.files;
+            var length=files.length;
+            var count=0;
+            for(var i=0;i<length;i++){
+                var file=files[i];
+                var strId=json.strId;
+                console.log(file.name);
+                wf(file,strId,function(){
+                    count++;
+                    if(count==length){
+                        callback({"status":"ok"});
+                        database.close();
                     }
+                });
+            }
+            function wf(file,strId,fun){
+                var gs=new gridStore(database,new objectId(),"w",{
+                    content_type:"image/png"
                 });
                 gs.open(function(err,gs){
                     //写入图片
-                    gs.writeFile(json.file.path,function(err,doc){
+                    gs.writeFile(file.path,function(err,doc){
                         var fileId=doc.fileId;
-                        var userId= _createObjectId(json.strId);
+                        var userId= _createObjectId(strId);
                         if(!userId){return callback("err")};
                         gs.close();
                         //将图片 id 存入到 相应图片库下；
                         var col=database.collection("image_libs");
                         //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
                             col.update({"_id":userId,"username":json.username},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
-                                callback({"status":"ok"});
-                                database.close();
+                                fun()
+                                //database.close();
                             });
                     });
                 });
+            };
             });
         });
     };
+
+
 
 
 exports.getImageLibs=_getImageLibs;

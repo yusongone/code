@@ -5,11 +5,12 @@ var mongodb=require("mongodb"),
     Db=mongodb.Db,
     Server=mongodb.Server;
 var db_conf=require("../../config.json").db;
+var createDb=require("./common").createDb;
 
 
 //user collection;
     var _insertUserName=function(json,callback){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("users");
@@ -35,7 +36,7 @@ var db_conf=require("../../config.json").db;
         });
     };
     var _compareNameAndPass=function(json,callback){
-        var db = new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("users");
@@ -55,7 +56,7 @@ var db_conf=require("../../config.json").db;
     }
 
 function _searchUser(json,callback){
-        var db = new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("users");

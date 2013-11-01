@@ -46,7 +46,7 @@ var d=null;
                     callback(data);
                 });
             }else{
-                callback("sorry,您的名下不存在此图片库ID");
+                callback("sorry,您的名下不存在此图片库IDff");
             }
         });
     };

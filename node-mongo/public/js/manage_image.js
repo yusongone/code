@@ -1,11 +1,117 @@
 
 var pageSpace;
 $(document).ready(function(){
-        pageSpace.con=$("#picList");
-        pageSpace._btn_fileUp=$("#fileUp");
-        pageSpace.bindEvent();
+        //pageSpace._btn_fileUp=$("#fileUp");
+       // pageSpace.bindEvent();
         ajax_get($("#lib_id").attr("value"));
+        UP.init();
+
+
+//测试
+    $('#addCustomer').fileupload({
+        autoUpload: true,//是否自动上传
+        url:"/uploadImage",//上传地址
+        acceptFileTypes: /(\.|\/)(gif|jpeg|png)$/i,
+        dataType: 'json',
+        formData:{"lib_id":$("#lib_id").attr("value"),"filename":"na"},
+        done: function (e, data) {//设置文件上传完毕事件的回调函数
+            var upl=data.context.data("object");
+                upl.done();
+        },
+        fail:function(e,data){
+            var upl=data.context.data("object");
+                console.log("fail");
+                upl.fail();
+        },
+        add:function(e,data){
+            data.context=UP.createAupload({name:data.files[0].name,"data":data});
+            UP.open();
+            data.submit();
+        },
+        progress: function (e, data) {//设置上传进度事件的回调函数
+            var upl=data.context.data("object");
+            var val=parseInt(data.loaded/data.total*100,10);
+            upl.setValue(val);
+        },
+        progressall: function (e, data) {//设置上传进度事件的回调函数
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+        }
+    });
 });
+
+
+var UP=(function(){
+        var div;
+    function _init(){
+        div=$("<div/>",{"class":"uploadList"});
+        div.dialog({
+            autoOpen:false,
+            resizable: true,
+            modal: true,
+            buttons: {
+                "Delete all items": function() {
+                    $('#addCustomer').fileupload('clear');
+                },
+                Cancel: function() {
+                $( this ).dialog( "close" );
+                }
+            },
+            "close":function(){
+                div.html("");
+            },
+            "beforeclose":function(){
+                
+            }
+        });
+    }
+
+    var uploadLi=function(){
+        this.body=$("<p/>");
+        this.body.data("object",this);
+    }
+    uploadLi.prototype.createUI=function(json){
+        var p=this.body;
+        var that=this;
+        var name=$("<div/>",{"class":"proName","text":json.name});
+        this.progress=$("<div/>",{});
+        var submit=$("<div/>",{"text":"取消","class":"cancel"});
+        p.append(this.progress.append(name,submit));
+        this.progress.progressbar({value:0});
+        this.progress.addClass("progress");
+        div.append(p);
+        submit.click(function(){
+            json.data.abort();
+            that.cancel();
+        });
+    }
+    uploadLi.prototype.fail=function(val){
+        this.progress.find("div").eq(-1).css("background","red");
+    }
+    uploadLi.prototype.cancel=function(val){
+        this.progress.find("div").eq(-1).css("background","yellow");
+    }
+    uploadLi.prototype.done=function(val){
+        this.progress.find("div").eq(-1).css("background","green");
+    }
+    uploadLi.prototype.setValue=function(val){
+        this.progress.progressbar({value:val});
+    }
+
+   return {
+        init:_init,
+        open:function(){
+            div.dialog("open");
+        },
+        createAupload:function(json){
+            var ul=new uploadLi();
+                ul.createUI(json);
+                return ul.body;
+        }
+    } 
+})();
+
+
+
 var ajax_get=function(libId){
     $.ajax({
         "type":"post",
@@ -22,119 +128,5 @@ var ajax_get=function(libId){
                 $(".imageList").append(thu.append(img));
             };
         }
-    })
-}
-pageSpace=pageSpace||(function(){
-        var pageSpaceTemp={};
-        /*
-         * bind �¼�;
-         * */
-        pageSpaceTemp.bindEvent=function(){
-                pageSpace._btn_fileUp.change(function(evt){
-                        var files=$(this)[0].files;
-                        var fileupload=pageSpaceTemp.FileUpload;
-                        for(var i=0,l=files.length;i<l;i++){
-                                var img="image/jpeg image/png";
-                                if(img.indexOf(files[i].type)!=-1){
-                                        var fu=new fileupload(files[i]);
-                                };
-                        }
-                });
-                document.addEventListener("drop",function(e){
-                        var files=e.dataTransfer.files;
-                        var fileupload=pageSpaceTemp.FileUpload;
-                        for(var i=0,l=files.length;i<l;i++){
-                                var fu=new fileupload(files[i]);
-                        }
-                        e.preventDefault();
-                },false);
-        };
-        /*
-         *
-         * */
-        function FileUpload(file){
-                this.file=file;
-                var ul=pageSpaceTemp.Uploader;
-                this.xhr=new XMLHttpRequest();
-               // this.UI=new ul(file,this.xhr);
-                this.bindEvent();
-                this.send();
-        };
-        FileUpload.prototype.send=function(){
-                var fd=new FormData();
-                        fd.append("dfile",this.file,true);
-                        fd.append("lib_id",$("#lib_id").attr("value"));
-                        fd.append("filename",this.file.name);
-                this.xhr.open("POST","/uploadImage");
-                this.xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
-                this.xhr.send(fd);
-        }
-        FileUpload.prototype.bindEvent=function(fun){
-                var that=this;
-                var xhr=this.xhr;
-                xhr.addEventListener("load",function(data){
-                    alert("dd");
-                    $("body").append(data);
-                    
-                },false);        
-                xhr.addEventListener("error",fun,false);        
-                xhr.addEventListener("cpm",fun,false);        
-                xhr.addEventListener("abort",function(){
-                        alert(that.file.name);
-                },false);        
-                xhr.upload.addEventListener("progress",function(e){
-                        if(e.lengthComputable){
-                                var loaded=Math.ceil((e.loaded/e.total)*100);
-                        }
-                        //that.UI.bar.css({"width":loaded+"%"});
-                        //that.UI.text.text(loaded+"%");
-                        
-                },false);
-        };
-
-        pageSpaceTemp.FileUpload=FileUpload;
-
-
-        /*
-         *uploader
-         * */
-        function Uploader(file,xhr){
-                var that=this;
-                        this.xhr=xhr;
-                var imgRead=new FileReader();
-                        imgRead.readAsDataURL(file);
-                        that.initUI({"name":file.name});
-                        imgRead.onload=function(f){
-                                        var img="image/jpeg image/png";
-                                        if(img.indexOf(file.type)!=-1){
-                                                that.UIimg.attr("src",f.srcElement.result);
-                                        };
-                        }
-        }
-        Uploader.prototype.initUI=function(json){
-                var that=this;
-                var p=$("<div/>",{"class":"img-polaroid pic"});        
-                var imgBox=$("<div/>",{"class":"imgBox"})
-                        this.UIimg=$("<img/>",{"class":"image","src":json.src})
-                        var alphaDiv=$("<div/>",{"class":"alphaDiv"});
-                        var infoDiv=$("<div/>",{"class":"infoDiv"});
-                                this.text=$("<div/>",{"class":"progressText","text":"0%"});
-                                this.bar=$("<div/>",{"class":"progressBar"});
-                                infoDiv.append(this.text,this.bar);
-                        imgBox.append(this.UIimg,alphaDiv,infoDiv);
-                var closeDiv=$("<div/>",{"class":"closeDiv"});
-                        var ii=$("<i/>",{"class":"icon-remove"});
-                this.UIname=$("<div/>",{"class":"name","text":json.name});
-                        p.append(imgBox,closeDiv.append(ii),this.UIname)
-                        pageSpace.con.append(p);
-                        console.dir(that.xhr);
-                        closeDiv.click(function(){
-                                if(confirm("��ȷ��Ҫȡ����ͼƬ��")){
-                                        that.xhr.abort();
-                                }
-                        });
-        }
-        pageSpaceTemp.Uploader=Uploader;
-
-        return pageSpaceTemp;
-})();
+    });
+};

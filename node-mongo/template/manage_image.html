@@ -3,8 +3,10 @@
     <head>
         <% include lib/header %>
         <link href="/css/manage_image.css?v=<%=css_version%>" rel="stylesheet" />
+        <link href="/css/custom-theme/jquery-ui-1.10.3.custom.min.css?v=<%=css_version%>" rel="stylesheet" />
         <script src="/js/manage_image.js?v=<%=js_version%>"></script>
         <script src="/js/vendor/jquery.ui.widget.js"></script>  
+        <script src="/js/vendor/jquery-ui.js"></script>  
         <script src="/js/vendor/jquery.iframe-transport.js"></script>  
         <script src="/js/vendor/jquery.fileupload.js"></script>  
     </head>
@@ -17,16 +19,17 @@
                 <div class="logoBox">LOGO</div>
                 <div class="buttonBox">
                     <input class="text search" placeholder="搜索客户">
-                    <div class="btnBlue">添加客户</div>
+                    <input class="btnBlue" type="file" accept="image/jpeg,image/png" id="addCustomer" multiple />
                 </div>
             </div>
             <div class="toolBar">
             </div>
             <div class="bottom_line"></div>
             <div class="content">
-                <div>
+                <div style="display:none;">
                     <input type="file" id="fileUp" accept="image/jpeg,image/png" multiple="multiple" > 
                 </div>
+                <div id="uploadList"></div>
                 <ul class="list imageList">
                      
                 </ul>
