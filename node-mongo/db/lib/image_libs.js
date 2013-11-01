@@ -56,7 +56,6 @@ function _createObjectId(str){
                     callback(item);
                     database.close();
                 });
-
             });
         });
 
@@ -120,12 +119,11 @@ function _createObjectId(str){
             for(var i=0;i<length;i++){
                 var file=files[i];
                 var strId=json.strId;
-                console.log(file.name);
                 wf(file,strId,function(){
                     count++;
                     if(count==length){
                         callback({"status":"ok"});
-                        database.close();
+                      //  database.close();
                     }
                 });
             }
@@ -142,10 +140,10 @@ function _createObjectId(str){
                         gs.close();
                         //将图片 id 存入到 相应图片库下；
                         var col=database.collection("image_libs");
-                        //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
                             col.update({"_id":userId,"username":json.username},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
-                                fun()
                                 //database.close();
+                                fun();
+                                _addBelong(fileId,userId,json.username);
                             });
                     });
                 });
@@ -153,6 +151,39 @@ function _createObjectId(str){
             });
         });
     };
+//也许可以优化
+function _addBelong(fileId,userId,username){
+    var db=createDb();
+    db.open(function(err,database){
+        database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+            var col=database.collection("image_libs");
+                col.update({"_id":userId,"username":username},{$addToSet:{belong:{$each:[{"username":"tt"}]}}},{w:1},function(){
+                    database.close();
+                });
+        });
+    });
+
+}
+
+function _checkBelong(json,callback){
+    var libId=json.libId,
+        imageId=json.imageId,
+        username=json.username;
+    var db=createDb();
+    db.open(function(err,database){
+        database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                var col=database.collection("image_libs");
+                var oid= _createObjectId(libId);
+                if(!oid){return callback("image_libs line 164 id err")};
+                var iid= _createObjectId(imageId);
+                if(!oid){return callback("image_libs line 167 id err")};
+                col.find({"_id":oid,$or:[{"username":username},{"belong":{$elemMatch:{"username":username}}}],"images":{$elemMatch:{"fileId":iid}}},{}).toArray(function(err,item){
+                    callback(err,item);
+                    database.close();
+                });
+        });
+    });
+};
 
 
 
@@ -163,5 +194,5 @@ exports.getDatasByLibId=_getDatasByLibId;
 exports.getImage=_getImage;
 exports.uploadImageBuffer=_uploadImageBuffer;
 exports.uploadImageFile=_uploadImageFile;
-
+exports.checkBelong=_checkBelong;
 

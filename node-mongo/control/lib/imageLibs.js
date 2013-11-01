@@ -50,10 +50,19 @@ var d=null;
             }
         });
     };
-    var _getImage=function(id,callback){
+    var _getImage=function(json,callback){
        // var strId=parse.base64ToStr(json.fileId);
-        db.ImageLibs.getImage(id,function(data){
-            callback(data);
+        db.ImageLibs.checkBelong({
+            "libId":parse.base64ToStr(json.libId),
+            "imageId":json.imageId,
+            "username":json.username
+        },function(err,data){
+            if(!(data.length>0)){
+                return callback("no image");
+            }
+            db.ImageLibs.getImage(json.imageId,function(data){
+                callback(data);
+            });
         });
     };
     var _getImagesByLibId=function(id,callback){

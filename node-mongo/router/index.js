@@ -102,12 +102,16 @@ function router(app){
             "title":"注册",
         });
     });
-    app.get('/images/*', function(req, res){
-        if(checkLogind(req,res,"get")){
-            ctrl.ImageLibs.getImage(req.params[0],function(data){
-                res.writeHead(200, {'Content-Type': 'image/png' });
-                res.end(data, 'binary');
-            });
+    app.get('/images/:libId/:imageId', function(req, res){
+        var libId=req.params.libId;
+        var imageId=req.params.imageId;
+        if(libId.toString()&&imageId.toString()){
+            if(checkLogind(req,res,"get")){
+                ctrl.ImageLibs.getImage({"libId":libId,"imageId":imageId,"username":req.session.username},function(data){
+                    res.writeHead(200, {'Content-Type': 'image/png' });
+                    res.end(data, 'binary');
+                });
+            }
         }
     });
 
@@ -143,8 +147,6 @@ function router(app){
         if(checkLogind(req,res)){
             var files=req.files,
                 lib_id=req.body.lib_id;
-                res.send({"status":"tt"});
-                return false;
             ctrl.ImageLibs.uploadImage({files:files.files,libId:lib_id,username:req.session.username},function(json){
                 res.send(json);
             });

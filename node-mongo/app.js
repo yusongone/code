@@ -28,10 +28,13 @@ app.configure(function(){
     app.use(express.cookieParser("keyboard cat"));
     app.use(express.session({
         "secret":"secret",
+        "key":"song",
         "cookie":{
-            maxAge:60*60*1000
+//            expires: new Date(Date.now() + 60 * 10000), 
+//               maxAge:300000
         },
         "store":store
+//        "store":MemoryStore
     }));
     app.use(express.bodyParser());
 
