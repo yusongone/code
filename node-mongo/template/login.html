@@ -4,6 +4,8 @@
         <% include lib/header %>
         <link rel="stylesheet" href="/css/login_register.css" />
         <script src="/js/login_register.js"></script>
+        <script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="100550929" data-redirecturi="http://makejs.com/login" charset="utf-8"></script>
+
     </head>
     <body class="login">
         <form class="infoBox" >
@@ -14,6 +16,14 @@
             <p class="btnBox">
                 <input class="btnSmall" type="button" id="login" value="登 录" />
                 <input class="btnSmall" type="button" id="cancel" value="取 消" />
+            </p>
+            <p>
+                <span id="qqLoginBtn"></span>
+                <script type="text/javascript">
+                    QC.Login({
+                       btnId:"qqLoginBtn"   //插入按钮的节点id
+                    });
+                </script>
             </p>
         </form>
         <% include lib/footer %>
