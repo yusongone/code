@@ -55,6 +55,7 @@ var createDb=require("./common").createDb;
         });
     }
 
+
 function _searchUser(json,callback){
         var db=createDb();
         db.open(function(err,database){
@@ -67,6 +68,7 @@ function _searchUser(json,callback){
         });
 }
 
+
+exports.searchUser=_searchUser;
 exports.insertUserName=_insertUserName;
 exports.compareNameAndPass=_compareNameAndPass;
-exports.searchUser=_searchUser;

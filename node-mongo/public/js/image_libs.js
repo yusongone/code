@@ -51,7 +51,6 @@ page.ajax_getImageLibs=function(json){
     });
     function createList(data){
         var Lib=page.Lib
-            console.log(data.length);
         for(var i=0;i<data.length;i++){
             var lib=new Lib(data[i]);
             $(".libsBox").append(lib.body);
@@ -83,16 +82,30 @@ page.Lib=(function(){
 page.LibBar=(function(){
     function bar(tage,libJson){
         this.initUI(tage,libJson);
-    }
+        this.id=libJson.id;
+    };
     bar.prototype.initUI=function(tage,libJson){
         var share=$("<a/>",{"text":"公开"});
         var remove=$("<a/>",{"text":"删除"});
         var setModle=$("<a/>",{"text":"添加模板"});
         var setImage=$("<a/>",{"href":"/b/manage_image/"+libJson.id,"target":"_blank","text":"管理图片"});
             tage.append(share,remove,setModle,setImage);
+            this.bindEvent(share);
+    };
+    bar.prototype.bindEvent=function(share){
+        var that=this;
+            share.click(function(){
+                alert(that.id);
             
-    }
+            });
+    };
     return bar;
+})();
+
+
+page.publisBox=(function(){
+    var box=$("<div/>",{});
+        box
 })();
 
 

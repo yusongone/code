@@ -5,6 +5,7 @@ var mongodb=require("mongodb"),
     Server=mongodb.Server,
     gridStore=mongodb.GridStore;
 var db_conf=require("../../config.json").db;
+var createDb=require("./common").createDb;
 
 function _createObjectId(str){
         try{
@@ -15,7 +16,7 @@ function _createObjectId(str){
 };
 
 function _addCustomer(json,callback){
-        var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+        var db=createDb();
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("customer");
@@ -28,7 +29,7 @@ function _addCustomer(json,callback){
 };
 
 function _getCustomerList(json,callback){
-    var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+    var db=createDb();
     db.open(function(err,database){
         database.authenticate(db_conf.user,db_conf.pass,function(err,db){
             var col=database.collection("customer");
@@ -45,7 +46,7 @@ function _getCustomerList(json,callback){
 }
 
 function _createCustomerRow(json,callback){
-    var db= new Db("picOnline", new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}));
+    var db=createDb();
     db.open(function(err,database){
         database.authenticate(db_conf.user,db_conf.pass,function(err,db){
             var col=database.collection("customer");
@@ -62,7 +63,19 @@ function _createCustomerRow(json,callback){
         });
     });
 }
+function _searchCustomer(json,callback){
+        var db=createDb();
+        db.open(function(err,database){
+            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
+                var col=database.collection("customer");
+                col.find({$or:[{"name":json.keyword},{"qqId":json.keyword},{"email":json.keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
+                    callback(item);
+                })
+            });
+        });
+}
 
+exports.searchCustomer=_searchCustomer;
 exports.addCustomer=_addCustomer;
 exports.getCustomerList=_getCustomerList;
 exports.createCustomerRow=_createCustomerRow;

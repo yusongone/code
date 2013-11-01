@@ -1,0 +1,17 @@
+//users
+[
+{ "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5" }
+{ "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5" }
+]
+
+//image_libs
+[
+{ "_id":"Object(123123)", "name":"图片库名称", "username":"创建者名称 aa", "belong":[{"username":"分享给username"}], "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
+{ "_id":"Object(123123)", "name":"图片库名称", "username":"创建者名称 aa", "belong":[{"username":"分享给username"}], "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
+]
+
+//customer
+[
+{ "_id":"object(543342311234986)", "username":"创建者名称", "customerList":[{"username":"客户名称"},{"username":"客户名称"}] }
+{ "_id":"object(543342311234986)", "username":"创建者名称", "customerList":[{"username":"客户名称"},{"username":"客户名称"}] }
+]

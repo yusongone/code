@@ -124,6 +124,15 @@ function router(app){
         };
     });
 
+    //查找客户 
+    app.post('/ajax_searchCustomer', function(req, res){
+        if(checkLogind(req,res)){
+            ctrl.Customer.searchCustomer({keyword:req.body.keyword},function(json){
+                res.send(json);
+            });
+        };
+    });
+
     //添加客户
     app.post('/ajax_addCustomer', function(req, res){
         if(checkLogind(req,res)){

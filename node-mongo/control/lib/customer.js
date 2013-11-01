@@ -24,5 +24,14 @@ function _getCustomer(json,callback){
 
 }
 
+function _searchCustomer(json,callback){
+    db.Customer.searchCustomer({
+        "keyword":json.keyword
+    },function(json){
+        callback(json);
+    });
+}
+
 exports.addCustomer=_addCustomer;
 exports.getCustomerList=_getCustomer;
+exports.searchCustomer=_searchCustomer;
