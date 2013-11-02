@@ -2,6 +2,8 @@
 <html>
     <head>
         <% include lib/header %>
+        <link href="/css/custom-theme/jquery-ui-1.10.3.custom.min.css?v=001" rel="stylesheet">
+        <script src="/js/vendor/jquery-ui.js"></script>
     </head>
     <body class="page customer">
         <% include lib/toplink%>
@@ -11,7 +13,7 @@
                 <div class="logoBox">LOGO</div>
                 <div class="buttonBox">
                     <input class="text search" placeholder="搜索客户">
-                    <div class="btnBlue">添加客户</div>
+                    <div class="btnBlue" id="addCustomer">添加客户</div>
                 </div>
             </div>
             <div class="toolBar">
@@ -30,8 +32,6 @@
                         <div class="td play"><a>删除</a> <a>详情</a></div>
                     </li>
                 </ul>
-                <input id="customer_name">
-                <div id="add" class="btnSmall">添加</div>
             </div>
         </div>
         <% include lib/footer %>

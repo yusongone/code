@@ -1,7 +1,7 @@
 //users
 [
-{ "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5" }
-{ "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5" }
+{ "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5","qq":"20126161","email":"yusongone@gmail.com"}
+{ "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5","qq":"", }
 ]
 
 //image_libs
@@ -12,6 +12,8 @@
 
 //customer
 [
-{ "_id":"object(543342311234986)", "username":"创建者名称", "customerList":[{"username":"客户名称"},{"username":"客户名称"}] }
+{ "_id":"object(543342311234986)", "username":"创建者名称", "customerList":[{"username":"客户名称"},{"username":"客户名称"},{"email":"yusongone@gmail.com"},{"qq":"20126162"}] }
 { "_id":"object(543342311234986)", "username":"创建者名称", "customerList":[{"username":"客户名称"},{"username":"客户名称"}] }
 ]
+
+//用户添加“未注册”用户到customer，储存email，先去users表中查找，如果没有，为没有绑定或注册的邮件。如果有，在users查找相应详细信息，返回username；给customerList；

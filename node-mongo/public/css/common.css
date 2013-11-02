@@ -5,7 +5,7 @@ img{border:none;}
 .hand{cursor:pointer;}
 input{color:#444;}
 a{cursor:pointer;}
-.text{height:24px;border-radius:3px;text-indent:5px;line-height:24px;border:1px solid #ddd;}
+.text{float:left;height:24px;border-radius:3px;text-indent:5px;line-height:24px;border:1px solid #ddd;}
 .toplink{position:absolute;top:0px;left:0px;width:100%;color:#999;}
 .links{margin:5px auto 0;font-size:12px;width:980px;text-align:right;}
 .links li{display:inline;margin-left:10px;}
