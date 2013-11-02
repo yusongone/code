@@ -61,7 +61,7 @@ function _searchUser(json,callback){
         db.open(function(err,database){
             database.authenticate(db_conf.user,db_conf.pass,function(err,db){
                 var col=database.collection("users");
-                col.find({$or:[{"name":json.keyword},{"qqId":json.keyword},{"email":json.keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
+                col.find({$or:[{"name":json.keyword},{"qq":json.keyword},{"email":json.keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
                     callback(item);
                     database.close();
                 })

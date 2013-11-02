@@ -105,9 +105,24 @@ var Common=(function(){
         }
 
         })();
+        
+    var btn=(function(){
+        var _buttonOpreta=function(btn,type){
+            if(type){
+                btn.removeClass("disable").data("status",1);
+            }else{
+                btn.addClass("disable").data("status",0);
+            }
+        }
+
+        return {
+            buttonOpreta:_buttonOpreta
+        }
+    })();
 
     return {
        Type:checkType,
+        Btn:btn
     }
 })();
 

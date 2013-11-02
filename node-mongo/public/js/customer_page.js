@@ -120,6 +120,7 @@ page.customer=(function(){
         }
     }
 
+
     var _initCustomerAddDialog=function(){
         var box=$("<div/>",{"class":"addCustomerBox"});
         var inputBox=$("<div/>",{"class":"inputBox"});
@@ -143,20 +144,31 @@ page.customer=(function(){
              modal: true
         });
         var interval=null;
+        var username;
         
         //input bind event
         var json={"email":"邮件","qq":"QQ帐号","mobile":"手机","err":"用户名"};
         input.bind("keyup",function(){
             var val=input.val();
+            var type=Common.Type.getType(val);
+            typeTab.html(json[type]);
             interval?clearTimeout(interval):"";
             interval=setTimeout(function(){
                 clearTimeout(interval);
-                typeTab.html(json[Common.Type.getType(val)]);
                 page.ajax_searchUser(val,function(data){
                     var l=data.length; 
                     ul.html("");
                     if(l>0){
+                        username=data[0].name;
                         _createSearchList(data,ul);
+                        Common.Btn.buttonOpreta(add,1);
+                    }else{
+                        username=null;
+                        if("err"==type){
+                            Common.Btn.buttonOpreta(add,0);
+                        }else{
+                            Common.Btn.buttonOpreta(add,1);
+                        }
                     }
                 });
             },500);
@@ -164,11 +176,12 @@ page.customer=(function(){
 
         //add bind event
         add.click(function(){
-            var value=input.val();
-            page.ajax_addCustomer(input.val());
+            if(!$(this).data("status")){return;}
+            var value=username||input.val();
+            page.ajax_addCustomer(value);
+            username=null;
         });
         addCustomerBox=box;
-
     }
     
     return {

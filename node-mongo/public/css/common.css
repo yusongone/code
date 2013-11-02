@@ -20,6 +20,10 @@ a{cursor:pointer;}
     border-radius: 5px;
     float:left;
 }
+.btnSmall.disable,.btnBlue.disable{
+    background:#ddd;
+    color:#eee;
+}
 .btnSmall{
     text-align:center;
     background:#ddd;

@@ -26,9 +26,11 @@ function checkLogind(req,res,type,path){
 var data;
 function router(app){
     app.get('/', function(req, res){
-        if(checkLogind(req,res,"get","")){
-            res.redirect("/image_library");
-        }
+            res.render("index",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "title":"首页"
+            });
         /*
         res.writeHead(200, {'Content-Type': 'image/png' });
         console.log(data);
@@ -37,6 +39,8 @@ function router(app){
     });
     app.get('/test', function(req, res){
         //db.test();
+        console.dir(req);
+        res.send("ok");
     });
 
     //b
