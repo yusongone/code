@@ -25,6 +25,7 @@ function checkLogind(req,res,type,path){
 
 var data;
 function router(app){
+
     app.get('/', function(req, res){
             res.render("index",{
                 "js_version":js_version,
@@ -37,10 +38,64 @@ function router(app){
         res.end(data, 'binary');
         */
     });
+
+    app.get("/callback",function(req,res){
+        var Acode=req.query.code;
+        var url=getToken(Acode,req,res);
+        ctrl.HttpGet.sendRequest(url,function(data){
+            try{
+            var json=parseToken(data.toString());
+            ctrl.HttpGet.sendRequest("https://graph.qq.com/oauth2.0/me?access_token="+json.access_token,function(data){
+                var json=parseOpenId(data);
+                    res.redirect("/");
+            });
+            }catch(e){
+                res.send(e);
+            }
+        });
+    });
+    function parseOpenId(str){
+        var start=str.indexOf("{");
+        var end=str.indexOf("}");
+        var jsonStr=str.substring(start,end+1);
+        var json= JSON.parse(jsonStr);
+        return json;
+    }
+    function parseToken(str){
+        var tempA=str.split("&");
+        var AtokenAry=tempA[0].split("=");
+        var BtokenAry=tempA[1].split("=");
+        var json={};
+            json[AtokenAry[0]]=AtokenAry[1];
+            json[BtokenAry[0]]=BtokenAry[1];
+        return json;
+    }
+    function getToken(Acode,req,res){
+        var path="https://graph.qq.com/oauth2.0/token";
+        var grant_type="authorization_code";
+        var client_id="100550929";
+        var client_secret="88641a170b4d51d2b47bc33ddaf0dcdd";
+        var code=Acode;
+        var redirect_uri="http://makejs.com/callback";
+        var url=path+"?grant_type="+grant_type+"&client_id="+client_id+"&client_secret="+client_secret+"&code="+code+"&redirect_uri="+redirect_uri;
+        //res.redirect(url);
+        return url;
+    }
+
     app.get('/test', function(req, res){
         //db.test();
         console.dir(req);
         res.send("ok");
+    });
+    app.get("/qqlogin",function(req,res){
+        var path="https://graph.qq.com/oauth2.0/authorize";
+        var response_type="code";
+        var client_id="100550929";
+        var redirect_uri="http://makejs.com/callback";
+        redirect_uri=encodeURIComponent(redirect_uri);
+        var state="1";
+        var url=path+"?response_type="+response_type+"&client_id="+client_id+"&redirect_uri="+redirect_uri+"&state="+state;
+        res.redirect(url);
     });
 
     //b
