@@ -9,63 +9,52 @@ var createDb=require("./common").createDb;
 
 
 //user collection;
-    var _insertUserName=function(json,callback){
-        var db=createDb();
-        db.open(function(err,database){
-            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
-                var col=database.collection("users");
-                col.find({"name":json.userName},{"name":1}).toArray(function(err,item){
-                    console.dir(err);
-                    if(err){database.close();return callback({"status":"sorry","message":err})}
-                    var count=item.length;
-                    if(count>0){
-                        callback({"status":"sorry","message":"用户名已经存在!"});
-                        database.close();
-                    }else{
-                        var md5=crypto.createHash("md5");
-                        var md5Pass=md5.update(json.pass).digest("base64");
-                        col.insert({"name":json.userName,"pass":md5Pass},function(err,res){
-                            console.dir(err);
-                            if(err){return callback({"status":"sorry","message":err});}
-                            callback({"status":"ok"});
-                            database.close();
-                        });
-                    }
-                });
+    var _insertUserName=function(jsonReq,callback){
+            var database=jsonReq.database;
+            var col=database.collection("users");
+            var username=jsonReq.username;
+            var pass=jsonReq.pass;
+            col.find({"name":username},{"name":1}).toArray(function(err,item){
+                if(err){return callback(err)};
+                var count=item.length;
+                if(count>0){
+                    callback(err,{"status":"sorry","message":"name ware exist!"});
+                }else{
+                    var md5=crypto.createHash("md5");
+                    var md5Pass=md5.update(pass).digest("base64");
+                    col.insert({"name":username,"pass":md5Pass},function(err,res){
+                        if(err){return callback(err)};
+                        callback(err,{"status":"ok"});
+                    });
+                }
             });
-        });
     };
-    var _compareNameAndPass=function(json,callback){
-        var db=createDb();
-        db.open(function(err,database){
-            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
-                var col=database.collection("users");
-                var md5=crypto.createHash("md5");
-                var md5Pass=md5.update(json.pass).digest("base64");
-                col.find({"name":json.userName,"pass":md5Pass}).toArray(function(err,item){
-                    if(item.length>0){
-                        callback({"status":"ok","userId":item[0]["_id"]});
-                        database.close();
-                    }else{
-                        callback({"status":"sorry","message":"用户名或密码不正确！"});
-                        database.close();
-                    }
-                })
-            });
-        });
+
+    var _compareNameAndPass=function(jsonReq,callback){
+        var database=jsonReq.database;
+        var username=jsonReq.username;
+        var pass=jsonReq.pass;
+
+        var col=database.collection("users");
+        var md5=crypto.createHash("md5");
+        var md5Pass=md5.update(pass).digest("base64");
+
+        col.find({"name":username,"pass":md5Pass}).toArray(function(err,item){
+            if(item.length>0){
+                callback(err,{"status":"ok","userId":item[0]["_id"]});
+            }else{
+                callback(err,{"status":"sorry","message":"用户名或密码不正确！"});
+            }
+        })
     }
 
 
-function _searchUser(json,callback){
-        var db=createDb();
-        db.open(function(err,database){
-            database.authenticate(db_conf.user,db_conf.pass,function(err,db){
-                var col=database.collection("users");
-                col.find({$or:[{"name":json.keyword},{"qq":json.keyword},{"email":json.keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
-                    callback(item);
-                    database.close();
-                })
-            });
+function _searchUser(jsonReq,callback){
+        var database=jsonReq.database;
+        var keyword=jsonReq.keyword;
+        var col=database.collection("users");
+        col.find({$or:[{"name":keyword},{"qq":keyword},{"email":keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
+            callback(err,item);
         });
 }
 

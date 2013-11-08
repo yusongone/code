@@ -237,10 +237,10 @@ function router(app){
     });
     //注册
     app.post('/ajax_register', function(req, res){
-        db.Users.insertUserName({
-            userName:req.body.username,
+        ctrl.Users.insertUserName({
+            username:req.body.username,
             pass:req.body.pass
-        },function(json){
+        },function(err,json){
             res.send(json); 
         });
     });
