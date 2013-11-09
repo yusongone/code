@@ -1,78 +1,73 @@
+/*
+ *control lib customer.js
+ * */
+
 var db=require("../../db");
 var parse=require("./common").parse;
 var Type=require("./common").Type;
-/*
-function _addCustomer(json,callback){
-    var json={
-        "username":json.username,
-        "cusUsername":json.cusUsername,
-        "type":Type.getType(json.cusUsername)
-    };
 
-
-    //假设customeer表中不存在登陆者的客户关系，将创建，如果存在，将插入数据；
-   db.Customer.createCustomerRow(json,function(data){
-       if(data!="err"){
-           var type=Type.getType(json.cusUsername);
-           if(type=="err"){
-               //添加用户只能添加已经注册过的用户，在现有数据库中查找验证。
-               db.Users.searchUser({"keyword":json.cusUsername},function(result){
-                   if(result.length>0){
-                       json.type="username";
-                       db.Customer.addCustomer(json,function(result){
-                             callback(result);
-                       }); 
-                   }else{
-                        callback("只能添加注册用户");
-                   }
-               });
-           }else{
-                var hash={"qq":"qq","email":"email","mobile":"mobile"};
-                if(!hash[type]){return callback("type error")};
-               //在现有用户中查找对应的user，如果存在，则存储username，不存在，储存此属性
-               db.Customer.addCustomer(json,function(result){
-                     callback(result);
-               }); 
-           }
-       }
-   });
-}
-*/
-
-function _addCustomer(json,callback){
-    var json={
-        "username":json.username,
-        "cusUsername":json.cusUsername,
-        "type":Type.getType(json.cusUsername)
-    };
-
-
-    //假设customeer表中不存在登陆者的客户关系，将创建，如果存在，将插入数据；
-   db.Customer.createCustomerRow(json,function(data){
-       if(data!="err"){
-           db.Customer.createCustomer({
-               
-           },function(){
-           });
-       }
-   });
-}
-
-function _getCustomer(json,callback){
-    db.Customer.getCustomerList(json,function(json){
-        callback(json);
+function _bindUser(jsonReq,callback){
+   db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
+        db.Customer.bindUser(jsonReq,function(err,item){
+            database.close();
+            callback(err,item);
+        }); 
    }); 
+};
+function _checkBind(jsonReq,callback){
+   db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
+        db.Customer.checkBind(jsonReq,function(err,item){
+            database.close();
+            callback(err,item);
+        }); 
+   }); 
+};
 
+function _addCustomer(jsonReq,callback){
+    db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
+        //假设customer表中不存在登陆者的客户关系，将创建，如果存在，将插入数据；
+        db.Customer.createCustomerListForUser(jsonReq,function(err,data){
+           if(data!="err"){
+               db.Customer.addCustomerInfo(jsonReq,function(err,cusInfoId){
+                   jsonReq.cusInfoId=cusInfoId;
+                db.Customer.addCustomerToList(jsonReq,function(err,result){
+                   database.close();
+                    callback(err,result);
+                });
+               });
+           }
+        });
+    });
+}
+//
+function _getCustomerList(jsonReq,callback){
+    var userId=jsonReq.userId;
+    db.Common.getAuthenticationDatabase(function(err,database){
+        db.Customer.getCustomerList({
+            database:database,
+            userId:userId
+        },function(err,json){
+            database.close();
+            callback(err,json);
+       }); 
+    });
 }
 
 function _searchCustomer(json,callback){
     db.Customer.searchCustomer({
         "keyword":json.keyword
     },function(json){
+        database.close();
         callback(json);
     });
 }
 
+
 exports.addCustomer=_addCustomer;
-exports.getCustomerList=_getCustomer;
+exports.getCustomerList=_getCustomerList;
 exports.searchCustomer=_searchCustomer;
+exports.bindUser=_bindUser;
+exports.checkBind=_checkBind;

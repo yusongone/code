@@ -2,30 +2,30 @@
 [
 { "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5","qq":"20126161","email":"yusongone@gmail.com"}
 { "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5","qq":"", }
+{ "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5","qq":"","customerListId":"Object(123456789123)"}
 ]
 
 //image_libs
 [
-{ "_id":"Object(123123)", "name":"图片库名称", "username":"创建者名称 aa", "belong":[{"username":"分享给username"}], "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
-{ "_id":"Object(123123)", "name":"图片库名称", "username":"创建者名称 aa", "belong":[{"username":"分享给username"}], "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
+{ "_id":"Object(123123)", "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
+{ "_id":"Object(123123)", "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
 ]
 
-//customerList
+//userCustomer
 [
-{ "_id":"object(543342311234986)", "username":"创建者名称", "customerList":[{"username":"客户名称"},{"username":"客户名称"},{"email":"yusongone@gmail.com"},{"qq":"20126162"}] },
-{ "_id":"object(543342311234986)", "username":"创建者名称", "customerList":[{"username":"客户名称"},{"username":"客户名称"}] },
 {
     "_id":"object(543342311234986)",
-    "username":"创建者名称", 
     "customerList":[{"cusId":"Object(123453123)"},{"cusId":"Object(123456789)"}]
     }
 ]
 
-//customer
+//customerInfo
 {
     "_id":"object(234235235234234)",
     imagesLibs:"Object(134922349595239)",
-    reserverMessage:"abc"
+    reserverMessage:"abc",
+    address:"",
+    bindUser:userId,
     menber:{
         boy:{
             name:"abc",

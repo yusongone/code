@@ -132,7 +132,7 @@ function router(app){
         res.render("register",{
             "js_version":js_version,
             "css_version":css_version,
-            "title":"注册",
+            "title":"注册"
         });
     });
     app.get('/images/:libId/:imageId', function(req, res){
@@ -147,6 +147,64 @@ function router(app){
             }
         }
     });
+    app.get("/verifyCode",function(req,res){
+        ctrl.VerifyCode.getVcode(function(jsonRes){
+            var buf=jsonRes.buf;
+            var vcode=jsonRes.vcode;
+                req.session.vcode=vcode;
+                res.writeHead(200, {'Content-Type': 'image/png' });
+                res.end(buf, 'binary');
+        });
+    });
+
+
+    app.get('/bindLink/:cusId', function(req, res){
+        var jsonReq={};
+        if(checkLogind(req,res)){
+            jsonReq.userId=req.session.userId;
+            jsonReq.cusId=req.params.cusId;
+            ctrl.Customer.checkBind(jsonReq,function(err,result){
+                if(!result){
+                    res.render("bindlink",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "cusId":jsonReq.cusId,
+                        "title":"绑定用户"
+                    });
+                }else{
+                    res.render("error",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "title":"Error",
+                        "message":"此对象已经进行过绑定，请不要重复绑定；"
+                    });    
+                }
+            });
+        };
+    });
+    app.post('/bindLink', function(req, res){
+        console.log(req.session.vcode);
+        var jsonReq={};
+        var cusId=req.body.cusId;
+        var reserverMessage=req.body.reserverMessage;
+        if(!(reserverMessage&&cusId)){
+            res.send({"status":"error","message":"params error"});
+            return ;
+        }
+        if(checkLogind(req,res)){
+            jsonReq.cusId=cusId;
+            jsonReq.userId=req.session.userId;
+            jsonReq.reserverMessage=reserverMessage;
+            ctrl.Customer.bindUser(jsonReq,function(err,json){
+                if(err){return res.send({"status":"sorry","message":err})}
+                if(json>0){
+                    res.send({"status":"bind ok"});
+                }
+            });
+        };
+    });
+
+
 
     //查找用户 user
     app.post('/ajax_searchUser', function(req, res){
@@ -168,18 +226,32 @@ function router(app){
 
     //添加客户
     app.post('/ajax_addCustomer', function(req, res){
+        var reqBody=req.body;
+        var jsonReq={};
+            jsonReq.username=req.session.username;
+            jsonReq.userId=req.session.userId;
+
+            jsonReq.boyName=reqBody.boyName;
+            jsonReq.boyPhone=reqBody.boyPhone;
+            jsonReq.boyOther=reqBody.boyOther;
+            jsonReq.girlName=reqBody.girlName;
+            jsonReq.girlPhone=reqBody.girlPhone;
+            jsonReq.girlOther=reqBody.girlOther;
+            jsonReq.message=reqBody.message;
+            jsonReq.address=reqBody.address;
+
         if(checkLogind(req,res)){
-            ctrl.Customer.addCustomer({username:req.session.username,cusUsername:req.body.cusUsername},function(json){
+            ctrl.Customer.addCustomer(jsonReq,function(err,json){
                 res.send(json);
             });
         };
     });
     //获取客户列表
     app.post('/ajax_getCustomer', function(req, res){
+        var username=req.session.username;
+        var userId=req.session.userId;
         if(checkLogind(req,res)){
-            var file=req.files.dfile,
-                lib_id=req.body.lib_id;
-            ctrl.Customer.getCustomerList({username:req.session.username},function(json){
+            ctrl.Customer.getCustomerList({userId:userId},function(err,json){
                 res.send(json);
             });
         };
@@ -224,10 +296,10 @@ function router(app){
     });
     //登录
     app.post('/ajax_login', function(req, res){
-        db.Users.compareNameAndPass({
-            "userName":req.body.username,
+        ctrl.Users.login({
+            "username":req.body.username,
             "pass":req.body.pass
-        },function(json){
+        },function(err,json){
             if("ok"==json.status){
                 req.session.username=req.body.username;
                 req.session.userId=json.userId;

@@ -3,12 +3,26 @@ var mongodb=require("mongodb"),
     objectId=mongodb.ObjectID;
 var Common=db.Common;
 
+var testUserId=new objectId("527ce977e920d9af09000001");
+var testCusId=new objectId("527cea824ae799ba0a000001");
 
-function _test_addCustomer(){
+function _test_createCustomerListForUser(){
     Common.getAuthenticationDatabase(function(err,database){
-        db.Customer.addCustomer({
+        db.Customer.createCustomerListForUser({
             "database":database,
-            "username":"test1",
+            "userId":testUserId
+        },function(err,result){
+            if(err){return console.log("******db_customer>>>>>>>>>>>>>>>>>>> getCustomerById Error")};
+            console.log("db_customer",result);
+        });
+    });
+}
+
+function _test_addCustomerToList(){
+    Common.getAuthenticationDatabase(function(err,database){
+        db.Customer.addCustomerToList({
+            "database":database,
+            "userId":testUserId,
             "cusId":new objectId()
         },function(err,result){
             database.close();
@@ -21,13 +35,13 @@ function _test_addCustomer(){
 }
 
 
-function _test_createCustomer(){
+function _test_addCustomerInfo(){
     Common.getAuthenticationDatabase(function(err,database){
-        db.Customer.createCustomer({
+        db.Customer.addCustomerInfo({
             "database":database,
             "imageId":new objectId(),
-            "userId":new objectId(),
-            "reserverMessage":"abc",
+            "userId":testUserId,
+            "message":"abc",
             "boyInfo":{
                     "name":"刘德华",
                     "phone":"13000000000"
@@ -39,31 +53,56 @@ function _test_createCustomer(){
             "address":"北京"
         },function(err,result){
             database.close();
-            if(err){return console.log("******db_users>>>>>>>>>>>>>>>>>>> createCustomer Error")};
+            if(err){return console.log("******db_users>>>>>>>>>>>>>>>>>>> addCustomerInfo Error")};
+            console.log("db_customer",result);
             if(result.length>0){
-                console.log("db_customer-------->create Customer insert ok");
+                console.log("db_customer-------->addCustomerInfo insert ok");
             }else{
-                console.log("db_customer========>create Customer insert faile ok");
+                console.log("db_customer========>addCustomerInfo insert faile ok");
             }
         });
     });
 }
 
+function _test_getCustomerList(){
+    Common.getAuthenticationDatabase(function(err,database){
+        db.Customer.getCustomerList({
+            "database":database,
+            "userId":testUserId
+        },function(err,result){
+            if(err){return console.log("******db_users>>>>>>>>>>>>>>>>>>> getCustomerById Error")};
+            console.log(result);
+        });
+    });
+
+};
+
 function _test_getCustomerById(){
     Common.getAuthenticationDatabase(function(err,database){
         db.Customer.getCustomerInfoById({
             "database":database,
-            "cusId":new objectId("527ba64b31c714db78000003") 
+            "cusId":new objectId("527cec280f75e7ce0a000002") 
         },function(err,result){
-            if(err){return console.log("******db_users>>>>>>>>>>>>>>>>>>> createCustomer Error")};
+            if(err){return console.log("******db_users>>>>>>>>>>>>>>>>>>> getCustomerById Error")};
             console.log(result);
         });
     });
 }
 
 
+
 exports.test=function(){
-    _test_createCustomer();
-    _test_addCustomer();
+    _test_createCustomerListForUser();
+    _test_addCustomerToList();
+    _test_addCustomerInfo();
+    _test_getCustomerList();
     _test_getCustomerById();
 }
+/*
+exports.createCustomerListForUser=_createCustomerListForUser;
+exports.addCustomerToList=_addCustomerToList;
+exports.addCustomerInfo=_addCustomerInfo;
+exports.getCustomerList=_getCustomerList;
+
+exports.getCustomerInfoById=_getCustomerInfoById;
+*/

@@ -120,8 +120,20 @@ var Common=(function(){
         }
     })();
 
+    var verifyCode=(function(){
+        var getVerifyCode=function(){
+            var date=(new Date()).valueOf();
+            var image="/verifycode?"+date;
+            return image;
+        }
+        return {
+            getVC:getVerifyCode
+        }
+    })();
+
     return {
        Type:checkType,
+        VC:verifyCode,
         Btn:btn
     }
 })();

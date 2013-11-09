@@ -14,12 +14,12 @@ page.bindEvent=function(){
     });
 };
 
-page.ajax_addCustomer=function(username){
+page.ajax_addCustomer=function(data){
     $.ajax({
         "type":"post",
         "url":"/ajax_addCustomer",
         "dataType":"json",
-        "data":{"cusUsername":username},
+        "data":data,
         "success":function(result){
             if("ok"==result.status){
                 alert("create ok");
@@ -46,11 +46,31 @@ page.ajax_searchUser=function(username,callback){
         }
     });
 }
-page.ajax_getCusList=function(){
+page.ajax_getBindLink=function(){
+    $.ajax({
+        "type":"post",
+        "url":"/ajax_getBindLink",
+        "dataType":"json",
+        "success":function(data){
+            if(data&&data.length>0){
+                var Lib=page.Lib
+                for(var i=0;i<data.length;i++){
+                    var lib=new Lib(data[i]);
+                    $(".list").append(lib.body);
+                } 
+            }
+        },
+        "error":function(){
+        
+        }
+    });
+};
+page.ajax_getCusList=function(cusId){
     $.ajax({
         "type":"post",
         "url":"/ajax_getCustomer",
         "dataType":"json",
+        "data":{"cusId":cusId},
         "success":function(data){
             if(data&&data.length>0){
                 var Lib=page.Lib
@@ -90,11 +110,12 @@ page.Lib=(function(){
 })();
 page.LibBar=(function(){
     function bar(tage,libJson){
+        this.cusId=libJson._id;
         this.initUI(tage,libJson);
-        this.id=libJson.id;
     };
     bar.prototype.initUI=function(tage,libJson){
-        var share=$("<a/>",{"text":"公开"});
+        var that=this;
+        var share=$("<a/>",{"text":"绑定链接"});
         var remove=$("<a/>",{"text":"删除"});
         var setModle=$("<a/>",{"text":"添加模板"});
         var setImage=$("<a/>",{"href":"/b/manage_image/"+libJson.id,"target":"_blank","text":"管理图片"});
@@ -104,14 +125,86 @@ page.LibBar=(function(){
     bar.prototype.bindEvent=function(share){
         var that=this;
             share.click(function(){
-                alert(that.id);
-            
+                alert("http://makejs.com/bindlink/"+that.cusId);
             });
     };
     return bar;
 })();
 
 page.customer=(function(){
+    var addCustomerBox;
+    var _initCustomerAddDialog=function(){
+        var box=$("<div/>",{"class":"addCustomerBox"});
+        var boy="<div class='boyBox'>"+
+                    "<div>帅哥</div>"+
+                    "<input placeholder='姓名' class='text name' />"+
+                    "<input placeholder='电话' class='text phone' />"+
+                    "<textarea class='text otherInfo'></textarea>"+
+                "</div>";
+        var girl="<div class='girlBox'>"+
+                    "<div>美女</div>"+
+                    "<input placeholder='姓名' class='text name' />"+
+                    "<input placeholder='电话' class='text phone' />"+
+                    "<textarea class='text otherInfo'></textarea>"+
+                "</div>";
+        var otherMessage="<div class='otherMessage'>"+
+                            "<div></div>"+
+                            "<input placeholder='预留信息' class='text message'/>"+
+                            "<input placeholder='地址' class='text address'/>"
+        box.append(boy,girl,otherMessage);
+        box.dialog({
+             autoOpen:false,
+            // resizable:false,
+            width:590,
+            height:450,
+            modal: true,
+            buttons:{
+                "提交":function(){
+                    var value=getValue(); 
+                    if(value){
+                        page.ajax_addCustomer(value)
+                    }
+                }
+            }
+        });
+        function getValue(){
+            var member={};
+            member={
+                boyName:box.find(".boyBox .name").val(),
+                boyPhone:box.find(".boyBox .phone").val(),
+                boyOther:box.find(".boyBox .otherInfo").val(),
+                girlName:box.find(".girlBox .name").val(),
+                girlPhone:box.find(".girlBox .phone").val(),
+                girlOther:box.find(".girlBox .otherInfo").val(),
+                message:box.find(".message").val(),
+                address:box.find(".address").val()
+            }
+            var boyInfo=!!(member.boyName&&member.boyPhone);
+            var girlInfo=!!(member.girlName&&member.girlPhone);
+            if(!(boyInfo||girlInfo)){
+                    alert("最少输入一个姓名和电话");
+                return false; 
+            }
+            if(!member.message){
+                    alert("必须预留信息，用来登录绑定图片库!");
+                return false; 
+            }
+            return member;
+        }
+        addCustomerBox=box;
+    }
+    return {
+        init:function(){
+            _initCustomerAddDialog();
+        },
+        openAddBox:function(){
+            addCustomerBox.dialog("open");
+        }
+    }
+})();
+
+//删除掉
+page.customer_des=(function(){
     var addCustomerBox;
     var _createSearchList=function(data,tag){
         for(var i=0;i<data.length;i++){
@@ -124,11 +217,6 @@ page.customer=(function(){
     var _initCustomerAddDialog=function(){
         var box=$("<div/>",{"class":"addCustomerBox"});
         var inputBox=$("<div/>",{"class":"inputBox"});
-        var select=$("<select/>",{ "class":"select"});
-            var Ousername=$("<option/>",{value:"用户名","text":"用户名"});
-            var Oemail=$("<option/>",{value:"Email","text":"Email"});
-            var Oqq=$("<option/>",{value:"QQ账号","text":"QQ账号"});
-            select.append(Ousername,Oemail,Oqq);
         var input=$("<input/>",{"class":"text searchCusInput","placeholder":"用户名/邮箱/第三方账号"});
         var typeTab=$("<div/>",{"class":"typeTab"}); 
         var add=$("<div/>",{"class":"btnBlue add","text":"添加"});

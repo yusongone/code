@@ -6,6 +6,24 @@
     line-height:20px;
     font-size:12px;
 }
+.addCustomerBox{
+    width:530px;
+}
+.addCustomerBox .boyBox,
+.addCustomerBox .girlBox,
+.addCustomerBox .otherMessage{
+    width:270px;
+    margin-top:15px;
+    float:left;
+}
+
+.addCustomerBox .otherInfo{
+    width:250px;
+    height:100px;
+}
+.addCustomerBox .text{
+    margin-top:5px;
+}
 .addCustomerBox .select{
     float:left;
     border: 1px solid #CCC;

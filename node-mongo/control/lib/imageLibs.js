@@ -88,13 +88,13 @@ var d=null;
                 return callback("no image");
             }
             db.ImageLibs.getImage({
-                json.imageId,
                 database:database
              },function(err,data){
                 database.close();
                 callback(err,data);
             });
         });
+    });
     };
     var _getImagesByLibId=function(id,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
