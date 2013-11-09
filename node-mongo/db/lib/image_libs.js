@@ -42,6 +42,20 @@ function _createObjectId(str){
             callback(err,{"status":"ok","_id":_id});
         });
     };
+    
+    var _addImageIdToLibs=function(jsonReq,callback){
+        var database=jsonReq.database;
+        var userId=jsonReq.userId;
+        var cusInfoId=jsonReq.cusInfoId;
+        var fileId=jsonReq.fileId;
+            cusInfoId= _createObjectId(cusInfoId);
+            userId= _createObjectId(userId);
+            if(!(userId&&cusInfoId)){return callback("err")};
+        var col=database.collection("image_libs");
+            col.update({"userId":userId,"cusInfoId":cusInfoId},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
+                    callback(err,{"status":"ok"});
+                });
+    };
 
     //通过图片库Id查找此 库下所有信息
     var _getDatasByLibId=function(jsonReq,callback){
@@ -78,5 +92,6 @@ function getImagesListByCusInfoId(jsonReq,callback){
 exports.getImageLibs=_getImageLibs;
 exports.createImageLibs=_createImageLibs;
 exports.getDatasByLibId=_getDatasByLibId;
+exports.addImageIdToLibs=_addImageIdToLibs;
 
 exports.getImagesListByCusInfoId=getImagesListByCusInfoId;

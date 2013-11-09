@@ -32,10 +32,12 @@ function getUserAndCustomerRelation(jsonReq,callback){
     var col=database.collection("customerInfo");
         col.findOne({"_id":cid},function(err,doc){
             var ID;
+            console.log(doc.userId,uid);
+            console.log((doc.userId.toString())==(uid.toString()));
             if(doc){
-              if(uid==doc.bindUser){
+              if(doc.bindUser&&(uid.toString())==(doc.bindUser.toString())){
                   ID="binder";
-              }else if(uid=doc.userId){
+              }else if(doc.userId&&(uid.toString())==(doc.userId.toString())){
                   ID="creator";
               }else{
                   ID="none";

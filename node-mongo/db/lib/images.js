@@ -30,6 +30,7 @@ var _getImage=function(jsonReq,callback){
         gs.open(function(err,gs){
             gs.read(function(err,doc){
                 callback(err,doc);
+                gs.close();
             });
         });
 };
@@ -61,40 +62,23 @@ var _uploadImageBuffer=function(jsonReq,callback){
         });
 };
 //上传图片，并且把图片ID存放到相应 图片库文件夹下
-var _uploadImageFile=function(jsonReq,callback){
+function uploadImage(jsonReq,callback){
     var database=jsonReq.database;
-        var files=jsonReq.files;
-        var length=files.length;
-        var count=0;
-        for(var i=0;i<length;i++){
-            var file=files[i];
-            var strId=jsonReq.strId;
-            wf(file,strId,function(){
-                count++;
-                if(count==length){
-                    callback(null,{"status":"ok"});
-                }
-            });
-        }
-        function wf(file,strId,fun){
-            var gs=new gridStore(database,new objectId(),"w",{
-                content_type:"image/png"
-            });
-            gs.open(function(err,gs){
-                //写入图片
-                gs.writeFile(file.path,function(err,doc){
-                    var fileId=doc.fileId;
-                    var userId= _createObjectId(strId);
-                    if(!userId){database.close();return callback("err")};
-                    gs.close();
-                    //将图片 id 存入到 相应图片库下；
-                    var col=database.collection("image_libs");
-                        col.update({"_id":userId,"username":jsonReq.username},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
-                            //database.close();
-                            fun();
-                            });
-                        });
-                });
-            });
-        };
-};
+    var file=jsonReq.files[0];
+
+    var gs=new gridStore(database,new objectId(),"w",{
+        content_type:"image/png"
+    });
+    gs.open(function(err,gs){
+        gs.writeFile(file.path,function(err,doc){
+            if(err){return callback(err);}
+            var fileId=doc.fileId; 
+            gs.close();
+            callback(err,fileId);
+            //将图片 id 存入到 相应图片库下；
+        });
+    });
+}
+
+exports.uploadImage=uploadImage;
+exports.getImage=_getImage;

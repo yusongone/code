@@ -10,10 +10,10 @@ $(document).ready(function(){
 //测试
     $('#addCustomer').fileupload({
         autoUpload: true,//是否自动上传
-        url:"/uploadImage",//上传地址
+        url:"/uploadImageToImagesLib",//上传地址
         acceptFileTypes: /(\.|\/)(gif|jpeg|png)$/i,
         dataType: 'json',
-        formData:{"lib_id":$("#lib_id").attr("value"),"filename":"na"},
+        formData:{"cusInfoId":$("#cusInfo_id").attr("value"),"filename":"na"},
         done: function (e, data) {//设置文件上传完毕事件的回调函数
             var upl=data.context.data("object");
                 upl.done();
@@ -123,7 +123,7 @@ var ajax_get=function(cusInfoId){
             var data=json.data;
             for(var i=0,l=data.length;i<l;i++){
                 var id=data[i].fileId; 
-                var img=$("<img/>",{"src":"/images/"+id});
+                var img=$("<img/>",{"src":"/images/"+cusInfoId+"/"+id});
                 var thu=$("<li/>",{"class":"thu"});
                 $(".imageList").append(thu.append(img));
             };

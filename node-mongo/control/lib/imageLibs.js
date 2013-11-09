@@ -24,46 +24,57 @@ var d=null;
         }); 
     });
     };
-    //创建一个图片库
-    var _createImageLibs=function(json,callback){
-        db.ImageLibs.createImageLibs(json,function(err,result){
-            callback(err,result);
-            database.close();
-        }); 
-    };
+//创建一个图片库
+var _createImageLibs=function(json,callback){
+    db.ImageLibs.createImageLibs(json,function(err,result){
+        callback(err,result);
+        database.close();
+    }); 
+};
 
-//Images function
-    var _uploadImageToImagesLib=function(json,callback){
-        json.strId=parse.base64ToStr(json.libId);
+//上传图片并插入Id到ImagesLib;
+var _uploadImageToImagesLib=function(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
         if(err){return callback(err);}
         db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            console.log(result);
             if("creator"!=result){
+                database.close();
                 callback(err,{"status":"sorry","message":"no permission"});
             }else{
-
-            }
-        });
-        //判断此 图片库 是否属于当前登录人
-        db.ImageLibs.getDatasByLibId({
-            database:database,
-            strId:json.strId,
-        },function(err,item){
-            database.close();
-            if(json.username==item.username){
-                json.database=database;
-                db.ImageLibs.uploadImageFile(json,function(data){
-                    callback(err,data);
-                });
-            }else{
-                callback("sorry,您的名下不存在此图片库IDff");
+                db.Images.uploadImage(jsonReq,function(err,fileId){
+                    jsonReq.fileId=fileId;
+                    //把添加的图片Id添加到imagesLib中；
+                    db.ImageLibs.addImageIdToLibs(jsonReq,function(err,result){
+                    database.close();
+                    callback(err,result);
+                    });
+                });       
             }
         });
     });
-    };
-    var _getImage=function(json,callback){
+};
+//获取图片
+    var _getImage=function(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
         if(err){return callback(err);}
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if("creator"==result||"binder"==result){
+                //get cache
+
+                //get database
+                db.Images.getImage(jsonReq,function(err,buf){
+                    console.log(err);
+                    database.close();
+                    callback(err,buf);
+                });
+            }else{
+                callback("no permission");
+            }
+        });
+        return false;
        // var strId=parse.base64ToStr(json.fileId);
         db.ImageLibs.checkBelong({
             "database":database,
@@ -125,11 +136,13 @@ function _findLibsByUserIdAndCusInfoId(jsonReq,callback){
                 db.ImageLibs.getImagesListByCusInfoId(jsonReq,function(err,result){
                     database.close();
                     if(result){
-                        callback(err,result);    
+                        callback(err,{"status":"ok","data":result});    
                     }else{
-                        callback(err,[]);
+                        callback(err,{"status":"sorry"});
                     }
                 });         
+            }else{
+                callback(err,{"status":"sorry"});
             }
              
         });

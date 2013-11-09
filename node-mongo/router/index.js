@@ -145,7 +145,7 @@ function router(app){
                 "P_css":"customer_page",
                 "P_js":"customer_page",
                 "title":"客户管理",
-                "user":{"name":"song","qq":"20126162"},
+                "user":{"name":req.session.username,"qq":"20126162"},
                 "id":req.query.id
             });
         }
@@ -168,14 +168,19 @@ function router(app){
             "title":"注册"
         });
     });
-    app.get('/images/:libId/:imageId', function(req, res){
-        var libId=req.params.libId;
+    app.get('/images/:cusInfoId/:imageId', function(req, res){
+        var cusInfoId=req.params.cusInfoId;
         var imageId=req.params.imageId;
-        if(libId.toString()&&imageId.toString()){
+        var userId=req.session.userId;
+        if(cusInfoId.toString()&&imageId.toString()){
             if(checkLogind(req,res,"get")){
-                ctrl.ImageLibs.getImage({"libId":libId,"imageId":imageId,"username":req.session.username},function(data){
-                    res.writeHead(200, {'Content-Type': 'image/png' });
-                    res.end(data, 'binary');
+                ctrl.ImageLibs.getImage({"cusInfoId":cusInfoId,"fileId":imageId,"userId":userId},function(err,data){
+                    if(err){
+                        res.redirect("/404");
+                    }else{
+                        res.writeHead(200, {'Content-Type': 'image/png' });
+                        res.end(data, 'binary');
+                    }
                 });
             }
         }
@@ -296,8 +301,8 @@ function router(app){
                 jsonReq.files=req.files.files;
                 jsonReq.cusInfoId=req.body.cusInfoId;
                 jsonReq.userId=req.session.userId;
-            ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(json){
-                
+            ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(err,json){
+                console.log(json);
                 res.send(json);
             });
         };
@@ -310,9 +315,8 @@ function router(app){
                 jsonReq.cusInfoId=cusInfoId;
                 jsonReq.userId=req.session.userId;
             ctrl.ImageLibs.findLibsByUserIdAndCusInfoId(jsonReq,function(err,result){
-                console.log(result);
-                if(result&&result.length>0){
-                    res.send({"status":"ok","data":result[0].images||[]});
+                if(result&&result.status=="ok"){
+                    res.send({"status":"ok","data":result.data});
                 }else{
                     res.send({"status":"sorry","data":[]});
                 }
