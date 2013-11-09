@@ -33,11 +33,12 @@ function _createObjectId(str){
     var _createImageLibs=function(jsonReq,callback){
         var database=jsonReq.database;
         var userId=jsonReq.userId;
+        var cusInfoId=jsonReq.cusInfoId;
+        var _id=jsonReq.imageLibId;
         var col=database.collection("image_libs");
-        var _id=new objectId();
         var uid= _createObjectId(userId);
-        if(!uid){ database.close(); return callback("image_libs line 52 id err")};
-        col.insert({"_id":_id,"userId":uid},function(err,result){
+        if(!uid){return callback("image_libs line 52 id err")};
+        col.insert({"_id":_id,"userId":uid,"cusInfoId":cusInfoId},function(err,result){
             if(err){return callback({"status":"sorry","message":"db error"});}
             callback(err,{"status":"ok","_id":_id});
         });
@@ -45,15 +46,16 @@ function _createObjectId(str){
     //通过图片库Id查找此 库下所有信息
     var _getDatasByLibId=function(jsonReq,callback){
         var database=jsonReq.database;
-        var id=jsonReq.id;
+        var imagesLibId=jsonReq.imagesLibId;
 
         var col=database.collection("image_libs");
-        var oid= _createObjectId(id);
-        if(!oid){ database.close(); return callback("image_libs line 52 id err")};
+        var oid= _createObjectId(imagesLibId);
+        if(!oid){ return callback("image_libs line 52 id err")};
         col.findOne({"_id":oid},{},function(err,item){
             callback(err,item);
         });
     };
+
     //读取图片
     var _getImage=function(jsonReq,callback){
         var database=jsonReq.database;
@@ -147,6 +149,7 @@ function _addBelong(jsonReq,callback){
         });
 }
 
+/*
 function _checkBelong(jsonReq,callback){
     var libId=jsonReq.libId,
         imageId=jsonReq.imageId,
@@ -161,8 +164,50 @@ function _checkBelong(jsonReq,callback){
             callback(err,item);
         });
 };
+*/
+
+//通过 cusInfoId 插入 图片Id；
+function _addImageInImagesLibByCusInfoId(){
+
+}
+
+//通过 cusInfoId 获取 图片列表；
+function _getImagesListByCusInfoId(){
+
+}
+
+/*
+**验证登录者和cusInfoId 的关系
+**创建，绑定，none；
+*/
+function getUserAndCustomerRelation(){
+    var database=jsonReq.database;
+    var cusInfoId=jsonReq.cusInfoId;
+    var cid= _createObjectId(cusInfoId);
+    if(!cid){return callback("err")};
+    var col=database.collection("image_libs");
+        col.findOne({"_id":cid},function(err,doc){
+            console.log(doc); 
+        });
+}
+
+//验证 登录者是cusInfoId 绑定者 的关系
+
+//验证 登录者是cusInfoId 的 创建者 或者 是绑定者的关系；
 
 
+function _findLibsByUserIdAndCusInfoId(jsonReq,callback){
+    var database=jsonReq.database;
+    var userId=jsonReq.userId;
+    var cusInfoId=jsonReq.cusInfoId;
+    var uid= _createObjectId(userId);
+    var cid= _createObjectId(cusInfoId);
+    if(!(uid&&cid)){return callback("err")};
+    var col=database.collection("image_libs");
+        col.find({"userId":uid,"cusInfoId":cid},{}).toArray(function(err,item){
+           callback(err,item); 
+        });
+};
 
 
 exports.getImageLibs=_getImageLibs;
@@ -171,5 +216,6 @@ exports.getDatasByLibId=_getDatasByLibId;
 exports.getImage=_getImage;
 exports.uploadImageBuffer=_uploadImageBuffer;
 exports.uploadImageFile=_uploadImageFile;
-exports.checkBelong=_checkBelong;
+//exports.checkBelong=_checkBelong;
 
+exports.findLibsByUserIdAndCusInfoId=_findLibsByUserIdAndCusInfoId;

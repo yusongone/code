@@ -72,7 +72,6 @@ function _bindUser(jsonReq,callback){
 function _addCustomerInfo(jsonReq,callback){
     var database=jsonReq.database;
     var userId=jsonReq.userId;
-    var imagesLibId=jsonReq.imagesLibId,
         boy={
             "name":jsonReq.boyName||null,
             "phone":jsonReq.boyPhone||null,
@@ -89,18 +88,25 @@ function _addCustomerInfo(jsonReq,callback){
     var col=database.collection("customerInfo");
         var id=new objectId();
         var userId=_createObjectId(userId);
+        var imagesLibId=new objectId();
         if(!userId){return callback("create ObjectId error")};
         col.insert({"_id":id,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
-            callback(err,id);
+            callback(err,{"cusInfoId":id,"imageLibId":imagesLibId});
         });
 }
 //通过Id 获取一项客户具体信息
-function _getCustomerInfoById(jsonReq,callback){
+//function _getCustomerInfoById(jsonReq,callback){
+function _getImageLibsId(jsonReq,callback){
     var database=jsonReq.database;
     var cusId=jsonReq.cusId;
+    var userId=jsonReq.userId;
     var col=database.collection("customerInfo");
-    col.find({"_id":cusId}).toArray(function(err,item){
-        callback(err,item); 
+    col.find({"_id":cusId,"userId":userId}).toArray(function(err,item){
+        if(item.length>0){
+            callback(err,item[0].imagesLibId); 
+        }else{
+            callback(err,null); 
+        }
     });
 }
 //通过用户Id 获取 客户关系表
@@ -115,7 +121,7 @@ function _getCustomerList(jsonReq,callback){
         var tempAry=[];
         for(var i=0;i<ary.length;i++){
             var cusId=_createObjectId(ary[i].cusId);
-            if(!(cusId)){return callback("create ObjectId error")}
+          //  if(!(cusId)){return callback("create ObjectId error")}
             tempAry.push(cusId);
         }
         var coll=database.collection("customerInfo");
@@ -165,5 +171,5 @@ exports.checkBind=_checkBind;
 exports.addCustomerToList=_addCustomerToList;
 exports.getCustomerList=_getCustomerList;
 exports.addCustomerInfo=_addCustomerInfo;
-exports.getCustomerInfoById=_getCustomerInfoById;
+exports.getImageLibsId=_getImageLibsId;
 exports.createCustomerListForUser=_createCustomerListForUser;

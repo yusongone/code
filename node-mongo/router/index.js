@@ -106,26 +106,35 @@ function router(app){
             });
         }
     });
-    app.get('/b/manage_image/:id', function(req, res){
-        if(!req.params.id){ res.redirect("/404"); };
+    app.get('/b/manage_image/:cusInfoId', function(req, res){
+        if(!req.params.cusInfoId){ res.redirect("/404"); };
         if(checkLogind(req,res,"get","/b/manage_image"+req.params.id)){
-            var json={
-                "libId":req.params.id,
-                "userId":req.session.userId
-            };
-            //验证登陆用户是否存在此id 图片库
-            ctrl.ImageLibs.checkLibsBelong(json,function(bool){
-                if(bool){
+            var jsonReq={}
+                jsonReq.cusInfoId=req.params.cusInfoId,
+                jsonReq.userId=req.session.userId
+            //检测本用户下是否存在此库
+            ctrl.ImageLibs.findLibsByUserIdAndCusInfoId(jsonReq,function(err,result){
+                var r;
+                if(result&&result.length>0){
+                    r=1;
+                }else{
+                    r=0;
+                }
                     res.render("manage_image",{
                         "js_version":js_version,
                         "css_version":css_version,
                         "title":"uploadImage",
-                        "id":req.params.id
+                        "id":req.params.cusInfoId,
+                        "result":r
                     });
+            });
+            /*
+            ctrl.ImageLibs.checkLibsBelong(json,function(bool){
+                if(bool){
                 }else{
-                    res.redirect("/404"); 
                 }
             });
+            */
         }
     });
     app.get('/b/customer', function(req, res){
@@ -291,12 +300,29 @@ function router(app){
         };
     });
     //根据图片库Id获取图片列表
-    app.post('/getImagesByLibId', function(req, res){
+    app.post('/getImagesByCusInfoId', function(req, res){
         if(checkLogind(req,res)){
-            var id=req.body.libId;
-            ctrl.ImageLibs.getImagesByLibId(id,function(ary){
+            var cusInfoId=req.body.cusInfoId;
+            var jsonReq={};
+                jsonReq.cusInfoId=cusInfoId;
+                jsonReq.userId=req.session.userId;
+            ctrl.ImageLibs.findLibsByUserIdAndCusInfoId(jsonReq,function(err,result){
+                console.log(result);
+                if(result&&result.length>0){
+                    res.send({"status":"ok","data":result[0].images||[]});
+                }else{
+                    res.send({"status":"sorry","data":[]});
+                }
+            });
+            /*
+            ctrl.ImageLibs.getImagesByCusInfoId({
+                "cusInfoId":cusInfoId,
+                "userId":req.session.userId
+            },function(err,ary){
+                console.log(ary);
                 res.send({"status":"ok","data":ary});
             });
+            */
         };
     });
     //创建图片库

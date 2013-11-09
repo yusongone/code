@@ -32,6 +32,7 @@ var d=null;
         }); 
     };
     //判断图片库是否属于登陆用户
+    /*
     var _checkLibsBelong=function(json,callback){
         var libId=parse.base64ToStr(json.libId);
         var username=json.username;
@@ -49,6 +50,7 @@ var d=null;
         });
     });
     }
+    */
 
 
 
@@ -96,27 +98,57 @@ var d=null;
         });
     });
     };
-    var _getImagesByLibId=function(id,callback){
+    var _getImagesByCusInfoId=function(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
         if(err){return callback(err);}
-        var strId=parse.base64ToStr(id);
-        db.ImageLibs.getDatasByLibId({
-            database:database,
-            strId:strId
-        },function(err,item){
-            database.close();
-            if(item&&item.images){
-                callback(err,item.images);
-            }else{
-                callback("sorry");
+        //var strId=parse.base64ToStr(id);
+        var cusInfoId=jsonReq.cusInfoId;
+        var userId=jsonReq.userId;
+        db.Customer.getImageLibsId({
+            cusInfoId:cusInfoId,
+            userId:userId
+        },function(err,jsonRes){
+            if(jsonRes){
+                db.ImageLibs.getDatasByLibId({
+                    database:database,
+                    imagesLibId:jsonRes
+                },function(err,item){
+                    database.close();
+                    if(item&&item.images){
+                        callback(err,item.images);
+                    }else{
+                        callback("sorry");
+                    }
+                });
             }
         });
     });
     };
+// user 用户 选片 图片列表；
+// 通过bindUser 查找 CusInfoId ,通过 CusInfoId 返回Images信息
+
+//CusInfoId 和 Images id
+//首先验证 userId和CusInfoId关系/bindUser 或者 userId，如果存在，通过ImagesId 取图片返回；
+
+
+//通过userId和cusInfoId查找 图片库所有内容；
+function _findLibsByUserIdAndCusInfoId(jsonReq,callback){
+    db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
+        db.ImageLibs.findLibsByUserIdAndCusInfoId(jsonReq,function(err,item){
+            database.close();
+            callback(err,item);
+        });
+    });
+
+}
 
 exports.getImageLibs=_getImageLibs;
 exports.createImageLibs=_createImageLibs;
 exports.uploadImage=_uploadImage;
 exports.getImage=_getImage;
-exports.getImagesByLibId=_getImagesByLibId;
-exports.checkLibsBelong=_checkLibsBelong;
+exports.getImagesByCusInfoId=_getImagesByCusInfoId;
+//exports.checkLibsBelong=_checkLibsBelong;
+
+
+exports.findLibsByUserIdAndCusInfoId=_findLibsByUserIdAndCusInfoId;

@@ -31,11 +31,12 @@ function _addCustomer(jsonReq,callback){
         //假设customer表中不存在登陆者的客户关系，将创建，如果存在，将插入数据；
         db.Customer.createCustomerListForUser(jsonReq,function(err,data){
            if(data!="err"){
-                db.ImageLibs.createImageLibs(jsonReq,function(err,result){
-                    jsonReq.imagesLibId=result["_id"];
-                    //创建图片库
-                    db.Customer.addCustomerInfo(jsonReq,function(err,cusInfoId){
-                        jsonReq.cusInfoId=cusInfoId;
+                //创建图片库
+                db.Customer.addCustomerInfo(jsonReq,function(err,result){
+                   jsonReq.cusInfoId=result.cusInfoId;
+                   jsonReq.imageLibId=result.imageLibId;
+                    db.ImageLibs.createImageLibs(jsonReq,function(err,result){
+                        jsonReq.imagesLibId=result["_id"];
                         db.Customer.addCustomerToList(jsonReq,function(err,result){
                            database.close();
                             callback(err,result);

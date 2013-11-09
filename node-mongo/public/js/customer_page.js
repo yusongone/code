@@ -46,25 +46,6 @@ page.ajax_searchUser=function(username,callback){
         }
     });
 }
-page.ajax_getBindLink=function(){
-    $.ajax({
-        "type":"post",
-        "url":"/ajax_getBindLink",
-        "dataType":"json",
-        "success":function(data){
-            if(data&&data.length>0){
-                var Lib=page.Lib
-                for(var i=0;i<data.length;i++){
-                    var lib=new Lib(data[i]);
-                    $(".list").append(lib.body);
-                } 
-            }
-        },
-        "error":function(){
-        
-        }
-    });
-};
 page.ajax_getCusList=function(cusId){
     $.ajax({
         "type":"post",
@@ -118,7 +99,7 @@ page.LibBar=(function(){
         var share=$("<a/>",{"text":"绑定链接"});
         var remove=$("<a/>",{"text":"删除"});
         var setModle=$("<a/>",{"text":"添加模板"});
-        var setImage=$("<a/>",{"href":"/b/manage_image/"+libJson.id,"target":"_blank","text":"管理图片"});
+        var setImage=$("<a/>",{"href":"/b/manage_image/"+that.cusId,"target":"_blank","text":"管理图片"});
             tage.append(share,remove,setModle,setImage);
             this.bindEvent(share);
     };

@@ -3,7 +3,7 @@ var pageSpace;
 $(document).ready(function(){
         //pageSpace._btn_fileUp=$("#fileUp");
        // pageSpace.bindEvent();
-        ajax_get($("#lib_id").attr("value"));
+        ajax_get($("#cusInfo_id").attr("value"));
         UP.init();
 
 
@@ -112,12 +112,12 @@ var UP=(function(){
 
 
 
-var ajax_get=function(libId){
+var ajax_get=function(cusInfoId){
     $.ajax({
         "type":"post",
-        "url":"/getImagesByLibId",
+        "url":"/getImagesByCusInfoId",
         "datatype":"json",
-        "data":{"libId":libId},
+        "data":{"cusInfoId":cusInfoId},
         "success":function(json){
             if("sorry"==json.status){alert(json.message);return false;};
             var data=json.data;
