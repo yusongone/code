@@ -14,7 +14,7 @@ page.bindEvent=function(){
     });
 };
 
-page.ajax_addCustomer=function(data){
+page.ajax_addCustomer=function(data,fun){
     $.ajax({
         "type":"post",
         "url":"/ajax_addCustomer",
@@ -22,7 +22,7 @@ page.ajax_addCustomer=function(data){
         "data":data,
         "success":function(result){
             if("ok"==result.status){
-                alert("create ok");
+                fun();
             }else{
             }
         },
@@ -162,7 +162,9 @@ page.customer=(function(){
                 "提交":function(){
                     var value=getValue(); 
                     if(value){
-                        page.ajax_addCustomer(value)
+                        page.ajax_addCustomer(value,function(){
+                            addCustomerBox.dialog("close");
+                        })
                     }
                 }
             }

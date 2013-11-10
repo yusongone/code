@@ -10,7 +10,8 @@ page.bindEvent=function(){
     $("#login").click(function(){
         page.ajax_login({
             username:$("#username").val(),
-            pass:$("#pass").val()
+            pass:$("#pass").val(),
+            path:$("#path").val()
         }); 
     }); 
 
@@ -35,7 +36,7 @@ page.ajax_login=function(json){
         "type":"post",
         "url":"/ajax_login",
         "dataType":"json",
-        "data":{"username":json.username,"pass":json.pass},
+        "data":{"username":json.username,"pass":json.pass,"path":json.path},
         "success":function(result){
             if("ok"==result.status){
                 finish_login(result);
@@ -48,7 +49,13 @@ page.ajax_login=function(json){
         }
     });
     function finish_login(result){
-        $("body").css({"background":"green"});
+        var path=json.path;
+        if(path){
+            window.location=path;
+        }else{
+            window.location="/";
+        };
+        //$("body").css({"background":"green"});
     }
 
 };

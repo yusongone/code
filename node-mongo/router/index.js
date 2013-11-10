@@ -27,6 +27,7 @@ var data;
 function router(app){
 
     app.get('/', function(req, res){
+            res.redirect("/photos");
             res.render("index",{
                 "js_version":js_version,
                 "css_version":css_version,
@@ -72,6 +73,26 @@ function router(app){
         console.dir(req);
         res.send("ok");
     });
+    app.get("/select_photos",function(req,res){
+        if(checkLogind(req,res,"get","/select_photos")){
+            res.render("select_photos",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "user":{"name":"song","qq":"20126162"},
+                "title":"选片"
+            });
+        }
+    })
+    app.get("/photos",function(req,res){
+        if(checkLogind(req,res,"get","/photos")){
+            res.render("photos",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "user":{"name":"song","qq":"20126162"},
+                "title":"相册"
+            });
+        }
+    })
     //b  ------------------- b ------
     app.get('/b/image_library', function(req, res){
         if(checkLogind(req,res,"get","/b/image_library")){
@@ -87,10 +108,10 @@ function router(app){
     });
     app.get('/b/manage_image/:id', function(req, res){
         if(!req.params.id){ res.redirect("/404"); };
-        if(checkLogind(req,res,"get","/b/manage_image")){
+        if(checkLogind(req,res,"get","/b/manage_image"+req.params.id)){
             var json={
                 "libId":req.params.id,
-                "username":req.session.username
+                "userId":req.session.userId
             };
             //验证登陆用户是否存在此id 图片库
             ctrl.ImageLibs.checkLibsBelong(json,function(bool){
@@ -121,11 +142,14 @@ function router(app){
         }
     });
 
-    app.get('/login', function(req, res,next){
+    app.get('/login', function(req,res){
+        var path=req.query.path;
+        if(path){path=path.toString()};
         res.render("login",{
             "js_version":js_version,
             "css_version":css_version,
             "title":"登录",
+            "path":path
         });
     });
     app.get('/register', function(req, res){
@@ -160,7 +184,7 @@ function router(app){
 
     app.get('/bindLink/:cusId', function(req, res){
         var jsonReq={};
-        if(checkLogind(req,res)){
+        if(checkLogind(req,res,"get")){
             jsonReq.userId=req.session.userId;
             jsonReq.cusId=req.params.cusId;
             ctrl.Customer.checkBind(jsonReq,function(err,result){
@@ -296,6 +320,7 @@ function router(app){
     });
     //登录
     app.post('/ajax_login', function(req, res){
+            var path=req.body.path;
         ctrl.Users.login({
             "username":req.body.username,
             "pass":req.body.pass

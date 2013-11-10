@@ -32,11 +32,14 @@ function _createObjectId(str){
     //创建一个图片文件夹（库）
     var _createImageLibs=function(jsonReq,callback){
         var database=jsonReq.database;
+        var userId=jsonReq.userId;
         var col=database.collection("image_libs");
-
-        col.insert({"name":jsonReq.libname,"username":jsonReq.username},function(err,result){
+        var _id=new objectId();
+        var uid= _createObjectId(userId);
+        if(!uid){ database.close(); return callback("image_libs line 52 id err")};
+        col.insert({"_id":_id,"userId":uid},function(err,result){
             if(err){return callback({"status":"sorry","message":"db error"});}
-            callback(err,{"status":"ok"});
+            callback(err,{"status":"ok","_id":_id});
         });
     };
     //通过图片库Id查找此 库下所有信息

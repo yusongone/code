@@ -9,10 +9,11 @@ var createDb=require("./common").createDb;
 
 
 function _createObjectId(str){
-        str=str.toString();
         try{
+            str=str.toString();
             return  new objectId(str);
         }catch(err){
+            console.error("createObjectId:",err);
             return false;
         }
 };
@@ -70,7 +71,8 @@ function _bindUser(jsonReq,callback){
 //增加一项客户具体信息
 function _addCustomerInfo(jsonReq,callback){
     var database=jsonReq.database;
-    var imageId=jsonReq.imageId,
+    var userId=jsonReq.userId;
+    var imagesLibId=jsonReq.imagesLibId,
         boy={
             "name":jsonReq.boyName||null,
             "phone":jsonReq.boyPhone||null,
@@ -86,7 +88,9 @@ function _addCustomerInfo(jsonReq,callback){
 
     var col=database.collection("customerInfo");
         var id=new objectId();
-        col.insert({"_id":id,imagesLibId:imageId,bindUser:null,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
+        var userId=_createObjectId(userId);
+        if(!userId){return callback("create ObjectId error")};
+        col.insert({"_id":id,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
             callback(err,id);
         });
 }
@@ -106,10 +110,13 @@ function _getCustomerList(jsonReq,callback){
     var col=database.collection("userCustomer");
     col.find({userId:userId}).toArray(function(err,item){
         //callback(err,item[0].customerList);
+        if(item.length==0){return callback(err,[])};
         var ary=item[0].customerList;
         var tempAry=[];
-        for(var i=1;i<ary.length;i++){
-            tempAry.push(ary[i].cusId);
+        for(var i=0;i<ary.length;i++){
+            var cusId=_createObjectId(ary[i].cusId);
+            if(!(cusId)){return callback("create ObjectId error")}
+            tempAry.push(cusId);
         }
         var coll=database.collection("customerInfo");
         coll.find({"_id":{$in:tempAry}},{"reserverMessage":1,member:1}).toArray(function(err,item){
