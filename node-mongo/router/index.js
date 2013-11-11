@@ -70,7 +70,6 @@ function router(app){
 
     app.get('/test', function(req, res){
         //db.test();
-        console.dir(req);
         res.send("ok");
     });
     app.get("/select_photos",function(req,res){
@@ -181,7 +180,6 @@ function router(app){
         var imageId=req.params.imageId;
         var userId=req.session.userId;
         var sizeR={"origin":"origin","300":300,"180":180,"100":100};
-        console.log(sizeR[req.query.size]);
         var size=sizeR[req.query.size]||180;
         if(cusInfoId.toString()&&imageId.toString()){
             if(checkLogind(req,res,"get")){
@@ -192,10 +190,8 @@ function router(app){
                         "size":size
                 },function(err,data){
                     if(err){
-                        console.log(err);
                         res.redirect("/404");
                     }else{
-                        console.log(data,"fefxxxx");
                         res.writeHead(200, {'Content-Type': 'image/png' });
                         res.end(data, 'binary');
                     }

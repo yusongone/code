@@ -55,7 +55,6 @@ var _uploadBuffer=function(jsonReq,callback){
             if(err){return callback(err);}
             var fileId=doc.fileId;
             gs.close(function(err,result){
-                console.log("fefefefefe");
                 callback(err,fileId);
             });
         });
@@ -72,8 +71,9 @@ function uploadImage(jsonReq,callback){
         gs.writeFile(file.path,function(err,doc){
             if(err){return callback(err);}
             var fileId=doc.fileId; 
-            gs.close();
-            callback(err,fileId);
+            gs.close(function(err,result){
+                callback(err,fileId);
+            });
             //将图片 id 存入到 相应图片库下；
         });
     });
