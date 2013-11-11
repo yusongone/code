@@ -58,7 +58,7 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
     });
 };
 //»ñÈ¡Í¼Æ¬
-    var _getImage=function(jsonReq,callback){
+var _getImage=function(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
         jsonReq.database=database;
         if(err){return callback(err);}
@@ -76,26 +76,9 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
                 callback("no permission");
             }
         });
-        return false;
-       // var strId=parse.base64ToStr(json.fileId);
-        db.ImageLibs.checkBelong({
-            "database":database,
-            "libId":parse.base64ToStr(json.libId),
-            "imageId":json.imageId,
-            "username":json.username
-        },function(err,data){
-            if(!(data.length>0)){
-                return callback("no image");
-            }
-            db.ImageLibs.getImage({
-                database:database
-             },function(err,data){
-                database.close();
-                callback(err,data);
-            });
-        });
     });
-    };
+};
+
     var _getImagesByCusInfoId=function(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
         if(err){return callback(err);}

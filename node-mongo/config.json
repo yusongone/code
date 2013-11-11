@@ -6,7 +6,7 @@
         "port":"27017",
         "user":"song",
         "pass":"song",
-        "name":"picOnline"
+        "dbname":"picOnline"
     },
     "session":{
         "path":"127.0.0.1",
@@ -14,6 +14,14 @@
         "user":"song",
         "pass":"song",
         "collection":"session",
-        "name":"picOnline"
+        "dbname":"picOnline"
+    },
+    "thumbnail":{
+        "path":"127.0.0.1",
+        "port":"27017",
+        "user":"song",
+        "pass":"song",
+        "collection":"session",
+        "dbname":"pic_thumbnial"
     }
 }
