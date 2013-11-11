@@ -115,7 +115,7 @@ var UP=(function(){
 var ajax_get=function(cusInfoId){
     $.ajax({
         "type":"post",
-        "url":"/getImagesByCusInfoId",
+        "url":"/getCustomerImages",
         "datatype":"json",
         "data":{"cusInfoId":cusInfoId},
         "success":function(json){

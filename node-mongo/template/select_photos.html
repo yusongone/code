@@ -2,10 +2,12 @@
 <html>
     <head>
         <% include lib/header %>
+        <link href="/css/select_images.css" rel="stylesheet">
+        <script src="/js/select_images.js"></script>
     </head>
     <body class="page image_libs">
+        <input type="hidden" id="cusInfoId" value="<%=cusInfoId%>" />
         <% include lib/user_toplink%>
-        <% include lib/user_nav %>
         <div class="right_area">
             <div class="topBox">
                 <div class="logoBox">LOGO</div>
@@ -20,7 +22,7 @@
             </div>
             <div class="bottom_line"></div>
             <div class="content">
-                <ul class="list libsBox">
+                <ul class="list imageList">
                 </ul>
             </div>
         </div>

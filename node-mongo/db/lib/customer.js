@@ -17,6 +17,33 @@ function _createObjectId(str){
             return false;
         }
 };
+/*
+**返回customerInfo 详细信息；
+*根据
+*/
+function _getCustomerInfoData(jsonReq,callback){
+    var database=jsonReq.database;
+    var userId=jsonReq.userId;
+    var uid= _createObjectId(userId);
+    var tempObj={};
+    var queryObj=jsonReq.queryObj;
+    if(queryObj.userId){
+        var userId=_createObjectId(queryObj.userId);
+        if(!userId){return callback("err")};
+        tempObj["userId"]=userId;
+    }
+    if(queryObj.bindUser){
+        var bindUser=_createObjectId(queryObj.bindUser);
+        if(!bindUser){return callback("err")};
+        tempObj["bindUser"]=bindUser;
+    }
+    console.log(tempObj);
+    var col=database.collection("customerInfo");
+        col.findOne(tempObj,function(err,doc){
+            if(err){return callback(err)};
+            callback(err,doc);
+        });
+}
 
 /*
 **验证登录者和cusInfoId 的关系
@@ -28,12 +55,10 @@ function getUserAndCustomerRelation(jsonReq,callback){
     var userId=jsonReq.userId;
     var cid= _createObjectId(cusInfoId);
     var uid= _createObjectId(userId);
-    if(!cid){return callback("err")};
+    if(!(cid&&uid)){return callback("err")};
     var col=database.collection("customerInfo");
         col.findOne({"_id":cid},function(err,doc){
             var ID;
-            console.log(doc.userId,uid);
-            console.log((doc.userId.toString())==(uid.toString()));
             if(doc){
               if(doc.bindUser&&(uid.toString())==(doc.bindUser.toString())){
                   ID="binder";
@@ -59,7 +84,7 @@ function _addCustomerToList(jsonReq,callback){
             callback(err,{"status":"ok"});
         });
 };
-
+//检测customerInfo 相信信息是否绑定用户;
 function _checkBind(jsonReq,callback){
     var database=jsonReq.database;
     var cusId=jsonReq.cusId;
@@ -92,6 +117,7 @@ function _bindUser(jsonReq,callback){
         _checkBind(jsonReq,function(err,result){
             if(!result){
                 col.update({"_id":cusId,"reserverMessage":reserverMessage},{$set:{"bindUser":userId}},function(err,item){
+                    console.log(item);
                         callback(err,item);
                 });
             }else{
@@ -147,13 +173,11 @@ function _getCustomerList(jsonReq,callback){
     var userId=jsonReq.userId;
     var col=database.collection("userCustomer");
     col.find({userId:userId}).toArray(function(err,item){
-        //callback(err,item[0].customerList);
         if(item.length==0){return callback(err,[])};
         var ary=item[0].customerList;
         var tempAry=[];
         for(var i=0;i<ary.length;i++){
             var cusId=_createObjectId(ary[i].cusId);
-          //  if(!(cusId)){return callback("create ObjectId error")}
             tempAry.push(cusId);
         }
         var coll=database.collection("customerInfo");
@@ -165,6 +189,7 @@ function _getCustomerList(jsonReq,callback){
     });
 };
 
+//在customerList表中创建账号对应的客户关系表
 function _createCustomerListForUser(jsonReq,callback){
     var database=jsonReq.database;
     var userId=jsonReq.userId;
@@ -183,7 +208,6 @@ function _createCustomerListForUser(jsonReq,callback){
                 callback(err,"customerList exist");
             }
         });
-
 }
 /*
 function _searchCustomer(jsonReq,callback){
@@ -206,3 +230,4 @@ exports.addCustomerInfo=_addCustomerInfo;
 exports.getImageLibsId=_getImageLibsId;
 exports.createCustomerListForUser=_createCustomerListForUser;
 exports.getUserAndCustomerRelation=getUserAndCustomerRelation;
+exports.getCustomerInfoData=_getCustomerInfoData;

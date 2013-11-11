@@ -75,20 +75,28 @@ function router(app){
     });
     app.get("/select_photos",function(req,res){
         if(checkLogind(req,res,"get","/select_photos")){
-            res.render("select_photos",{
-                "js_version":js_version,
-                "css_version":css_version,
-                "user":{"name":"song","qq":"20126162"},
-                "title":"选片"
+            //
+            var jsonReq={};
+                jsonReq.userId=req.session.userId;
+            ctrl.Customer.getCustomerInfoIdByBindUserId(jsonReq,function(err,cusInfoId){
+                var cusId=cusInfoId||"";
+                res.render("select_photos",{
+                    "js_version":js_version,
+                    "css_version":css_version,
+                    "user":{"name":req.session.username},
+                    "title":"选片",
+                    "cusInfoId":cusId
+                });
             });
         }
-    })
+    });
+
     app.get("/photos",function(req,res){
         if(checkLogind(req,res,"get","/photos")){
             res.render("photos",{
                 "js_version":js_version,
                 "css_version":css_version,
-                "user":{"name":"song","qq":"20126162"},
+                "user":{"name":req.session.username},
                 "title":"相册"
             });
         }
@@ -113,7 +121,7 @@ function router(app){
                 jsonReq.cusInfoId=req.params.cusInfoId,
                 jsonReq.userId=req.session.userId
             //检测本用户下是否存在此库
-            ctrl.ImageLibs.findLibsByUserIdAndCusInfoId(jsonReq,function(err,result){
+            ctrl.ImageLibs.getCustomerImages(jsonReq,function(err,result){
                 var r;
                 if(result&&result.length>0){
                     r=1;
@@ -220,6 +228,9 @@ function router(app){
             });
         };
     });
+    app.post("/getSelectPhoto",function(req,res){
+    
+    });
     app.post('/bindLink', function(req, res){
         console.log(req.session.vcode);
         var jsonReq={};
@@ -236,7 +247,9 @@ function router(app){
             ctrl.Customer.bindUser(jsonReq,function(err,json){
                 if(err){return res.send({"status":"sorry","message":err})}
                 if(json>0){
-                    res.send({"status":"bind ok"});
+                    res.send({"status":"ok"});
+                }else{
+                    res.send({"status":"sorry"});
                 }
             });
         };
@@ -307,14 +320,30 @@ function router(app){
             });
         };
     });
-    //根据图片库Id获取图片列表
-    app.post('/getImagesByCusInfoId', function(req, res){
+    //获取选片图片列表
+    app.post('/getSelectImages', function(req, res){
         if(checkLogind(req,res)){
             var cusInfoId=req.body.cusInfoId;
             var jsonReq={};
                 jsonReq.cusInfoId=cusInfoId;
                 jsonReq.userId=req.session.userId;
-            ctrl.ImageLibs.findLibsByUserIdAndCusInfoId(jsonReq,function(err,result){
+            ctrl.ImageLibs.getSelectPhotos(jsonReq,function(err,result){
+                if(result&&result.status=="ok"){
+                    res.send({"status":"ok","data":result.data});
+                }else{
+                    res.send({"status":"sorry","data":[]});
+                }
+            });
+        };
+    });
+    //根据图片库Id获取图片列表
+    app.post('/getCustomerImages', function(req, res){
+        if(checkLogind(req,res)){
+            var cusInfoId=req.body.cusInfoId;
+            var jsonReq={};
+                jsonReq.cusInfoId=cusInfoId;
+                jsonReq.userId=req.session.userId;
+            ctrl.ImageLibs.getCustomerImages(jsonReq,function(err,result){
                 if(result&&result.status=="ok"){
                     res.send({"status":"ok","data":result.data});
                 }else{

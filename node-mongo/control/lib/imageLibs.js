@@ -1,7 +1,10 @@
 var db=require("../../db");
 var parse=require("./common").parse;
 
-var d=null;
+//
+
+
+//====================================
     var _getImageLibs=function(username,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
         if(err){return callback(err);}
@@ -11,7 +14,6 @@ var d=null;
         },function(err,json){
             var da=json.data;
             var tempAry=[];
-            d=da[0]._id.toString();
             for(var i=0,l=da.length;i<l;i++){
                 var z={
                     "name":da[i].name,
@@ -122,13 +124,28 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
     };
 // user 用户 选片 图片列表；
 // 通过bindUser 查找 CusInfoId ,通过 CusInfoId 返回Images信息
+function _getSelectPhotos(jsonReq,callback){
+    db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,relation){
+            if("binder"==relation){
+                db.ImageLibs.getImagesListByCusInfoId(jsonReq,function(err,result){
+                    database.close();
+                    if(result){
+                        callback(err,{"status":"ok","data":result});    
+                    }else{
+                        callback(err,{"status":"sorry"});
+                    }
+                });
+            }
+        });
+    })
 
-//CusInfoId 和 Images id
-//首先验证 userId和CusInfoId关系/bindUser 或者 userId，如果存在，通过ImagesId 取图片返回；
+};
 
 
 //通过userId和cusInfoId查找 图片库所有内容；
-function _findLibsByUserIdAndCusInfoId(jsonReq,callback){
+function _getCustomerImages(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
         jsonReq.database=database;
         db.Customer.getUserAndCustomerRelation(jsonReq,function(err,relation){
@@ -157,4 +174,5 @@ exports.getImagesByCusInfoId=_getImagesByCusInfoId;
 //exports.checkLibsBelong=_checkLibsBelong;
 
 
-exports.findLibsByUserIdAndCusInfoId=_findLibsByUserIdAndCusInfoId;
+exports.getSelectPhotos=_getSelectPhotos;
+exports.getCustomerImages=_getCustomerImages;

@@ -6,6 +6,23 @@ var db=require("../../db");
 var parse=require("./common").parse;
 var Type=require("./common").Type;
 
+function _getCustomerInfoIdByBindUserId(jsonReq,callback){
+   db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
+        jsonReq.queryObj={
+            bindUser:jsonReq.userId
+        }
+       db.Customer.getCustomerInfoData(jsonReq,function(err,doc){
+           if(doc){
+                callback(err,doc["_id"]); 
+           }else{
+                callback(err,null); 
+           }
+       });
+   });
+}
+
+//绑定用户到客户关系；
 function _bindUser(jsonReq,callback){
    db.Common.getAuthenticationDatabase(function(err,database){
         jsonReq.database=database;
@@ -15,6 +32,8 @@ function _bindUser(jsonReq,callback){
         }); 
    }); 
 };
+
+//检测客户关系是否已经绑定过
 function _checkBind(jsonReq,callback){
    db.Common.getAuthenticationDatabase(function(err,database){
         jsonReq.database=database;
@@ -25,6 +44,7 @@ function _checkBind(jsonReq,callback){
    }); 
 };
 
+//账户增加客户
 function _addCustomer(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
         jsonReq.database=database;
@@ -47,7 +67,7 @@ function _addCustomer(jsonReq,callback){
         });
     });
 }
-//
+//获取账户下所有客户
 function _getCustomerList(jsonReq,callback){
     var userId=jsonReq.userId;
     db.Common.getAuthenticationDatabase(function(err,database){
@@ -60,7 +80,7 @@ function _getCustomerList(jsonReq,callback){
        }); 
     });
 }
-
+//搜索客户
 function _searchCustomer(json,callback){
     db.Customer.searchCustomer({
         "keyword":json.keyword
@@ -76,3 +96,4 @@ exports.getCustomerList=_getCustomerList;
 exports.searchCustomer=_searchCustomer;
 exports.bindUser=_bindUser;
 exports.checkBind=_checkBind;
+exports.getCustomerInfoIdByBindUserId=_getCustomerInfoIdByBindUserId;
