@@ -2,28 +2,40 @@ var db=require("../../db");
 var fs=require("fs");
 var Canvas=require("canvas");
     var Image=Canvas.Image;
+var getPool=db.Common.getPool;
+var poolMain=getPool("main");
+var poolThumbnail=getPool("thumbnail");
 
 //获取图片
 var _getImage=function(jsonReq,callback){
-    db.Common.getAuthenticationDatabase(function(err,database){
-        jsonReq.database=database;
+    poolMain.acquire(function(err,database){
         if(err){return callback(err);}
+        jsonReq.database=database;
         db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if(err){
+                poolMain.release(database);
+                return callback(err)
+            };
             if("creator"==result||"binder"==result){
                 //get database
                 //检查图片是否存在此Customer 库中；
                 db.ImageLibs.checkImageInCustomer(jsonReq,function(err,result){
-                    if(err){return callback(err);}
+                    if(err){
+                        poolMain.release(database);
+                        return callback(err);}
                     //null 此图片不存在此图片库中
-                    if(result==null){return callback("no image")};
-                    console.log(jsonReq.size);
+                    if(result==null){
+                        poolMain.release(database);
+                        return callback("no image")
+                    };
                     if(jsonReq.size=="origin"){
                         db.Images.getImage(jsonReq,function(err,buf){
-                            database.close();
+                            poolMain.release(database);
                             callback(err,buf);
                         });
                         return;
                     }
+                    poolMain.release(database);
                     /*
                     */
                     _getThumbnailImage(jsonReq,function(err,buf){
@@ -47,20 +59,26 @@ var _getImage=function(jsonReq,callback){
 };
 //获取缩略图
 var _getThumbnailImage=function(jsonReq,callback){
-    db.Common.getThumbnailDatabase(function(err,database){
+    poolThumbnail.acquire(function(err,database){
         jsonReq.database=database;
         jsonReq.queryObj={
             "metadata.size":jsonReq.size,
             "metadata.originalImageId":jsonReq.fileId
         }
         db.Images.getImageInfo(jsonReq,function(err,imageInfo){
-            if(err){return callback(err)};
-            if(!imageInfo){return callback(err,null);}
+            if(err){
+                poolThumbnail.release(database);
+                return callback(err)
+            };
+            if(!imageInfo){
+                poolThumbnail.release(database);
+                return callback(err,null);
+            }
             var id=imageInfo["_id"];
             jsonReq.fileId=id;
             //在缩略图数据库中获取图片
             db.Images.getImage(jsonReq,function(err,buf){
-                database.close();
+                poolThumbnail.release(database);
                 if(err){return callback(err)};
                 callback(err,buf);
             });
@@ -69,7 +87,7 @@ var _getThumbnailImage=function(jsonReq,callback){
 };
 //把缩略图插入本地数据库
 var _insertThumbnailToDB=function(jsonReq,callback){
-    db.Common.getThumbnailDatabase(function(err,database){
+    poolThumbnail.acquire(function(err,database){
         jsonReq.database=database;
         jsonReq.attr={
             "content_type":"image/png",
@@ -81,17 +99,17 @@ var _insertThumbnailToDB=function(jsonReq,callback){
         }
         db.Images.uploadBuffer(jsonReq,function(err,result){
             console.log(jsonReq.attr,err,result);
-            database.close();
+            poolThumbnail.release(database);
             callback(err,result);
         });
     });
 }
 //获取原始图片
 var getOriginalImage=function(jsonReq,callback){
-    db.Common.getAuthenticationDatabase(function(err,database){
+    poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Images.getImage(jsonReq,function(err,buf){
-            database.close();
+            poolMain.release(database);
             if(err){return callback(err)};
             jsonReq.buf=buf;
             _crop(jsonReq,function(err,cropBuf){

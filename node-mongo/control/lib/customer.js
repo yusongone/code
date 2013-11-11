@@ -3,16 +3,19 @@
  * */
 
 var db=require("../../db");
-var parse=require("./common").parse;
-var Type=require("./common").Type;
+var parse=db.Common.parse;
+var Type=db.Common.Type;
+var getPool=db.Common.getPool;
+var poolMain=getPool("main");
 
 function _getCustomerInfoIdByBindUserId(jsonReq,callback){
-   db.Common.getAuthenticationDatabase(function(err,database){
+    poolMain.acquire(function(err,database){
         jsonReq.database=database;
         jsonReq.queryObj={
             bindUser:jsonReq.userId
         }
        db.Customer.getCustomerInfoData(jsonReq,function(err,doc){
+            poolMain.release(database);
            if(doc){
                 callback(err,doc["_id"]); 
            }else{
@@ -24,10 +27,10 @@ function _getCustomerInfoIdByBindUserId(jsonReq,callback){
 
 //绑定用户到客户关系；
 function _bindUser(jsonReq,callback){
-   db.Common.getAuthenticationDatabase(function(err,database){
+    poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Customer.bindUser(jsonReq,function(err,item){
-            database.close();
+            poolMain.release(database);
             callback(err,item);
         }); 
    }); 
@@ -35,10 +38,10 @@ function _bindUser(jsonReq,callback){
 
 //检测客户关系是否已经绑定过
 function _checkBind(jsonReq,callback){
-   db.Common.getAuthenticationDatabase(function(err,database){
+    poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Customer.checkBind(jsonReq,function(err,item){
-            database.close();
+            poolMain.release(database);
             callback(err,item);
         }); 
    }); 
@@ -46,7 +49,7 @@ function _checkBind(jsonReq,callback){
 
 //账户增加客户
 function _addCustomer(jsonReq,callback){
-    db.Common.getAuthenticationDatabase(function(err,database){
+    poolMain.acquire(function(err,database){
         jsonReq.database=database;
         //假设customer表中不存在登陆者的客户关系，将创建，如果存在，将插入数据；
         db.Customer.createCustomerListForUser(jsonReq,function(err,data){
@@ -56,9 +59,16 @@ function _addCustomer(jsonReq,callback){
                    jsonReq.cusInfoId=result.cusInfoId;
                    jsonReq.imageLibId=result.imageLibId;
                     db.ImageLibs.createImageLibs(jsonReq,function(err,result){
+                        if(err){
+                            poolMain.release(database);
+                            return callback(err);
+                        }
                         jsonReq.imagesLibId=result["_id"];
                         db.Customer.addCustomerToList(jsonReq,function(err,result){
-                           database.close();
+                            poolMain.release(database);
+                            if(err){
+                                return callback(err);
+                            }
                             callback(err,result);
                         });
                     });
@@ -70,23 +80,32 @@ function _addCustomer(jsonReq,callback){
 //获取账户下所有客户
 function _getCustomerList(jsonReq,callback){
     var userId=jsonReq.userId;
-    db.Common.getAuthenticationDatabase(function(err,database){
+    poolMain.acquire(function(err,database){
         db.Customer.getCustomerList({
             database:database,
             userId:userId
         },function(err,json){
-            database.close();
+            poolMain.release(database);
+            if(err){
+                return callback(err);
+            }
             callback(err,json);
        }); 
     });
 }
 //搜索客户
 function _searchCustomer(json,callback){
-    db.Customer.searchCustomer({
-        "keyword":json.keyword
-    },function(json){
-        database.close();
-        callback(json);
+    poolMain.acquire(function(err,database){
+        db.Customer.searchCustomer({
+            database:database,
+            "keyword":json.keyword
+        },function(json){
+            poolMain.release(database);
+            if(err){
+                return callback(err);
+            }
+            callback(json);
+        });
     });
 }
 
