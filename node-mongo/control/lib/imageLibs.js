@@ -57,24 +57,6 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
         });
     });
 };
-//ªÒ»°Õº∆¨
-var _getImage=function(jsonReq,callback){
-    db.Common.getAuthenticationDatabase(function(err,database){
-        jsonReq.database=database;
-        if(err){return callback(err);}
-        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
-            if("creator"==result||"binder"==result){
-                //get database
-                db.Images.getImage(jsonReq,function(err,buf){
-                    database.close();
-                    callback(err,buf);
-                });
-            }else{
-                callback("no permission");
-            }
-        });
-    });
-};
 
     var _getImagesByCusInfoId=function(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
@@ -149,7 +131,6 @@ function _getCustomerImages(jsonReq,callback){
 exports.getImageLibs=_getImageLibs;
 exports.createImageLibs=_createImageLibs;
 exports.uploadImageToImagesLib=_uploadImageToImagesLib;
-exports.getImage=_getImage;
 exports.getImagesByCusInfoId=_getImagesByCusInfoId;
 //exports.checkLibsBelong=_checkLibsBelong;
 

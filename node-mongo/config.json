@@ -17,11 +17,10 @@
         "dbname":"sessionDB"
     },
     "thumbnail":{
-        "path":"127.0.0.1",
+        "ip":"127.0.0.1",
         "port":"27017",
         "user":"song",
         "pass":"song",
-        "collection":"session",
-        "dbname":"pic_thumbnial"
+        "dbname":"thumbnailDB"
     }
 }

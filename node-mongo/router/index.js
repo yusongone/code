@@ -180,12 +180,28 @@ function router(app){
         var cusInfoId=req.params.cusInfoId;
         var imageId=req.params.imageId;
         var userId=req.session.userId;
+        var size=req.query.size||100;
+        /*
+    db.Common.getAuthenticationDatabase(function(err,database){
+        db.Images.getImage({"fileId":imageId,"database":database},function(err,data){
+                        res.writeHead(200, {'Content-Type': 'image/png' });
+                        res.end(data, 'binary');
+
+        });
+        });
+        */
         if(cusInfoId.toString()&&imageId.toString()){
             if(checkLogind(req,res,"get")){
-                ctrl.ImageLibs.getImage({"cusInfoId":cusInfoId,"fileId":imageId,"userId":userId},function(err,data){
+                ctrl.Images.getImage({
+                        "cusInfoId":cusInfoId,
+                        "fileId":imageId,
+                        "userId":userId,
+                        "size":size
+                },function(err,data){
                     if(err){
                         res.redirect("/404");
                     }else{
+                        console.log(data,"fefxxxx");
                         res.writeHead(200, {'Content-Type': 'image/png' });
                         res.end(data, 'binary');
                     }

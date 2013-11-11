@@ -42,7 +42,21 @@ function _createObjectId(str){
             callback(err,{"status":"ok","_id":_id});
         });
     };
-    
+
+    var checkImageInCustomer=function(jsonReq,callback){
+        var database=jsonReq.database;    
+        var fileId=jsonReq.fileId;
+        var cusInfoId=jsonReq.cusInfoId;
+            cusInfoId=_createObjectId(cusInfoId);
+            fileId=_createObjectId(fileId);
+            if(!(fileId&&cusInfoId)){return callback("err")};
+        var col=database.collection("image_libs");
+            col.findOne({"cusInfoId":cusInfoId,"images":{$elemMatch:{"fileId":fileId}}},function(err,doc){
+               if(err){return callback(err)} 
+               callback(err,doc);
+            });
+    }    
+
     var _addImageIdToLibs=function(jsonReq,callback){
         var database=jsonReq.database;
         var userId=jsonReq.userId;
@@ -97,3 +111,4 @@ exports.getDatasByLibId=_getDatasByLibId;
 exports.addImageIdToLibs=_addImageIdToLibs;
 
 exports.getImagesListByCusInfoId=getImagesListByCusInfoId;
+exports.checkImageInCustomer=checkImageInCustomer;

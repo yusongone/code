@@ -3,32 +3,57 @@ var fs=require("fs");
 var Canvas=require("canvas");
     var Image=Canvas.Image;
 
-var createThumbnail=function(buf){
+//获取图片
+var _getImage=function(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
-        var jsonReq={};
-            jsonReq.database=database;
-            //jsonReq.cusInfoId="527fcc612413c7cf24000001";
-            jsonReq.cusInfoId="527e8d558de43a4726000001";
-            //jsonReq.fileId="52802c98f5cd56e32c000001";
-            jsonReq.fileId="52838419d5c66f3f0e00000b";
-        db.Images.getImage(jsonReq,function(err,buf){
-            console.log(err,buf);
-            //testFs(buf);
-            crop({buf:buf,size:100},"a");
-        }); 
+        jsonReq.database=database;
+        if(err){return callback(err);}
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if("creator"==result||"binder"==result){
+                //get database
+                //检查图片是否存在此Customer 库中；
+                db.ImageLibs.checkImageInCustomer(jsonReq,function(err,result){
+                    if(err){return callback(err);}
+                    //null 此图片不存在此图片库中
+                    if(result==null){return callback("no image")};
+                    /*
+                    db.Images.getImage(jsonReq,function(err,buf){
+                        database.close();
+                        callback(err,buf);
+                    });
+                    */
+                    _getThumbnailImage(jsonReq,function(err,buf){
+                        if(err){return callback(err)};
+                        if(buf){
+                            callback(err,buf);
+                        }else{
+                            getOriginalImage(jsonReq,function(err,buf){
+                                callback(err,buf);
+                            }); 
+                        }
+                    });
+                });
+            }else{
+                callback("no permission");
+            }
+        });
     });
-}
+};
 //获取缩略图
-var getThumbnailImage=function(jsonReq,callback){
+var _getThumbnailImage=function(jsonReq,callback){
     db.Common.getThumbnailDatabase(function(err,database){
         jsonReq.database=database;
         jsonReq.queryObj={
-            originalId:jsonReq.fileId
+            "metadata.size":jsonReq.size,
+            "metadata.originalImageId":jsonReq.size
         }
-        db.Images.getImageByQuery(jsonReq,function(err,imageInfo){
+        db.Images.getImageInfo(jsonReq,function(err,imageInfo){
+            database.close();
             if(err){return callback(err)};
+            if(!imageInfo){return callback(err,null);}
             var id=imageInfo["_id"];
             jsonReq.fileId=id;
+            //在缩略图数据库中获取图片
             db.Images.getImage(jsonReq,function(err,buf){
                 if(err){return callback(err)};
                 callback(err,buf);
@@ -36,23 +61,48 @@ var getThumbnailImage=function(jsonReq,callback){
         });
     })
 };
+//把缩略图插入本地数据库
+var _insertThumbnailToDB=function(jsonReq,callback){
+    db.Common.getThumbnailDatabase(function(err,database){
+        jsonReq.database=database;
+        jsonReq.attr={
+            "content_type":"image/png",
+            "metadata":{
+                "originalImageId":jsonReq.fileId,
+                "size":jsonReq.size,
+            },
+            "chunkSize":jsonReq.buf.length
+        }
+        db.Images.uploadBuffer(jsonReq,function(err,result){
+            database.close();
+            callback(err,result);
+        });
+    });
+}
 //获取原始图片
 var getOriginalImage=function(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
+        jsonReq.database=database;
         db.Images.getImage(jsonReq,function(err,buf){
+            database.close();
             if(err){return callback(err)};
             jsonReq.buf=buf;
             _crop(jsonReq,function(err,cropBuf){
-                    
+                if(err){return callback(err)};
+                callback(err,cropBuf);
+                jsonReq.buf=cropBuf;
+                return;
+                _insertThumbnailToDB(jsonReq,function(){
+                    console.log("create a new Thu image");
+                });
             });
         });
     });
-
 }
 //压缩图片
-function crop(jsonReq,callback){
+function _crop(jsonReq,callback){
     var buf=jsonReq.buf;
-    var size=jsonReq.size;
+    var size=parseInt(jsonReq.size)||100;
     var img=new Image;
         img.src=buf;
     var w=img.width, 
@@ -75,7 +125,6 @@ function testFs(buf){
     var canvas=new Canvas(100,100);
     var img=new Image;
         img.src=buf;
-        console.log(img);
     var ctx=canvas.getContext("2d");
         ctx.drawImage(img,0,0,50,50);
 }
@@ -102,9 +151,25 @@ function save2(canvas){
         stream.pipe(out);
 }
 
+/*
+var createThumbnail=function(buf){
+    db.Common.getAuthenticationDatabase(function(err,database){
+        var jsonReq={};
+            jsonReq.database=database;
+            //jsonReq.cusInfoId="527fcc612413c7cf24000001";
+            jsonReq.cusInfoId="527e8d558de43a4726000001";
+            //jsonReq.fileId="52802c98f5cd56e32c000001";
+            jsonReq.fileId="52838419d5c66f3f0e00000b";
+        db.Images.getImage(jsonReq,function(err,buf){
+            console.log(err,buf);
+            //testFs(buf);
+            crop({buf:buf,size:100},"a");
+        }); 
+    });
+}
+*/
 
 
-exports.createThumbnail=createThumbnail;
-exports.getThumbnailImage=getThumbnailImage;
-
-createThumbnail();
+//exports.createThumbnail=createThumbnail;
+//exports.getThumbnailImage=getThumbnailImage;
+exports.getImage=_getImage;
