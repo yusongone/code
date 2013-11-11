@@ -18,6 +18,20 @@ function _test_createCustomerListForUser(){
     });
 }
 
+function testRelation(){
+    Common.getAuthenticationDatabase(function(err,database){
+        db.Customer.getUserAndCustomerRelation({
+            "database":database,
+            "userId":"527b8be29544dc3c72000001",
+            "cusInfoId":"527fcc612413c7cf24000001"
+        },function(err,result){
+            if(err){return console.log("******db_customer>>>>>>>>>>>>>>>>>>> getCustomerById Error")};
+            console.log("db_customer",result);
+        });
+    });
+}
+
+
 function _test_addCustomerToList(){
     Common.getAuthenticationDatabase(function(err,database){
         db.Customer.addCustomerToList({
@@ -91,12 +105,15 @@ function _test_getCustomerById(){
 
 
 
+    testRelation();
 exports.test=function(){
+    /*
     _test_createCustomerListForUser();
     _test_addCustomerToList();
     _test_addCustomerInfo();
     _test_getCustomerList();
     _test_getCustomerById();
+    */
 }
 /*
 exports.createCustomerListForUser=_createCustomerListForUser;

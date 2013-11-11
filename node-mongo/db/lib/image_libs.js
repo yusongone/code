@@ -2,7 +2,6 @@ var mongodb=require("mongodb"),
     crypto=require("crypto");
     objectId=mongodb.ObjectID,
     Db=mongodb.Db,
-    Server=mongodb.Server,
     gridStore=mongodb.GridStore;
 var db_conf=require("../../config.json").db;
 var createDb=require("./common").createDb;
@@ -43,6 +42,7 @@ function _createObjectId(str){
             callback(err,{"status":"ok","_id":_id});
         });
     };
+
     //通过图片库Id查找此 库下所有信息
     var _getDatasByLibId=function(jsonReq,callback){
         var database=jsonReq.database;
@@ -56,166 +56,27 @@ function _createObjectId(str){
         });
     };
 
-    //读取图片
-    var _getImage=function(jsonReq,callback){
-        var database=jsonReq.database;
-        var fileId=jsonReq.fileId;
-        var id= _createObjectId(fileId);
-        if(!id){return callback("err")};
-
-        var gs=new gridStore(database,id,"r");
-            gs.open(function(err,gs){
-                gs.read(function(err,doc){
-                    callback(err,doc);
-                });
-            });
-    };
-    var _uploadImageBuffer=function(jsonReq,callback){
-        var database=jsonReq.database;
-        //var col=database.collection("image_libs");
-        var gs=new gridStore(database,"t.png","w",{"content_type":"image/png","chunkSize":buf.length});
-            gs.open(function(err,gs){
-                /*
-                gs.collection(function(err,coll){
-                    coll.find({"md5":"28a230b1646b40125b6fec83d19bdbfe"},{}).toArray(function(err,result){
-                        database.close();
-                    });
-                });
-                */
-                gs.write(buf.toString("binary"),function(err,doc){
-                    var fff=doc.fileId;
-                    gs.close();
-                    var userId= _createObjectId(jsonReq.strId);
-                    if(!UserId){ database.close(); return callback("err")};
-                //将图片 id 存入到 相应图片库下；
-                var col=database.collection("image_libs");
-                //db.one.update({"name":"e"},{$addToSet:{images:{$each:[{"name":"c"}]}}});
-                    col.update({"_id":userId,"username":jsonReq.username},{$addToSet:{images:{$each:[{"fileId":fff}]}}},{w:1},function(err){
-                        callback();
-                    });
-                })
-            });
-    };
-    //上传图片，并且把图片ID存放到相应 图片库文件夹下
-    var _uploadImageFile=function(jsonReq,callback){
-        var database=jsonReq.database;
-            var files=jsonReq.files;
-            var length=files.length;
-            var count=0;
-            for(var i=0;i<length;i++){
-                var file=files[i];
-                var strId=jsonReq.strId;
-                wf(file,strId,function(){
-                    count++;
-                    if(count==length){
-                        callback(null,{"status":"ok"});
-                    }
-                });
-            }
-            function wf(file,strId,fun){
-                var gs=new gridStore(database,new objectId(),"w",{
-                    content_type:"image/png"
-                });
-                gs.open(function(err,gs){
-                    //写入图片
-                    gs.writeFile(file.path,function(err,doc){
-                        var fileId=doc.fileId;
-                        var userId= _createObjectId(strId);
-                        if(!userId){database.close();return callback("err")};
-                        gs.close();
-                        //将图片 id 存入到 相应图片库下；
-                        var col=database.collection("image_libs");
-                            col.update({"_id":userId,"username":jsonReq.username},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
-                                //database.close();
-                                fun();
-                                _addBelong({ fileId:fileId, userId:userId,database:database},function(){
-                                
-                                });
-                            });
-                    });
-                });
-            };
-    };
-//也许可以优化
-function _addBelong(jsonReq,callback){
-    var database=jsonReq.databse;
-    var username=jsonReq.username;
-    var fileId=jsonReq.fileId;
-    var userId=jsonReq.userId;
-
-    var col=database.collection("image_libs");
-        col.update({"_id":userId,"username":username},{$addToSet:{belong:{$each:[{"username":"tt"}]}}},{w:1},function(err,doc){
-            callback(err,{});
-        });
-}
-
-/*
-function _checkBelong(jsonReq,callback){
-    var libId=jsonReq.libId,
-        imageId=jsonReq.imageId,
-        username=jsonReq.username;
-    var database=jsonReq.database;
-        var col=database.collection("image_libs");
-        var oid= _createObjectId(libId);
-        if(!oid){return callback("image_libs line 164 id err")};
-        var iid= _createObjectId(imageId);
-        if(!oid){return callback("image_libs line 167 id err")};
-        col.find({"_id":oid,$or:[{"username":username},{"belong":{$elemMatch:{"username":username}}}],"images":{$elemMatch:{"fileId":iid}}},{}).toArray(function(err,item){
-            callback(err,item);
-        });
-};
-*/
-
-//通过 cusInfoId 插入 图片Id；
-function _addImageInImagesLibByCusInfoId(){
-
-}
-
 //通过 cusInfoId 获取 图片列表；
-function _getImagesListByCusInfoId(){
-
-}
-
-/*
-**验证登录者和cusInfoId 的关系
-**创建，绑定，none；
-*/
-function getUserAndCustomerRelation(){
+function getImagesListByCusInfoId(jsonReq,callback){
     var database=jsonReq.database;
+    var userId=jsonReq.userId;
     var cusInfoId=jsonReq.cusInfoId;
     var cid= _createObjectId(cusInfoId);
     if(!cid){return callback("err")};
     var col=database.collection("image_libs");
-        col.findOne({"_id":cid},function(err,doc){
-            console.log(doc); 
+        col.findOne({"cusInfoId":cid},function(err,doc){
+            if(doc){
+              callback(err,doc.images);    
+            }else{
+              callback(err,null);    
+            };
         });
 }
 
-//验证 登录者是cusInfoId 绑定者 的关系
-
-//验证 登录者是cusInfoId 的 创建者 或者 是绑定者的关系；
-
-
-function _findLibsByUserIdAndCusInfoId(jsonReq,callback){
-    var database=jsonReq.database;
-    var userId=jsonReq.userId;
-    var cusInfoId=jsonReq.cusInfoId;
-    var uid= _createObjectId(userId);
-    var cid= _createObjectId(cusInfoId);
-    if(!(uid&&cid)){return callback("err")};
-    var col=database.collection("image_libs");
-        col.find({"userId":uid,"cusInfoId":cid},{}).toArray(function(err,item){
-           callback(err,item); 
-        });
-};
 
 
 exports.getImageLibs=_getImageLibs;
 exports.createImageLibs=_createImageLibs;
 exports.getDatasByLibId=_getDatasByLibId;
-exports.getImage=_getImage;
-exports.uploadImageBuffer=_uploadImageBuffer;
-exports.uploadImageFile=_uploadImageFile;
-//exports.checkBelong=_checkBelong;
 
-exports.findLibsByUserIdAndCusInfoId=_findLibsByUserIdAndCusInfoId;
+exports.getImagesListByCusInfoId=getImagesListByCusInfoId;

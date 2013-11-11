@@ -31,34 +31,19 @@ var d=null;
             database.close();
         }); 
     };
-    //≈–∂œÕº∆¨ø‚ «∑Ò Ù”⁄µ«¬Ω”√ªß
-    /*
-    var _checkLibsBelong=function(json,callback){
-        var libId=parse.base64ToStr(json.libId);
-        var username=json.username;
-    db.Common.getAuthenticationDatabase(function(err,database){
-        if(err){return callback(err);}
-        db.ImageLibs.getDatasByLibId({
-            database:database,
-            "libId":libId
-            },function(err,item){
-            if(username==item.username){
-                callback(err,true);
-            }else{
-                callback(err,false);
-            }
-        });
-    });
-    }
-    */
-
-
 
 //Images function
-    var _uploadImage=function(json,callback){
+    var _uploadImageToImagesLib=function(json,callback){
         json.strId=parse.base64ToStr(json.libId);
     db.Common.getAuthenticationDatabase(function(err,database){
         if(err){return callback(err);}
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if("creator"!=result){
+                callback(err,{"status":"sorry","message":"no permission"});
+            }else{
+
+            }
+        });
         //≈–∂œ¥À Õº∆¨ø‚  «∑Ò Ù”⁄µ±«∞µ«¬º»À
         db.ImageLibs.getDatasByLibId({
             database:database,
@@ -135,17 +120,25 @@ var d=null;
 function _findLibsByUserIdAndCusInfoId(jsonReq,callback){
     db.Common.getAuthenticationDatabase(function(err,database){
         jsonReq.database=database;
-        db.ImageLibs.findLibsByUserIdAndCusInfoId(jsonReq,function(err,item){
-            database.close();
-            callback(err,item);
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,relation){
+            if("creator"==relation){
+                db.ImageLibs.getImagesListByCusInfoId(jsonReq,function(err,result){
+                    database.close();
+                    if(result){
+                        callback(err,result);    
+                    }else{
+                        callback(err,[]);
+                    }
+                });         
+            }
+             
         });
     });
-
 }
 
 exports.getImageLibs=_getImageLibs;
 exports.createImageLibs=_createImageLibs;
-exports.uploadImage=_uploadImage;
+exports.uploadImageToImagesLib=_uploadImageToImagesLib;
 exports.getImage=_getImage;
 exports.getImagesByCusInfoId=_getImagesByCusInfoId;
 //exports.checkLibsBelong=_checkLibsBelong;

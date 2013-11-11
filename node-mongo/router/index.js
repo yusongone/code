@@ -123,7 +123,7 @@ function router(app){
                     res.render("manage_image",{
                         "js_version":js_version,
                         "css_version":css_version,
-                        "title":"uploadImage",
+                        "title":"图片管理",
                         "id":req.params.cusInfoId,
                         "result":r
                     });
@@ -290,11 +290,14 @@ function router(app){
         };
     });
     //上传图片
-    app.post('/uploadImage', function(req, res){
+    app.post('/uploadImageToImagesLib', function(req, res){
         if(checkLogind(req,res)){
-            var files=req.files,
-                lib_id=req.body.lib_id;
-            ctrl.ImageLibs.uploadImage({files:files.files,libId:lib_id,username:req.session.username},function(json){
+            var jsonReq={};
+                jsonReq.files=req.files.files;
+                jsonReq.cusInfoId=req.body.cusInfoId;
+                jsonReq.userId=req.session.userId;
+            ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(json){
+                
                 res.send(json);
             });
         };
@@ -314,15 +317,6 @@ function router(app){
                     res.send({"status":"sorry","data":[]});
                 }
             });
-            /*
-            ctrl.ImageLibs.getImagesByCusInfoId({
-                "cusInfoId":cusInfoId,
-                "userId":req.session.userId
-            },function(err,ary){
-                console.log(ary);
-                res.send({"status":"ok","data":ary});
-            });
-            */
         };
     });
     //创建图片库

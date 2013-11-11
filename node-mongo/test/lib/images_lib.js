@@ -7,10 +7,6 @@ var testUserId=new objectId("527ce977e920d9af09000001");
 var testCusId=new objectId("527cea824ae799ba0a000001");
 
 
-function testRelation(){
-        
-}
-
 /*
 exports.createCustomerListForUser=_createCustomerListForUser;
 exports.addCustomerToList=_addCustomerToList;

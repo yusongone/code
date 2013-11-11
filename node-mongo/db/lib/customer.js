@@ -18,6 +18,35 @@ function _createObjectId(str){
         }
 };
 
+/*
+**验证登录者和cusInfoId 的关系
+**创建，绑定，none；
+*/
+function getUserAndCustomerRelation(jsonReq,callback){
+    var database=jsonReq.database;
+    var cusInfoId=jsonReq.cusInfoId;
+    var userId=jsonReq.userId;
+    var cid= _createObjectId(cusInfoId);
+    var uid= _createObjectId(userId);
+    if(!cid){return callback("err")};
+    var col=database.collection("customerInfo");
+        col.findOne({"_id":cid},function(err,doc){
+            var ID;
+            if(doc){
+              if(uid==doc.bindUser){
+                  ID="binder";
+              }else if(uid=doc.userId){
+                  ID="creator";
+              }else{
+                  ID="none";
+              }
+            }else{
+                  ID="none";
+            }
+            callback(err,ID);
+        });
+}
+
 //在 客户关系表中增加一项 客户具体信息 的索引
 function _addCustomerToList(jsonReq,callback){
     var database=jsonReq.database;
@@ -28,6 +57,7 @@ function _addCustomerToList(jsonReq,callback){
             callback(err,{"status":"ok"});
         });
 };
+
 function _checkBind(jsonReq,callback){
     var database=jsonReq.database;
     var cusId=jsonReq.cusId;
@@ -173,3 +203,4 @@ exports.getCustomerList=_getCustomerList;
 exports.addCustomerInfo=_addCustomerInfo;
 exports.getImageLibsId=_getImageLibsId;
 exports.createCustomerListForUser=_createCustomerListForUser;
+exports.getUserAndCustomerRelation=getUserAndCustomerRelation;
