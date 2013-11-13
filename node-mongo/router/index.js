@@ -315,7 +315,6 @@ function router(app){
                 jsonReq.cusInfoId=req.body.cusInfoId;
                 jsonReq.userId=req.session.userId;
             ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(err,json){
-                console.log(json);
                 res.send(json);
             });
         };

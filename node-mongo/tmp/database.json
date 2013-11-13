@@ -42,3 +42,11 @@
 
 
 //用户添加“未注册”用户到customer，储存email，先去users表中查找，如果没有，为没有绑定或注册的邮件。如果有，在users查找相应详细信息，返回username；给customerList；
+
+
+{
+    "_id":"object(123952348323456)",
+    originalId:objectId(123023457934845),
+    size:50,
+    thumbnailFileId:objectId(1072340871623412)
+}

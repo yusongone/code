@@ -14,7 +14,7 @@
         "user":"song",
         "pass":"song",
         "collection":"session",
-        "dbname":"picOnline"
+        "dbname":"sessionDB"
     },
     "thumbnail":{
         "path":"127.0.0.1",

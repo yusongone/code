@@ -49,8 +49,8 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
                     jsonReq.fileId=fileId;
                     //把添加的图片Id添加到imagesLib中；
                     db.ImageLibs.addImageIdToLibs(jsonReq,function(err,result){
-                    database.close();
-                    callback(err,result);
+                        database.close();
+                        callback(err,result);
                     });
                 });       
             }
@@ -64,11 +64,8 @@ var _getImage=function(jsonReq,callback){
         if(err){return callback(err);}
         db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
             if("creator"==result||"binder"==result){
-                //get cache
-
                 //get database
                 db.Images.getImage(jsonReq,function(err,buf){
-                    console.log(err);
                     database.close();
                     callback(err,buf);
                 });

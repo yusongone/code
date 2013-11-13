@@ -51,8 +51,10 @@ function _createObjectId(str){
             cusInfoId= _createObjectId(cusInfoId);
             userId= _createObjectId(userId);
             if(!(userId&&cusInfoId)){return callback("err")};
+        var filename=jsonReq.files[0].name;
         var col=database.collection("image_libs");
-            col.update({"userId":userId,"cusInfoId":cusInfoId},{$addToSet:{images:{$each:[{"fileId":fileId}]}}},{w:1},function(err){
+        console.log(filename);
+            col.update({"userId":userId,"cusInfoId":cusInfoId},{$addToSet:{images:{$each:[{"fileId":fileId,"filename":filename}]}}},{w:1},function(err){
                     callback(err,{"status":"ok"});
                 });
     };
