@@ -5,7 +5,7 @@ var express=require("express"),
     MongoStore=require("connect-mongo")(express),
     session_conf=require("./config.json").session;
 var store=new MongoStore({
-            db:session_conf.name,
+            db:session_conf.dbname,
             host:session_conf.path,
             port:session_conf.port,  // optional, default: 27017
             username:session_conf.user, // optional
