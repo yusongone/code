@@ -9,6 +9,7 @@ var createDb=require("./common").createDb;
 
 function _createObjectId(str){
         try{
+            str=str.toString();
             return  new objectId(str);
         }catch(err){
             console.log(err);
@@ -23,7 +24,6 @@ var _getImageInfo=function(jsonReq,callback){
     var col=database.collection("fs.files");
         var queryObj=jsonReq.queryObj;
         col.findOne(queryObj,function(err,result){
-            console.log(result);
             callback(err,result);
         });;
 
@@ -52,11 +52,12 @@ var _uploadBuffer=function(jsonReq,callback){
     var gs=new gridStore(database,oid,"w",attr);
     gs.open(function(err,gss){
         gs.write(buf.toString("binary"),function(err,doc){
-            console.log(doc);
             if(err){return callback(err);}
             var fileId=doc.fileId;
-            gs.close();
-            //callback(err,fileId);
+            gs.close(function(err,result){
+                console.log("fefefefefe");
+                callback(err,fileId);
+            });
         });
     });
 };

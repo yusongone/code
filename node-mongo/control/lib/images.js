@@ -16,17 +16,23 @@ var _getImage=function(jsonReq,callback){
                     if(err){return callback(err);}
                     //null 此图片不存在此图片库中
                     if(result==null){return callback("no image")};
+                    console.log(jsonReq.size);
+                    if(jsonReq.size=="origin"){
+                        db.Images.getImage(jsonReq,function(err,buf){
+                            database.close();
+                            callback(err,buf);
+                        });
+                        return;
+                    }
                     /*
-                    db.Images.getImage(jsonReq,function(err,buf){
-                        database.close();
-                        callback(err,buf);
-                    });
                     */
                     _getThumbnailImage(jsonReq,function(err,buf){
                         if(err){return callback(err)};
                         if(buf){
+                            console.log("cache");
                             callback(err,buf);
                         }else{
+                            console.log("crop");
                             getOriginalImage(jsonReq,function(err,buf){
                                 callback(err,buf);
                             }); 
@@ -45,16 +51,16 @@ var _getThumbnailImage=function(jsonReq,callback){
         jsonReq.database=database;
         jsonReq.queryObj={
             "metadata.size":jsonReq.size,
-            "metadata.originalImageId":jsonReq.size
+            "metadata.originalImageId":jsonReq.fileId
         }
         db.Images.getImageInfo(jsonReq,function(err,imageInfo){
-            database.close();
             if(err){return callback(err)};
             if(!imageInfo){return callback(err,null);}
             var id=imageInfo["_id"];
             jsonReq.fileId=id;
             //在缩略图数据库中获取图片
             db.Images.getImage(jsonReq,function(err,buf){
+                database.close();
                 if(err){return callback(err)};
                 callback(err,buf);
             });
@@ -74,6 +80,7 @@ var _insertThumbnailToDB=function(jsonReq,callback){
             "chunkSize":jsonReq.buf.length
         }
         db.Images.uploadBuffer(jsonReq,function(err,result){
+            console.log(jsonReq.attr,err,result);
             database.close();
             callback(err,result);
         });
@@ -91,9 +98,8 @@ var getOriginalImage=function(jsonReq,callback){
                 if(err){return callback(err)};
                 callback(err,cropBuf);
                 jsonReq.buf=cropBuf;
-                return;
-                _insertThumbnailToDB(jsonReq,function(){
-                    console.log("create a new Thu image");
+                _insertThumbnailToDB(jsonReq,function(err,doc){
+                    console.log(err,"create a new Thu image");
                 });
             });
         });
