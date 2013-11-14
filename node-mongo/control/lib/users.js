@@ -33,10 +33,11 @@ function _insertUserName(jsonReq,callback){
         if(err){return callback(err);}
         db.Users.insertUserName({
             database:database,
-            userName:jsonReq.username,
+            username:jsonReq.username,
             pass:jsonReq.pass
-        },function(jsonRes){
-            callback(null,jsonRes);
+        },function(err,jsonRes){
+            if(err){return callback(err)};
+            callback(err,jsonRes);
             database.close();
         });
     });
