@@ -3,8 +3,8 @@ var ejs=require("ejs");
 var js_version=config.js_version,
     css_version=config.css_version;
     var fs=require("fs");
-    var db=require("../db");
     var ctrl=require("../control");
+    var upload_max_size=1024*1024*2;
 
     var test=require("../test/canvas_test");
 
@@ -337,6 +337,10 @@ function router(app){
                 jsonReq.files=req.files.files;
                 jsonReq.cusInfoId=req.body.cusInfoId;
                 jsonReq.userId=req.session.userId;
+                var ImageSize=jsonReq.files[0].size;
+                if(parseInt(ImageSize)>upload_max_size){
+                    return res.send({"stuats":"sorry","message":"Image too large"});
+                }
             ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(err,json){
                 res.send(json);
             });

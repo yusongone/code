@@ -60,7 +60,8 @@ function uploadImage(jsonReq,callback){
     var database=jsonReq.database;
     var file=jsonReq.files[0];
     var gs=new gridStore(database,new objectId(),"w",{
-        content_type:"image/png"
+        content_type:"image/png",
+        chunkSize:file.size
     });
     gs.open(function(err,gs){
         gs.writeFile(file.path,function(err,doc){
