@@ -1,3 +1,7 @@
+var mongodb=require("mongodb"),
+    Db=mongodb.Db,
+    Server=mongodb.Server,
+    objectId=mongodb.ObjectID;
 var db_conf=require("../../config.json").db;
 var thu_conf=require("../../config.json").thumbnail;
 var poolModule=require("generic-pool");
@@ -5,12 +9,11 @@ var poolModule=require("generic-pool");
 var poolMain = poolModule.Pool({
         name     : 'main',
         create   : function(callback) {
-            var db= new Db(db_conf.dbname, new Server(db_conf.ip, db_conf.port, {auto_reconnect: true}, {w:1}),{safe:true});
-            db.open(function(err,database){
-                if(err){return callback(err);}
-                database.authenticate(db_conf.user,db_conf.pass,function(err,db){
-                    callback(err,database);
-                });
+            mongodb.MongoClient.connect("mongodb://"+db_conf.ip+"/"+db_conf.dbname,{server:{poolSize:1}},function(err,database){
+                    if(err){return callback(err);}
+                    database.authenticate(db_conf.user,db_conf.pass,function(err,ddb){
+                        callback(err,database);
+                    });
             });
         },
         destroy  : function(database) { 
@@ -24,13 +27,11 @@ var poolMain = poolModule.Pool({
 var poolThumbnail = poolModule.Pool({
         name     : 'thumbnail',
         create   : function(callback) {
-            var db= new Db(thu_conf.dbname, new Server(thu_conf.ip, thu_conf.port, {auto_reconnect: true}, {w:1}),{safe:true});
-            db.open(function(err,database){
-                console.log("=========================================================================================",err);
-                if(err){return callback(err);}
-                database.authenticate(thu_conf.user,thu_conf.pass,function(err,db){
-                    callback(err,database);
-                });
+            mongodb.MongoClient.connect("mongodb://"+thu_conf.ip+"/"+thu_conf.dbname,{server:{poolSize:1}},function(err,database){
+                    if(err){return callback(err);}
+                    database.authenticate(thu_conf.user,thu_conf.pass,function(err,ddb){
+                        callback(err,database);
+                    });
             });
         },
         destroy  : function(database) { 

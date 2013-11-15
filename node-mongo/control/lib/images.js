@@ -63,7 +63,8 @@ var _getThumbnailImage=function(jsonReq,callback){
         jsonReq.database=database;
         jsonReq.queryObj={
             "metadata.size":jsonReq.size,
-            "metadata.originalImageId":jsonReq.fileId
+            "metadata.originalImageId":jsonReq.fileId,
+            "metadata.type":jsonReq.imageType
         }
         db.Images.getImageInfo(jsonReq,function(err,imageInfo){
             if(err){
@@ -94,6 +95,7 @@ var _insertThumbnailToDB=function(jsonReq,callback){
             "metadata":{
                 "originalImageId":jsonReq.fileId,
                 "size":jsonReq.size,
+                "type":jsonReq.imageType
             },
             "chunkSize":jsonReq.buf.length
         }
@@ -131,16 +133,31 @@ function _crop(jsonReq,callback){
         img.src=buf;
     var w=img.width, 
         h=img.height;
-    if(w>h){
-        smallW=size;
-        smallH=(size/w)*h;
-    }else{
-        smallH=size;
-        smallW=(size/h)*w;
-    }
-    var canvas=new Canvas(smallW,smallH);
-    var ctx=canvas.getContext("2d");
-        ctx.drawImage(img,0,0,smallW,smallH);
+    var smallH,smallW;
+        if(jsonReq.imageType=="fill"){
+            var canvas=new Canvas(size,size);
+            var ctx=canvas.getContext("2d");
+            if(w>h){
+                smallH=size;
+                smallW=(size/h)*w;
+                ctx.drawImage(img,-(smallW-size)/2,0,smallW,smallH);
+            }else{
+                smallW=size;
+                smallH=(size/w)*h;
+                ctx.drawImage(img,0,-(smallH-size)/2,smallW,smallH);
+            }
+        }else{
+            if(w>h){
+                smallW=size;
+                smallH=(size/w)*h;
+            }else{
+                smallH=size;
+                smallW=(size/h)*w;
+            }
+            var canvas=new Canvas(smallW,smallH);
+            var ctx=canvas.getContext("2d");
+            ctx.drawImage(img,0,0,smallW,smallH);
+        }
         canvas.toBuffer(callback);
 }
 
@@ -175,25 +192,6 @@ function save2(canvas){
         stream.pipe(out);
 }
 
-/*
-var createThumbnail=function(buf){
-    db.Common.getAuthenticationDatabase(function(err,database){
-        var jsonReq={};
-            jsonReq.database=database;
-            //jsonReq.cusInfoId="527fcc612413c7cf24000001";
-            jsonReq.cusInfoId="527e8d558de43a4726000001";
-            //jsonReq.fileId="52802c98f5cd56e32c000001";
-            jsonReq.fileId="52838419d5c66f3f0e00000b";
-        db.Images.getImage(jsonReq,function(err,buf){
-            console.log(err,buf);
-            //testFs(buf);
-            crop({buf:buf,size:100},"a");
-        }); 
-    });
-}
-*/
 
 
-//exports.createThumbnail=createThumbnail;
-//exports.getThumbnailImage=getThumbnailImage;
 exports.getImage=_getImage;

@@ -1,11 +1,7 @@
 var mongodb=require("mongodb"),
     format=require("util").format,
-    crypto=require("crypto");
     objectId=mongodb.ObjectID,
-    Db=mongodb.Db,
-    Server=mongodb.Server;
-var db_conf=require("../../config.json").db;
-var createDb=require("./common").createDb;
+    crypto=require("crypto");
 
 
 //user collection;

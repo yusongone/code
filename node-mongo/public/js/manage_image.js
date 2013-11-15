@@ -122,11 +122,38 @@ var ajax_get=function(cusInfoId){
             if("sorry"==json.status){alert(json.message);return false;};
             var data=json.data;
             for(var i=0,l=data.length;i<l;i++){
-                var id=data[i].fileId; 
-                var img=$("<img/>",{"src":"/images/"+cusInfoId+"/"+id});
-                var thu=$("<li/>",{"class":"thu"});
-                $(".imageList").append(thu.append(img));
+                var imgObj=new imageObj();
+                    var thu=imgObj.initUI({
+                        cusInfoId:cusInfoId,
+                        id:data[i].fileId
+                    });
+                $(".imageList").append(thu);
             };
         }
     });
 };
+
+var imageObj=(function(){
+    function image(){
+    
+    }
+    image.prototype.initUI=function(json){
+        var cusInfoId=json.cusInfoId;
+        var id=json.id;
+        var thu=$("<li/>",{"class":"thu"});
+        var imgBox=$("<p/>",{"class":"imgBox"});
+            var img=$("<img/>",{"src":"/images/"+cusInfoId+"/"+id+"?type=fill"});
+            var del=$("<div/>",{"class":"delete"})
+            imgBox.append(img,del);
+        thu.append(imgBox);
+        return thu;
+    }
+
+
+
+
+    return image;
+})();
+
+
+

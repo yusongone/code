@@ -180,13 +180,16 @@ function router(app){
         var imageId=req.params.imageId;
         var userId=req.session.userId;
         var sizeR={"origin":"origin","300":300,"180":180,"100":100};
+        var typeR={"fill":"fill"}
         var size=sizeR[req.query.size]||180;
+        var type=typeR[req.query.type]||"normal";
         if(cusInfoId.toString()&&imageId.toString()){
             if(checkLogind(req,res,"get")){
                 ctrl.Images.getImage({
                         "cusInfoId":cusInfoId,
                         "fileId":imageId,
                         "userId":userId,
+                        "imageType":type,
                         "size":size
                 },function(err,data){
                     if(err){

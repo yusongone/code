@@ -1,11 +1,6 @@
 var mongodb=require("mongodb"),
-    crypto=require("crypto");
     objectId=mongodb.ObjectID,
-    Db=mongodb.Db,
-    Server=mongodb.Server,
     gridStore=mongodb.GridStore;
-var db_conf=require("../../config.json").db;
-var createDb=require("./common").createDb;
 
 function _createObjectId(str){
         try{
