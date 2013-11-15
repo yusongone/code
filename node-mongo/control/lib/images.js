@@ -48,12 +48,12 @@ var _getImage=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
         if(err){return callback(err);}
         jsonReq.database=database;
-        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,UserTitle){
             if(err){
                 poolMain.release(database);
                 return callback(err)
             };
-            if("creator"==result||"binder"==result){
+            if("creator"==UserTitle||"binder"==UserTitle){
                 //get database
                 //检查图片是否存在此Customer 库中；
                 db.ImageLibs.checkImageInCustomer(jsonReq,function(err,result){
@@ -66,10 +66,15 @@ var _getImage=function(jsonReq,callback){
                         return callback("no image")
                     };
                     if(jsonReq.size=="origin"){
-                        db.Images.getImage(jsonReq,function(err,buf){
-                            poolMain.release(database);
-                            callback(err,buf);
-                        });
+                        console.log(UserTitle);
+                        if("creator"==UserTitle){
+                            db.Images.getImage(jsonReq,function(err,buf){
+                                poolMain.release(database);
+                                callback(err,buf);
+                            });
+                        }else{
+                            callback("you are not this image creator");
+                        }
                         return;
                     }
                     poolMain.release(database);
