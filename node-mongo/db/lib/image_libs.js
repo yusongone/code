@@ -98,6 +98,23 @@ function getImagesListByCusInfoId(jsonReq,callback){
         });
 }
 
+function removeImageFromImagelibs(jsonReq,callback){
+   var database=jsonReq.database; 
+    var userId=jsonReq.userId;
+    var cusInfoId=jsonReq.cusInfoId;
+    var fileId=jsonReq.fileId;
+    var cid= _createObjectId(cusInfoId);
+    var fid= _createObjectId(fileId);
+    if(!(cid&&fid)){return callback("err")};
+    var col=database.collection("image_libs");
+        //col.remove({"cusInfoId":cid,"images":{$elemMatch:{"fileId":fid}}},function(err,result){
+        col.update({"cusInfoId":cid},{$pull:{images:{"fileId":fid}}},function(err,result){
+            if(err){return callback(err)} 
+            console.log(result);
+            callback(err,result);
+        });
+}
+
 
 
 exports.getImageLibs=_getImageLibs;
@@ -107,3 +124,4 @@ exports.addImageIdToLibs=_addImageIdToLibs;
 
 exports.getImagesListByCusInfoId=getImagesListByCusInfoId;
 exports.checkImageInCustomer=checkImageInCustomer;
+exports.removeImageFromImagelibs=removeImageFromImagelibs;

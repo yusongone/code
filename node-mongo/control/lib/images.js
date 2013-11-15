@@ -6,6 +6,43 @@ var getPool=db.Common.getPool;
 var poolMain=getPool("main");
 var poolThumbnail=getPool("thumbnail");
 
+
+
+
+var _deleteImage=function(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if(err){ poolMain.release(database); return callback(err) };
+            if("creator"==result){
+                db.ImageLibs.checkImageInCustomer(jsonReq,function(err,result){
+                    if(err){ poolMain.release(database); return callback(err); }
+                    if(null!=result){
+                        db.Images.deleteImage(jsonReq,function(err,result){
+                            if(err){ poolMain.release(database); return callback(err); }
+                            db.ImageLibs.removeImageFromImagelibs(jsonReq,function(err,result){
+                                if(err){ poolMain.release(database); return callback(err); }
+                                    callback(err,result); 
+
+                            
+                            });
+                        }); 
+                    }else{
+                        poolMain.release(database);
+                        callback("no image");    
+                    }
+                });
+            }else{
+                callback("no permission");
+            }
+
+        });
+    });
+
+}
+
+
+
 //获取图片
 var _getImage=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
@@ -100,7 +137,6 @@ var _insertThumbnailToDB=function(jsonReq,callback){
             "chunkSize":jsonReq.buf.length
         }
         db.Images.uploadBuffer(jsonReq,function(err,result){
-            console.log(jsonReq.attr,err,result);
             poolThumbnail.release(database);
             callback(err,result);
         });
@@ -195,3 +231,4 @@ function save2(canvas){
 
 
 exports.getImage=_getImage;
+exports.deleteImage=_deleteImage;

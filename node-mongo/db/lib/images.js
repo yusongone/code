@@ -74,7 +74,19 @@ function uploadImage(jsonReq,callback){
     });
 }
 
+function deleteImage(jsonReq,callback){
+    var database=jsonReq.database;
+    var col=database.collection("fs.files");
+    var fileId=jsonReq.fileId; 
+    var fid= _createObjectId(fileId);
+    if(!fid){return callback("err")};
+    gridStore.unlink(database,fid,function(err,result){
+        callback(err,result);
+    });
+};
+
 exports.uploadImage=uploadImage;
 exports.uploadBuffer=_uploadBuffer;
 exports.getImage=_getImage;
 exports.getImageInfo=_getImageInfo;
+exports.deleteImage=deleteImage;

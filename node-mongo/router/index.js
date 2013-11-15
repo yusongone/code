@@ -316,6 +316,20 @@ function router(app){
             });
         };
     });
+    app.post('/deleteImage', function(req, res){
+        var cusInfoId=req.body.cusInfoId;
+        var fileId=req.body.fileId;
+        if(checkLogind(req,res)){
+            ctrl.Images.deleteImage({
+                cusInfoId:cusInfoId,
+                fileId:fileId,
+                userId:req.session.userId
+            },function(err,result){
+                if(err){return res.send({"status":"error","message":err})}
+                res.send({"status":"ok","cusInfoId":cusInfoId}); 
+            });
+        }
+    });
     //上传图片
     app.post('/uploadImageToImagesLib', function(req, res){
         if(checkLogind(req,res)){
@@ -331,9 +345,8 @@ function router(app){
     //获取选片图片列表
     app.post('/getSelectImages', function(req, res){
         if(checkLogind(req,res)){
-            var cusInfoId=req.body.cusInfoId;
             var jsonReq={};
-                jsonReq.cusInfoId=cusInfoId;
+                jsonReq.cusInfoId=req.body.cusInfoId;
                 jsonReq.userId=req.session.userId;
             ctrl.ImageLibs.getSelectPhotos(jsonReq,function(err,result){
                 if(result&&result.status=="ok"){

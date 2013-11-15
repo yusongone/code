@@ -133,20 +133,46 @@ var ajax_get=function(cusInfoId){
     });
 };
 
+var ajax_deleteImage=function(cusInfoId,fileId,callback){
+    $.ajax({
+        "type":"post",
+        "url":"/deleteImage",
+        "datatype":"json",
+        "data":{"cusInfoId":cusInfoId,fileId:fileId},
+        "success":function(json){
+            if("sorry"==json.status){alert(json.message);return false;};
+            callback();
+        }
+    });
+
+};
+
 var imageObj=(function(){
     function image(){
     
     }
     image.prototype.initUI=function(json){
-        var cusInfoId=json.cusInfoId;
-        var id=json.id;
+        var cusInfoId=this.cusInfoId=json.cusInfoId;
+        var id=this.fileId=json.id;
         var thu=$("<li/>",{"class":"thu"});
         var imgBox=$("<p/>",{"class":"imgBox"});
             var img=$("<img/>",{"src":"/images/"+cusInfoId+"/"+id+"?type=fill"});
             var del=$("<div/>",{"class":"delete"})
             imgBox.append(img,del);
         thu.append(imgBox);
+        this.thu=thu;
+        this.bindEvent({"del":del});
         return thu;
+    }
+    image.prototype.bindEvent=function(json){
+        var that=this;
+        json.del.click(function(){
+            alert(that.fileId);
+            ajax_deleteImage(that.cusInfoId,that.fileId,function(){
+                that.thu.remove();
+            });
+        });
+    
     }
 
 

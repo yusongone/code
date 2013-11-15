@@ -30,7 +30,11 @@
 .content .thu .imgBox{
     position:relative;
 }
+.content .thu .delete:hover{
+    background:#888;
+}
 .content .thu .delete{
+    cursor:pointer;
     position:absolute;
     top:0;
     right:0;
