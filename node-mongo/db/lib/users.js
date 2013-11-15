@@ -44,6 +44,18 @@ var mongodb=require("mongodb"),
         })
     }
 
+    var getUserInfoById=function(jsonReq,callback){
+        var database=jsonReq.database;
+        var userId=jsonReq.userId;
+        var col=database.collection("users");
+        var uid=_createObject(userId);
+        if(!uid){return callback("create uid error at getUserInfoById")}
+        col.findOne({"_id":uid},function(err,doc){
+            if(err){return callback(err)}
+            callback(err,doc);
+        });
+    };
+
 
 function _searchUser(jsonReq,callback){
         var database=jsonReq.database;
@@ -58,3 +70,4 @@ function _searchUser(jsonReq,callback){
 exports.searchUser=_searchUser;
 exports.insertUserName=_insertUserName;
 exports.compareNameAndPass=_compareNameAndPass;
+exports.getUserInfoById=getUserInfoById;

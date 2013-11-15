@@ -32,8 +32,6 @@
     line-height: 24px;
     font-size: 12px;
 }
-
-}
 .addCustomerBox .select option{
     display:block;
     height:24px;
@@ -55,6 +53,16 @@
     width:20%;
     color:#fff;
     cursor:default;
+}
+.content .girl{
+    color:#F627FF;
+}
+.content .boy{
+    color:#09f;
+}
+.content .bname,
+.content .gname{
+    padding:0 10px;
 }
 .toolBar .td,
 .content .td{
@@ -89,11 +97,20 @@
 }
 .toolBar .play,
 .content .play{
-    width:180px;
+    width:240px;
+}
+.content .play a.active{
+    color:#666;
+    font-weight:bold;
 }
 .content .play a{
     font-size:12px;
     color:#aaa;
+    padding:0 5px;
+    display:block;
+    width:50px;
+    text-align:center;
+    float:left;
 }
 .content .play a:hover{
     color:#333;

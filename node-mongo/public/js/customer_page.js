@@ -69,15 +69,21 @@ page.ajax_getCusList=function(cusId){
 
 page.Lib=(function(){
     function lib(json){
+        this.boy=json.member.boy;
+        this.girl=json.member.girl;
         this.initUI(json);
         this.createBar(json);
     }
     lib.prototype.initUI=function(json){
         var li=$("<li/>",{}); 
-            var name=$("<div/>",{"class":"td name","text":json.username});
+            var name=$("<div/>",{"class":"td name"});
+                this.boy.name?name.append("<a class='boy bname'>"+this.boy.name+"</a>"):"";
+                this.girl.name?name.append("<a class='girl gname'>"+this.girl.name+"</a>"):"";
             var cus=$("<div/>",{"class":"td qq","text":json.qq||"--"});
             var date=$("<div/>",{"class":"td email","text":json.email||"--"});
-            var tel=$("<div/>",{"class":"td tel","text":json.mobile||"--"});
+            var tel=$("<div/>",{"class":"td tel"});
+                this.boy.phone?tel.append("<a class='boy gphone'>"+this.boy.phone+"</a>"):"";
+                this.girl.phone?tel.append("<a class='girl gphone'>"+this.girl.phone+"</a>"):"";
             var play=$("<div/>",{"class":"td play"});
             li.append(name,cus,date,tel,play);
         this.body=li;
@@ -92,11 +98,13 @@ page.Lib=(function(){
 page.LibBar=(function(){
     function bar(tage,libJson){
         this.cusId=libJson._id;
+        this.bindUserId=libJson.bindUser;
         this.initUI(tage,libJson);
     };
     bar.prototype.initUI=function(tage,libJson){
         var that=this;
         var share=$("<a/>",{"text":"绑定链接"});
+        this.bindUserId?share.addClass("active")&&share.text("已绑定"):"";
         var remove=$("<a/>",{"text":"删除"});
         var setModle=$("<a/>",{"text":"添加模板"});
         var setImage=$("<a/>",{"href":"/b/manage_image/"+that.cusId,"target":"_blank","text":"管理图片"});

@@ -175,7 +175,7 @@ function _getCustomerList(jsonReq,callback){
             tempAry.push(cusId);
         }
         var coll=database.collection("customerInfo");
-        coll.find({"_id":{$in:tempAry}},{"reserverMessage":1,member:1}).toArray(function(err,item){
+        coll.find({"_id":{$in:tempAry}},{"reserverMessage":1,member:1,bindUser:1}).toArray(function(err,item){
             callback(err,item);
         });
     
