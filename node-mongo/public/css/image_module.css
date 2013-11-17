@@ -1,0 +1,54 @@
+.moduleList{
+    float:left;
+    width:810px;
+}
+.moduleList .addBox{
+    display:none;
+}
+.moduleList li{
+    position:relative;
+    float:left;
+    padding:20px 0;
+    float:left;
+    border-bottom:1px solid #ddd;
+    width:100%;
+}
+.imgBox{
+    float:left;
+    width:150px;
+    height:150px;
+    line-height:150px;
+    text-align:center;
+    background:#ddd;
+    cursor:pointer;
+}
+.rightBox{
+    float:left;
+    width:600px;
+    margin-left:10px;
+}
+.rightBox .name{
+    margin-top: 0;
+    font-size: 16px;
+    font-weight: bold;
+    width:100%;
+}
+.rightBox .size{
+    margin-top:5px;
+    width:100%;
+    float:left;
+}
+
+.rightBox .other{
+    margin-top:20px;
+    width:100%;
+    float:left;
+}
+.btnBar{
+    position:absolute;
+    right:0;
+}
+.btnBar .edit,
+.btnBar .delete{
+    margin-left:5px;
+}

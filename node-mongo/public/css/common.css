@@ -12,7 +12,7 @@ a{cursor:pointer;}
 .links li a{ text-decoration: none; color:#333;}
 .links li a:hover{color:#333;text-decoration:underline;}
 
-.btnSmall,.btnBlue{
+.btnSmall,.btnBlue,.btnRed{
     cursor:pointer;
     height:24px;
     line-height:24px;
@@ -21,7 +21,11 @@ a{cursor:pointer;}
     border-radius: 5px;
     float:left;
 }
-.btnSmall.disable,.btnBlue.disable{
+.btnSmall.disable,.btnBlue.disable,.btnRed.disable{
+    background:#ddd;
+    color:#eee;
+}
+.btnSmall.disable:hover,.btnBlue.disable:hover,.btnRed.disable:hover{
     background:#ddd;
     color:#eee;
 }
@@ -29,9 +33,19 @@ a{cursor:pointer;}
     text-align:center;
     background:#ddd;
 }
+.btnBlue:hover{
+    background:#008ded;
+}
 .btnBlue{
     color:#fff;
     background:#09f;
+}
+.btnRed:hover{
+    background:#F0004A;
+}
+.btnRed{
+    color:#fff;
+    background:#f26;
 }
 
 .logoBox{

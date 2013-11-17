@@ -1,5 +1,3 @@
-console.log("abc");
-
 var Common=(function(){
     var checkType=(function(){
         var email_Flag = false;
@@ -8,7 +6,7 @@ var Common=(function(){
         var qq_Flag = false;
         var syt_Flag = false;
 
-        //ÑéÖ¤ÊÇ·ñÎª¿Õ
+        //éªŒè¯æ˜¯å¦ä¸ºç©º
         function _verifyIsNull(str){
             var flag = false;
             if(str == ""|| str == " "||str==null){
@@ -17,7 +15,7 @@ var Common=(function(){
             return flag;
         }
 
-        //ÑéÖ¤ÓÊÏä 
+        //éªŒè¯é‚®ç®± 
         function _verifyEmail(str){
             if(_verifyIsNull(str)){
                 email_Flag = false;
@@ -35,14 +33,14 @@ var Common=(function(){
         function _verifyNum(s){
             if(s!=null){
                 var r,re;
-                re = /\d*/i; //\d±íÊ¾Êı×Ö,*±íÊ¾Æ¥Åä¶à¸öÊı×Ö
+                re = /\d*/i; //\dè¡¨ç¤ºæ•°å­—,*è¡¨ç¤ºåŒ¹é…å¤šä¸ªæ•°å­—
                 r = s.match(re);
                 return (r==s)?true:false;
             }
             return false;
         }
 
-        //ÑéÖ¤qqºÅÂë
+        //éªŒè¯qqå·ç 
         function _verifyQQ(str){
             if(_verifyIsNull(str)){
                 qq_Flag = false;
@@ -56,7 +54,7 @@ var Common=(function(){
                 return false;
             }
         }
-        ////ÑéÖ¤ÊÖ»úºÅÂë
+        ////éªŒè¯æ‰‹æœºå·ç 
         function _verifyMobile(str){
             if(_verifyIsNull(str)){
                 mobile_Flag = false;
@@ -144,7 +142,7 @@ var Common=(function(){
 
 
 //
-////ÑéÖ¤µç»°ºÅÂë
+////éªŒè¯ç”µè¯å·ç 
 //function verifyPhone(){
 //var strPhone = document.getElementById("phone").value; 
 //var phone_info = document.getElementById("phone_info");
@@ -155,9 +153,9 @@ var Common=(function(){
 //}     
 //phone_Flag = reg.test(strPhone);
 //if(phone_Flag){
-//phone_info.innerHTML = "¹§Ï²£¡µç»°ºÅÂëÊäÈëÕıÈ·¡£";
+//phone_info.innerHTML = "æ­å–œï¼ç”µè¯å·ç è¾“å…¥æ­£ç¡®ã€‚";
 //}else{
-//phone_info.innerHTML = "¶Ô²»Æğ£¬ÄúÊäÈëµÄµç»°ºÅÂë¸ñÊ½´íÎó¡£";
+//phone_info.innerHTML = "å¯¹ä¸èµ·ï¼Œæ‚¨è¾“å…¥çš„ç”µè¯å·ç æ ¼å¼é”™è¯¯ã€‚";
 //}
 //}
 //
