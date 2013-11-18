@@ -33,7 +33,60 @@ function setApp(app){
         };
     });
 
+//================================================  product ================//
+    app.post('/addProduct', function(req, res){
+        var reqBody=req.body;
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+            jsonReq.name=reqBody.productName;
+        if(checkLogind(req,res)){
+            ctrl.Product.addProduct(jsonReq,function(json){
+                res.send(json);
+            });
+        };
+    });
 
+    app.post('/getCustomerProduct', function(req, res){
+        var reqBody=req.body;
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+        if(checkLogind(req,res)){
+            ctrl.Product.getProductList(jsonReq,function(json){
+                res.send(json);
+            });
+        };
+    });
+
+    app.post('/getAllProduct', function(req, res){
+        var reqBody=req.body;
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+            console.log("ff",jsonReq.userId);
+        if(checkLogind(req,res)){
+            ctrl.Product.getProductByUserId(jsonReq,function(err,json){
+                res.send(json);
+            });
+        };
+    });
+
+    app.post('/changeProduct', function(req, res){
+        var reqBody=req.body;
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+            jsonReq.name=reqBody.productName;
+            jsonReq.size=reqBody.size;
+            jsonReq.description=reqBody.description;
+            jsonReq.imgPath=reqBody.imgPath;
+            jsonReq.price=reqBody.price;
+
+            if(checkLogind(req,res)){
+                ctrl.Product.changeProduct(jsonReq,function(json){
+                    res.send(json);
+                });
+            };
+    });
+
+//-------------------------------------- product --------------------------//
 
     //查找用户 user
     app.post('/ajax_searchUser', function(req, res){

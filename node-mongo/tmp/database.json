@@ -8,7 +8,7 @@
 //image_libs
 [
 { "_id":"Object(123123)", "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
-{ "_id":"Object(123123)", "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
+{ "_id":"Object(123123)","userId":"Object(023495827345234584)","cusInfoId":"object(081234123465923847548)", "images":[{"fileId":"Object("图片ID")"}, {"fileId":"Object("图片ID")"}] }
 ]
 
 //userCustomer
@@ -23,6 +23,7 @@
 {
     "_id":"object(234235235234234)",
     imagesLibs:"Object(134922349595239)",
+    productLists:"Object(12470245934812347)",
     reserverMessage:"abc",
     address:"",
     bindUser:userId,
@@ -40,13 +41,39 @@
 }
 
 
-
+//table fs.files and fs.chunks
 //用户添加“未注册”用户到customer，储存email，先去users表中查找，如果没有，为没有绑定或注册的邮件。如果有，在users查找相应详细信息，返回username；给customerList；
-
-
 {
     "_id":"object(123952348323456)",
-    originalImageId:objectId(123023457934845),
-    size:50,
+    "metadata":{
+        originalImageId:objectId(123023457934845),
+        size:50,
+        type:"fill"
+    }
     md5:"asdfaweff9879sf79as8ef9"
 }
+
+// table productList
+{
+    "_id":"object(123235467)",
+    "cusInfoId":"object(234712347612032934)",
+    "userId":"object(121234712347612032934)",
+    "products":[
+        {"productId":"object('1235234624573455245')"},
+        {"productId":"object('1235234624573455245')"}
+        ]
+}
+
+// table product;
+{
+    "_id":"object(12348712023471234)",
+    "name":"",
+    "userId":"object(1401234823495912347)",
+    "imgPath":"/private_images/125472831239348293423",
+    "size":"20*15",
+    "price":1200,
+    "description":"asdf easda ewqw esadf asef aef"
+}
+
+
+

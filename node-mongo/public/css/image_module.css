@@ -2,8 +2,34 @@
     float:left;
     width:810px;
 }
-.moduleList .addBox{
+.content{
+    position:relative;
+}
+.content .addBox{
+    width:810px;
+    text-align: center;
+    background: #FAFAFA;
+    height:100px;
+    float:left;
+    padding-bottom:10px;
     display:none;
+}
+.content .inputBox{
+    width:380px;
+    overflow:hidden;
+    margin:40px auto;
+}
+.content .inputBox .lab_name{
+    float:left;
+    line-height:30px;
+    padding:0 10px;
+}
+.content .inputBox .text{
+    margin-right:5px;
+    width:210px;
+}
+.content .inputBox .btnBlue{
+    margin-left:5px;
 }
 .moduleList li{
     position:relative;

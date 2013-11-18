@@ -10,7 +10,8 @@
         <script src="/js/vendor/jquery.iframe-transport.js"></script>  
         <script src="/js/vendor/jquery.fileupload.js"></script>  
     </head>
-    <body class="page manage_image">
+    <body class="manage_image">
+        <div class="page">
         <input type="hidden" id="cusInfo_id" value="<%=id%>">
         <% include lib/toplink%>
         <% include lib/nav %>
@@ -33,5 +34,6 @@
             </div>
         </div>
         <% include lib/footer %>
+        </div>
     </body>
 </html>
