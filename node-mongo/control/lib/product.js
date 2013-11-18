@@ -5,17 +5,17 @@ var getPool=db.Common.getPool;
 var poolMain=getPool("main");
 
 
-function addProduct(jsonReq,callback){
+function addProduct(jsonReq,_callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         //查看产品列表 productList 中是否存在 此userId的doc；如果有，直接插入，如没有，创建后插入；
         db.Product.checkProductDocExist(jsonReq,function(err,result){
             if(result==null){
                 db.Product.AddRowToProductList(jsonReq,function(err,callback){
-                    _addProduct(jsonReq,callback);
+                    _addProduct(jsonReq,_callback);
                 });
             }else{
-                _addProduct(jsonReq,callback);
+                _addProduct(jsonReq,_callback);
             }
         });
 

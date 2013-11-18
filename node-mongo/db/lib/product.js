@@ -83,7 +83,10 @@ function getProductsListByQuery(jsonReq,callback){
     var col=database.collection("productList");
         //col.find({"cusInfoId":cid}).toArray(function(err,itemArray){
         col.findOne(query,{},function(err,itemArray){
-            callback(err,itemArray.products);
+            if(itemArray){
+                return callback(err,itemArray.products);
+            }
+            callback(err,[]);
         });
 }
 
@@ -102,7 +105,6 @@ function changeProduct(jsonReq,callback){
     var uid=_createObjectId(userId);
         if(!(uid&&pid)){return callback("create objectId err db/lib/products changeParoduct")}
     var col=database.collection("productList");
-    console.log(pid,"fsfsfsf");
         col.update(
                 {"userId":uid,"products._id":pid},
                 {
