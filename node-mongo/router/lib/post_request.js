@@ -40,19 +40,9 @@ function setApp(app){
             jsonReq.userId=req.session.userId;
             jsonReq.name=reqBody.productName;
         if(checkLogind(req,res)){
-            ctrl.Product.addProduct(jsonReq,function(json){
-                res.send(json);
-            });
-        };
-    });
-
-    app.post('/getCustomerProduct', function(req, res){
-        var reqBody=req.body;
-        var jsonReq={};
-            jsonReq.userId=req.session.userId;
-        if(checkLogind(req,res)){
-            ctrl.Product.getProductList(jsonReq,function(json){
-                res.send(json);
+            ctrl.Product.addProduct(jsonReq,function(err,json){
+                if(err){return res.send({"status":"error","message":err})}
+                res.send({"status":"ok","id":json});
             });
         };
     });
@@ -85,6 +75,19 @@ function setApp(app){
                 });
             };
     });
+
+    app.post('/getCustomerProduct', function(req, res){
+        var reqBody=req.body;
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+        if(checkLogind(req,res)){
+            ctrl.Product.getProductList(jsonReq,function(json){
+                res.send(json);
+            });
+        };
+    });
+
+
 
 //-------------------------------------- product --------------------------//
 

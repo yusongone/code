@@ -22,7 +22,7 @@ var poolMain = poolModule.Pool({
         max      : 100,   //最大连接数
         idleTimeoutMillis : 30000,  //超时时间
         //log : true,  
-        log : false,  
+        log : false
     });
 
 var poolThumbnail = poolModule.Pool({
@@ -40,7 +40,8 @@ var poolThumbnail = poolModule.Pool({
          }, //当超时则释放连接
         max      : 100,   //最大连接数
         idleTimeoutMillis : 30000,  //超时时间
-        log : true,  
+        //log : true,  
+        log : false
     });
 
 

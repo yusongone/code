@@ -8,10 +8,37 @@ var poolMain=getPool("main");
 function addProduct(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-       db.Product.addProduct(jsonReq,function(err,doc){
+        //查看产品列表 productList 中是否存在 此userId的doc；如果有，直接插入，如没有，创建后插入；
+        db.Product.checkProductDocExist(jsonReq,function(err,result){
+            if(result==null){
+                db.Product.AddRowToProductList(jsonReq,function(err,callback){
+                    addProduct(jsonReq,callback);
+                });
+            }else{
+                addProduct(jsonReq,callback);
+            }
+        });
+
+        function addProduct(err,callback){
+           db.Product.addProductToList(jsonReq,function(err,id){
+                poolMain.release(database);
+                callback(err,id); 
+           });
+        }
+   });
+
+}
+
+function getProductByUserId(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        jsonReq.query={
+            userId:jsonReq.userId
+        }
+        db.Product.getProductsListByQuery(jsonReq,function(err,doc){
             poolMain.release(database);
            if(doc){
-                callback(err,doc["_id"]); 
+                callback(err,doc); 
            }else{
                 callback(err,null); 
            }
@@ -37,23 +64,6 @@ function getCustomerProduct(jsonReq,callback){
    });
 
 };
-function getProductByUserId(jsonReq,callback){
-    poolMain.acquire(function(err,database){
-        jsonReq.database=database;
-        jsonReq.query={
-            userId:jsonReq.userId
-        }
-        db.Product.getProductsListByQuery(jsonReq,function(err,doc){
-            poolMain.release(database);
-           if(doc){
-                callback(err,doc); 
-           }else{
-                callback(err,null); 
-           }
-       });
-   });
-
-}
 
 
 exports.addProduct=addProduct;

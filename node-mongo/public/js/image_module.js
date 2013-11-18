@@ -47,7 +47,7 @@ pageSpace.ajax_addProduct=function(name){
     });
 }
 pageSpace.createProduct=function(name){
-});
+};
 
 pageSpace.Product=(function(){
     function product(){
