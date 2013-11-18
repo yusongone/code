@@ -31,6 +31,12 @@ pageSpace.ajax_getProductList=function(){
         dataType:"json",
         success:function(data){
             if(data.status=="ok"){
+                var ary=data.data;
+                var product=pageSpace.Product;
+                for(var i=0,l=ary.length;i<l;i++){
+                    var d=new product(ary[i]);
+                    $("body").append(d.body);
+                }
             }
         }
     });
@@ -46,13 +52,37 @@ pageSpace.ajax_addProduct=function(name){
         }
     });
 }
-pageSpace.createProduct=function(name){
+pageSpace.ajax_changeProduct=function(name){
+    var jsonReq={
+        productName:"abc",
+        productId:"528a925bba32037949000001",
+        imagePath:"abc",
+        size:"20*20",
+        price:"102897464",
+        description:"asdfefeaslfefefesasdfefasefasdfefe"
+    }
+    $.ajax({
+        type:"post",
+        url:"/changeProduct",
+        dataType:"json",
+        data:jsonReq,
+        success:function(data){
+            console.log(data);
+        }
+    });
 };
 
 pageSpace.Product=(function(){
-    function product(){
+    function product(json){
+        var id=json["_id"];
+        this.body=$("<div/>",{});
+        this.initUI(json);
     }
-    product.prototype.initUI=function(){
-         
+    product.prototype.initUI=function(json){
+        var z=$("<div/>",{text:json.name});
+        this.body.append(z);
     }
+    product.prototype.initUI=function(json){
+    }
+    return product;
 })();

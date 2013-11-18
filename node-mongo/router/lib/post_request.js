@@ -54,7 +54,8 @@ function setApp(app){
             console.log("ff",jsonReq.userId);
         if(checkLogind(req,res)){
             ctrl.Product.getProductByUserId(jsonReq,function(err,json){
-                res.send(json);
+                if(err){return res.send({"status":"error","message":err})}
+                res.send({"status":"ok","data":json});
             });
         };
     });
@@ -68,6 +69,7 @@ function setApp(app){
             jsonReq.description=reqBody.description;
             jsonReq.imgPath=reqBody.imgPath;
             jsonReq.price=reqBody.price;
+            jsonReq.productId=reqBody.productId;
 
             if(checkLogind(req,res)){
                 ctrl.Product.changeProduct(jsonReq,function(json){

@@ -99,9 +99,24 @@ function changeProduct(jsonReq,callback){
         productId=jsonReq.productId,
         description=jsonReq.description;
     var pid=_createObjectId(productId);
-    var col=database.collection("product");
-        col.update({"_id":pid},{name:name,imgPath:imgPath,size:size,price:price,description:description},function(err,item){
-            callback(err,item);
+    var uid=_createObjectId(userId);
+        if(!(uid&&pid)){return callback("create objectId err db/lib/products changeParoduct")}
+    var col=database.collection("productList");
+    console.log(pid,"fsfsfsf");
+        col.update(
+                {"userId":uid,"products._id":pid},
+                {
+                    "$set":
+                    {
+                        "products.$.name":name,
+                        "products.$.imgPath":imgPath,
+                        "products.$.size":size,
+                        "products.$.price":price,
+                        "products.$.description":description
+                    }
+                }
+                ,function(err,item){
+                    callback(err,item);
         });
 }
 
@@ -110,3 +125,4 @@ exports.addProductToList=addProductToList;
 exports.getProductsListByQuery=getProductsListByQuery;
 exports.checkProductDocExist=checkProductDocExist;
 exports.AddRowToProductList=AddRowToProductList;
+exports.changeProduct=changeProduct;

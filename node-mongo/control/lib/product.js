@@ -12,14 +12,14 @@ function addProduct(jsonReq,callback){
         db.Product.checkProductDocExist(jsonReq,function(err,result){
             if(result==null){
                 db.Product.AddRowToProductList(jsonReq,function(err,callback){
-                    addProduct(jsonReq,callback);
+                    _addProduct(jsonReq,callback);
                 });
             }else{
-                addProduct(jsonReq,callback);
+                _addProduct(jsonReq,callback);
             }
         });
 
-        function addProduct(err,callback){
+        function _addProduct(err,callback){
            db.Product.addProductToList(jsonReq,function(err,id){
                 poolMain.release(database);
                 callback(err,id); 
@@ -47,6 +47,15 @@ function getProductByUserId(jsonReq,callback){
 
 }
 
+function changeProduct(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Product.changeProduct(jsonReq,function(err,result){
+            callback(err,result);  
+        });
+    });
+};
+
 function getCustomerProduct(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
@@ -69,3 +78,4 @@ function getCustomerProduct(jsonReq,callback){
 exports.addProduct=addProduct;
 exports.getCustomerProduct=getCustomerProduct;
 exports.getProductByUserId=getProductByUserId;
+exports.changeProduct=changeProduct;
