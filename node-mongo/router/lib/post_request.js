@@ -67,7 +67,7 @@ function setApp(app){
             jsonReq.name=reqBody.productName;
             jsonReq.size=reqBody.size;
             jsonReq.description=reqBody.description;
-            jsonReq.imgPath=reqBody.imgPath;
+            jsonReq.imgPath=reqBody.imagePath;
             jsonReq.price=reqBody.price;
             jsonReq.productId=reqBody.productId;
 
@@ -78,12 +78,20 @@ function setApp(app){
             };
     });
 
+    app.post("/uploadProductHeadImage",function(req,res){
+        if(checkLogind(req,res)){
+            ctrl.Product.uploadProductHeadImage({},function(err,result){
+                
+            });
+        };
+    });
+
     app.post('/getCustomerProduct', function(req, res){
         var reqBody=req.body;
         var jsonReq={};
             jsonReq.userId=req.session.userId;
         if(checkLogind(req,res)){
-            ctrl.Product.getProductList(jsonReq,function(json){
+            ctrl.Product.getProductList(jsonReq,function(err,json){
                 res.send(json);
             });
         };

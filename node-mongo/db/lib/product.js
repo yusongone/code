@@ -105,19 +105,14 @@ function changeProduct(jsonReq,callback){
     var uid=_createObjectId(userId);
         if(!(uid&&pid)){return callback("create objectId err db/lib/products changeParoduct")}
     var col=database.collection("productList");
-        col.update(
-                {"userId":uid,"products._id":pid},
-                {
-                    "$set":
-                    {
-                        "products.$.name":name,
-                        "products.$.imgPath":imgPath,
-                        "products.$.size":size,
-                        "products.$.price":price,
-                        "products.$.description":description
-                    }
-                }
-                ,function(err,item){
+    var setObject={};
+        name?setObject["products.$.name"]=name:"";
+        imgPath?setObject["products.$.imgPath"]=imgPath:"";
+        size?setObject["products.$.size"]=size:"";
+        price?setObject["products.$.price"]=price:"";
+        description?setObject["products.$.description"]=description:"";
+        console.log(setObject);
+        col.update( {"userId":uid,"products._id":pid},{ "$set":setObject },function(err,item){
                     callback(err,item);
         });
 }

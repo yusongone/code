@@ -54,11 +54,11 @@ pageSpace.ajax_addProduct=function(name){
 }
 pageSpace.ajax_changeProduct=function(name){
     var jsonReq={
-        productName:"abc",
+        productName:"",
         productId:"528a925bba32037949000001",
-        imagePath:"abc",
-        size:"20*20",
-        price:"102897464",
+        imagePath:"abffc",
+        size:"--",
+        price:"",
         description:"asdfefeaslfefefesasdfefasefasdfefe"
     }
     $.ajax({

@@ -156,7 +156,7 @@ var imageObj=(function(){
         var id=this.fileId=json.id;
         var thu=$("<li/>",{"class":"thu"});
         var imgBox=$("<p/>",{"class":"imgBox"});
-            var img=$("<img/>",{"src":"/images/"+cusInfoId+"/"+id+"?type=fill"});
+            var img=$("<img/>",{"src":"/photo/"+cusInfoId+"/"+id+"?type=fill"});
             var del=$("<div/>",{"class":"delete"})
             imgBox.append(img,del);
         thu.append(imgBox);

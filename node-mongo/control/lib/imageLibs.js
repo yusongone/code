@@ -48,6 +48,9 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
                 poolMain.release(database);
                 callback(err,{"status":"sorry","message":"no permission"});
             }else{
+                jsonReq.attr={
+                    "metadata":{ property:"private" }
+                }
                 db.Images.uploadImage(jsonReq,function(err,fileId){
                     if(err){
                         poolMain.release(database);

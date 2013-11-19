@@ -161,8 +161,24 @@ function setApp(app){
             });
         }
     });
-
-    app.get('/images/:cusInfoId/:imageId', function(req, res){
+    //获取公共图片
+    app.get("/public/images/:imageId",function(req,res){
+        var imageId=req.params.imageId;
+        var sizeR={"origin":"origin","300":300,"180":180,"100":100};
+        var typeR={"fill":"fill"}
+        var size=sizeR[req.query.size]||180;
+        var type=typeR[req.query.type]||"normal";
+            ctrl.Images.getPrivateImage({
+                "fileId":imageId,
+                "userId":userId,
+                "imageType":type,
+                "size":size
+            },function(err,result){
+                res.writeHead(200, {'Content-Type': 'image/png' });
+                res.end(data, 'binary');
+            });
+    });
+    app.get('/photo/:cusInfoId/:imageId', function(req, res){
         var cusInfoId=req.params.cusInfoId;
         var imageId=req.params.imageId;
         var userId=req.session.userId;

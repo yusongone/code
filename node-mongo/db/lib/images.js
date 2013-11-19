@@ -43,7 +43,9 @@ var _uploadBuffer=function(jsonReq,callback){
     var database=jsonReq.database;
     var oid=new objectId();
     var buf=jsonReq.buf;
-    var attr=jsonReq.attr;
+    var attr=jsonReq.attr||{};
+        attr.content_type="image/png";
+        attr.chunkSize=jsonReq.buf.length;
     var gs=new gridStore(database,oid,"w",attr);
     gs.open(function(err,gss){
         gs.write(buf.toString("binary"),function(err,doc){
@@ -59,10 +61,10 @@ var _uploadBuffer=function(jsonReq,callback){
 function uploadImage(jsonReq,callback){
     var database=jsonReq.database;
     var file=jsonReq.files[0];
-    var gs=new gridStore(database,new objectId(),"w",{
-        content_type:"image/png",
-        chunkSize:file.size
-    });
+        var attr=jsonReq.attr||{};
+            attr.content_type="image/png";
+            attr.chunkSize=file.size;
+    var gs=new gridStore(database,new objectId(),"w",attr);
     gs.open(function(err,gs){
         gs.writeFile(file.path,function(err,doc){
             if(err){return callback(err);}

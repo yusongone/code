@@ -133,13 +133,11 @@ var _insertThumbnailToDB=function(jsonReq,callback){
     poolThumbnail.acquire(function(err,database){
         jsonReq.database=database;
         jsonReq.attr={
-            "content_type":"image/png",
             "metadata":{
                 "originalImageId":jsonReq.fileId,
                 "size":jsonReq.size,
                 "type":jsonReq.imageType
-            },
-            "chunkSize":jsonReq.buf.length
+            }
         }
         db.Images.uploadBuffer(jsonReq,function(err,result){
             poolThumbnail.release(database);

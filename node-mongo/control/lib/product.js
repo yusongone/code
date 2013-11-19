@@ -26,8 +26,23 @@ function addProduct(jsonReq,_callback){
            });
         }
    });
-
 }
+function uploadProductHeadImage(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        jsonReq.attr={
+            "metadata":{
+                property:"public"
+            }
+        }
+        db.Images.uploadImage(jsonReq,function(err,_id){
+            jsonReq.imgPath=_id;
+            db.Product.changeProduct(jsonReq,function(err,result){
+                callback(err,result);    
+            });
+        });
+    });
+} 
 
 function getProductByUserId(jsonReq,callback){
     poolMain.acquire(function(err,database){
@@ -79,3 +94,4 @@ exports.addProduct=addProduct;
 exports.getCustomerProduct=getCustomerProduct;
 exports.getProductByUserId=getProductByUserId;
 exports.changeProduct=changeProduct;
+exports.uploadProductHeadImage=uploadProductHeadImage;
