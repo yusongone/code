@@ -86,22 +86,13 @@ function getProduct(jsonReq,callback){
 }
 
 //
-function getProductsListByQuery(jsonReq,callback){
+function getProductsByUserId(jsonReq,callback){
     var database=jsonReq.database;
-    var query=jsonReq.query;
-        if(query.cusInfoId){
-            var cid=_createObjectId(query.cusInfoId);
-            if(!cid){return callback("creat object error at getProductsListByQuery function")}
-            query.cusInfoId=cid;
-        }
-        if(query.userId){
-            var uid=_createObjectId(query.userId);
-            if(!uid){return callback("creat object error at getProductsListByQuery function")}
-            query.userId=uid;
-        }
+    var uid=_createObjectId(jsonReq.userId);
+    if(!uid){return callback("creat object error at getProductsListByQuery function")}
     var col=database.collection("productList");
         //col.find({"cusInfoId":cid}).toArray(function(err,itemArray){
-        col.findOne(query,{},function(err,itemArray){
+        col.findOne({"userId":uid},{},function(err,itemArray){
             if(itemArray){
                 return callback(err,itemArray.products);
             }
@@ -138,7 +129,7 @@ function changeProduct(jsonReq,callback){
 
 
 exports.addProductToList=addProductToList;
-exports.getProductsListByQuery=getProductsListByQuery;
+exports.getProductsByUserId=getProductsByUserId;
 exports.checkProductDocExist=checkProductDocExist;
 exports.AddRowToProductList=AddRowToProductList;
 exports.changeProduct=changeProduct;

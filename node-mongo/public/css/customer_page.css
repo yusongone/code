@@ -132,3 +132,22 @@
 
 .inputBox{position:relative;}
 .typeTab{position:absolute;right:3px;height:24px;line-height:24px;font-size:14px;color:#888;}
+
+.product{
+    width:800px;
+    height:400px;
+}
+.product .allProduct,
+.product .cusProduct{
+    width:250px;
+    height:380px;
+    border:1px solid #ddd;
+    border-radius:5px;
+}
+.product .allProduct{
+    float:left;
+}
+.product .cusProduct{
+    float:right;
+}
+

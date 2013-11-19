@@ -64,7 +64,7 @@ function getUserAndCustomerRelation(jsonReq,callback){
             }else{
                   ID="none";
             }
-            callback(err,ID);
+            callback(err,ID,{"userId":doc.userId});
         });
 }
 

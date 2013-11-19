@@ -61,10 +61,7 @@ function uploadProductHeadImage(jsonReq,callback){
 function getProductsByUserId(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-        jsonReq.query={
-            userId:jsonReq.userId
-        }
-        db.Product.getProductsListByQuery(jsonReq,function(err,doc){
+        db.Product.getProductsByUserId(jsonReq,function(err,doc){
             poolMain.release(database);
            if(doc){
                 callback(err,doc); 

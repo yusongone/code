@@ -145,12 +145,17 @@ function removeProductFromCustomer(jsonReq,callback){
 function getProductsFromCustomer(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result,resJson){
             if(err){ poolMain.release(database); return callback(err) };
             if("creator"==result||"binder"==result){
+                jsonReq.userId=resJson.userId;
                 db.Customer.getProductsFromCustomer(jsonReq,function(err,res){
-                    poolMain.release(database);
-                    callback(err,res);
+                    if(err){ poolMain.release(database);return callback(err);};
+                    db.Product.getProductsByUserId(jsonReq,function(err,doc){
+                        poolMain.release(database);
+                        //des   doc
+                        console.log(doc);
+                    });
                 });
             }
         });

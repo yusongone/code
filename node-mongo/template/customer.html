@@ -2,9 +2,14 @@
 <html>
     <head>
         <% include lib/header %>
-        <link href="/css/custom-theme/jquery-ui-1.10.3.custom.min.css?v=001" rel="stylesheet">
+        <link href="/css/custom-theme/jquery-ui-1.10.3.custom.min.css?v=<%=css_version%>" rel="stylesheet" />
+        <link href="/css/customer_page.css?v=<%=css_version%>" rel="stylesheet" />
+        <script src="/js/vendor/jquery.ui.widget.js"></script>  
+        <script src="/js/vendor/jquery-ui.js"></script>  
+        <script src="/js/vendor/jquery.iframe-transport.js"></script>  
+        <script src="/js/vendor/jquery.fileupload.js"></script>  
         <script src="/js/vendor/jquery-ui.js"></script>
-        <script src="/js/common.js"></script>
+        <script src="/js/customer_page.js"></script>
     </head>
     <body class="page customer">
         <% include lib/toplink%>

@@ -12,6 +12,7 @@ page.bindEvent=function(){
     $("#addCustomer").click(function(){
         page.customer.openAddBox();
     });
+    Product.init();
 };
 
 page.ajax_addCustomer=function(data,fun){
@@ -109,12 +110,18 @@ page.LibBar=(function(){
         var setModle=$("<a/>",{"text":"添加模板"});
         var setImage=$("<a/>",{"href":"/b/manage_image/"+that.cusId,"target":"_blank","text":"管理图片"});
             tage.append(share,remove,setModle,setImage);
-            this.bindEvent(share);
+            this.bindEvent({
+                share:share,
+                setModle:setModle
+            });
     };
-    bar.prototype.bindEvent=function(share){
+    bar.prototype.bindEvent=function(json){
         var that=this;
-            share.click(function(){
+            json.share.click(function(){
                 alert("http://makejs.com/bindlink/"+that.cusId);
+            });
+            json.setModle.click(function(){
+                Product.open(that.cusId);
             });
     };
     return bar;
@@ -273,6 +280,91 @@ page.customer_des=(function(){
     }
 })();
 
+var Product=(function(){
+    var div=$("<div/>",{});  
+    var html="<div class='product'>"+
+                "<div class='allProduct'>"+
+                    "<ul class='pList'></ul>"+
+                "</div>"+
+                "<div class='cusProduct'>"+
+                    "<ul class='pList'></ul>"+
+                "</div>"+
+            "</div>";
+    var z=$(html);
+    var aList=z.find(".allProduct .pList");
+    var pList=z.find(".cusProduct .pList");
+    function _init(){
+        z.dialog({
+            autoOpen:false,
+            resizable: true,
+            width:600,
+            modal: true,
+            buttons: {
+                "Delete all items": function() {
+                    $('#addCustomer').fileupload('clear');
+                },
+                Cancel: function() {
+                $( this ).dialog( "close" );
+                }
+            },
+            "close":function(){
+                div.html("");
+            },
+            "beforeclose":function(){
+                
+            }
+        });
+    }
+
+    function _getCusProducts(cusInfoId){
+        console.log(cusInfoId);
+        $.ajax({
+            "type":"post",
+            "url":"/ajax_getProductsFromCustomer",
+            "dataType":"json",
+            "data":{
+                "cusInfoId":cusInfoId
+            },
+            "success":function(data){
+                if(data.status=="ok"){
+                var ary=data.data;
+                    for(var i=0,l=ary.length;i<l;i++){
+                       pList.append(ary[i]); 
+                    };
+                }
+            }
+        });
+    }
+
+    function _getAllProducts(){
+        $.ajax({
+            type:"post",
+            url:"/getAllProduct",
+            dataType:"json",
+            success:function(data){
+                if(data.status=="ok"){
+                var ary=data.data;
+                    aList.html("");
+                    for(var i=0,l=ary.length;i<l;i++){
+                       aList.append(ary[i].name); 
+                    };
+                }
+            }
+        });
+
+    }
+    return {
+        init:function(){
+            _init();
+        },
+        open:function(cusInfoId){
+            _getCusProducts(cusInfoId);
+            _getAllProducts(cusInfoId);
+            z.dialog("open");
+        }
+    } 
+})();
+
 function _bindProduct(){
     $.ajax({
         "type":"post",
@@ -296,19 +388,6 @@ function _removeProduct(){
         "data":{
             "cusInfoId":"527fcc612413c7cf24000001",
             "productId":"528b83c6c56597d75500004d"
-        },
-        "success":function(data){
-            console.log(data);
-        }
-    });
-}
-function _getProducts(){
-    $.ajax({
-        "type":"post",
-        "url":"/ajax_getProductsFromCustomer",
-        "dataType":"json",
-        "data":{
-            "cusInfoId":"527fcc612413c7cf24000001",
         },
         "success":function(data){
             console.log(data);

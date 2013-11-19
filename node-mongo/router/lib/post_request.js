@@ -157,10 +157,8 @@ function setApp(app){
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
             ctrl.Customer.bindProductToCustomer(jsonReq,function(err,result){
-                if(err){return res.send("status":"error","message":err)}
-                if(result){
-                    res.send({"status":"ok"});
-                }
+                if(err){return res.send({"status":"error","message":err})}
+                res.send({"status":"ok"});
             });
         }
     });
@@ -173,10 +171,8 @@ function setApp(app){
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
             ctrl.Customer.removeProductFromCustomer(jsonReq,function(err,result){
-                if(err){return res.send("status":"error","message":err)}
-                if(result){
-                    res.send({"status":"ok"});
-                }
+                if(err){return res.send({"status":"error","message":err})}
+                res.send({"status":"ok"});
             });
         }
     });
@@ -189,10 +185,8 @@ function setApp(app){
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
             ctrl.Customer.getProductsFromCustomer(jsonReq,function(err,result){
-                if(err){return res.send("status":"error","message":err)}
-                if(result){
-                    res.send({"status":"ok","data":result});
-                }
+                if(err){return res.send({"status":"error","message":err})}
+                res.send({"status":"ok","data":result.products});
             });
         }
     });
