@@ -5,6 +5,37 @@ var poolMain=getPool("main");
 
 //
 
+var _deletePhoto=function(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if(err){ poolMain.release(database); return callback(err) };
+            if("creator"==result){
+                db.ImageLibs.checkImageInCustomer(jsonReq,function(err,result){
+                    if(err){ poolMain.release(database); return callback(err); }
+                    if(null!=result){
+                        db.Images.deleteImage(jsonReq,function(err,result){
+                            if(err){ poolMain.release(database); return callback(err); }
+                            db.ImageLibs.removeImageFromImagelibs(jsonReq,function(err,result){
+                                if(err){ poolMain.release(database); return callback(err); }
+                                    callback(err,result); 
+
+                            
+                            });
+                        }); 
+                    }else{
+                        poolMain.release(database);
+                        callback("no image");    
+                    }
+                });
+            }else{
+                callback("no permission");
+            }
+
+        });
+    });
+
+}
 
 //====================================
     var _getImageLibs=function(username,callback){
@@ -159,3 +190,4 @@ exports.getImagesByCusInfoId=_getImagesByCusInfoId;
 
 exports.getSelectPhotos=_getSelectPhotos;
 exports.getCustomerImages=_getCustomerImages;
+exports.deletePhoto=_deletePhoto;

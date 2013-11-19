@@ -30,21 +30,35 @@ function addProduct(jsonReq,_callback){
 function uploadProductHeadImage(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-        jsonReq.attr={
-            "metadata":{
-                property:"public"
-            }
-        }
-        db.Images.uploadImage(jsonReq,function(err,_id){
-            jsonReq.imgPath=_id;
-            db.Product.changeProduct(jsonReq,function(err,result){
-                callback(err,result);    
-            });
+        db.Product.getProduct(jsonReq,function(err,productObj){
+            if(err){return callback(err)};
+            if(productObj&&productObj.imgPath){
+                jsonReq.fileId=productObj.imgPath;
+                db.Images.deleteImage(jsonReq,function(err,result){
+                    if(err){return callback(err)} 
+                    uploadImg(jsonReq,callback);
+                })
+            }else{
+                uploadImg(jsonReq,callback);
+            };
         });
+        function uploadImg(jsonReq,callback){
+            jsonReq.attr={
+                "metadata":{
+                    property:"public"
+                }
+            }
+            db.Images.uploadImage(jsonReq,function(err,_id){
+                jsonReq.imgPath=_id;
+                db.Product.changeProduct(jsonReq,function(err,result){
+                    callback(err,result);    
+                });
+            });
+        }
     });
 } 
 
-function getProductByUserId(jsonReq,callback){
+function getProductsByUserId(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         jsonReq.query={
@@ -59,7 +73,6 @@ function getProductByUserId(jsonReq,callback){
            }
        });
    });
-
 }
 
 function changeProduct(jsonReq,callback){
@@ -92,6 +105,6 @@ function getCustomerProduct(jsonReq,callback){
 
 exports.addProduct=addProduct;
 exports.getCustomerProduct=getCustomerProduct;
-exports.getProductByUserId=getProductByUserId;
+exports.getProductsByUserId=getProductsByUserId;
 exports.changeProduct=changeProduct;
 exports.uploadProductHeadImage=uploadProductHeadImage;

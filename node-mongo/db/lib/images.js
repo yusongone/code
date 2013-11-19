@@ -12,6 +12,16 @@ function _createObjectId(str){
         }
 };
 
+var _getImageInfoById=function(jsonReq,callback){
+    var database=jsonReq.database;
+    var col=database.collection("fs.files");
+    var id=_createObjectId(jsonReq.fileId);
+    if(!id){return callback("error")}
+        col.findOne({"_id":id},function(err,result){
+            callback(err,result);
+        });;
+
+}
 
 //images libs
 var _getImageInfo=function(jsonReq,callback){
@@ -77,6 +87,7 @@ function uploadImage(jsonReq,callback){
     });
 }
 
+
 function deleteImage(jsonReq,callback){
     var database=jsonReq.database;
     var col=database.collection("fs.files");
@@ -93,3 +104,4 @@ exports.uploadBuffer=_uploadBuffer;
 exports.getImage=_getImage;
 exports.getImageInfo=_getImageInfo;
 exports.deleteImage=deleteImage;
+exports.getImageInfoById=_getImageInfoById;

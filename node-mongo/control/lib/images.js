@@ -7,41 +7,31 @@ var poolMain=getPool("main");
 var poolThumbnail=getPool("thumbnail");
 
 
-
-
-var _deleteImage=function(jsonReq,callback){
+var getPublicImage=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
-            if(err){ poolMain.release(database); return callback(err) };
-            if("creator"==result){
-                db.ImageLibs.checkImageInCustomer(jsonReq,function(err,result){
-                    if(err){ poolMain.release(database); return callback(err); }
-                    if(null!=result){
-                        db.Images.deleteImage(jsonReq,function(err,result){
-                            if(err){ poolMain.release(database); return callback(err); }
-                            db.ImageLibs.removeImageFromImagelibs(jsonReq,function(err,result){
-                                if(err){ poolMain.release(database); return callback(err); }
-                                    callback(err,result); 
-
-                            
-                            });
-                        }); 
+        db.Images.getImageInfoById(jsonReq,function(err,result){
+            poolMain.release(database);
+            if(result&&result.metadata&&result.metadata.property=="public"){
+                _getThumbnailImage(jsonReq,function(err,buf){
+                    if(err){return callback(err)};
+                    if(buf){
+                        console.log("cache");
+                        callback(err,buf);
                     }else{
-                        poolMain.release(database);
-                        callback("no image");    
+                        console.log("crop");
+                        getOriginalImage(jsonReq,function(err,buf){
+                            callback(err,buf);
+                        }); 
                     }
                 });
             }else{
-                callback("no permission");
-            }
-
+                console.log("no image");
+                callback("no image");
+            };
         });
     });
-
 }
-
-
 
 //获取图片
 var _getImage=function(jsonReq,callback){
@@ -66,7 +56,6 @@ var _getImage=function(jsonReq,callback){
                         return callback("no image")
                     };
                     if(jsonReq.size=="origin"){
-                        console.log(UserTitle);
                         if("creator"==UserTitle){
                             db.Images.getImage(jsonReq,function(err,buf){
                                 poolMain.release(database);
@@ -126,7 +115,7 @@ var _getThumbnailImage=function(jsonReq,callback){
                 callback(err,buf);
             });
         });
-    })
+    });
 };
 //把缩略图插入本地数据库
 var _insertThumbnailToDB=function(jsonReq,callback){
@@ -234,4 +223,4 @@ function save2(canvas){
 
 
 exports.getImage=_getImage;
-exports.deleteImage=_deleteImage;
+exports.getPublicImage=getPublicImage;

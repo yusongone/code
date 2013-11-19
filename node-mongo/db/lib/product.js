@@ -43,7 +43,6 @@ function addProductToList(jsonReq,callback){
     if(!uid){return callback("create object Id error");}
     var col=database.collection("productList");
     var _id=new objectId();
-    console.log(name,_id);
         col.update({"userId":uid},{$addToSet:{products:{$each:[{"_id":_id,"name":name}]}}},{w:1},function(err){
             callback(err,_id);
         });
@@ -65,6 +64,25 @@ function addProductToList(jsonReq,callback){
         });
 }
 */
+
+function getProduct(jsonReq,callback){
+    var database=jsonReq.database,
+        userId=jsonReq.userId,
+        productId=jsonReq.productId;
+    var uid=_createObjectId(userId);
+    var pid=_createObjectId(productId);
+    var col=database.collection("productList");
+        col.findOne({"userId":uid,"products._id":pid},function(err,doc){
+            var ary=doc.products;
+            for(var i=0,l=ary.length;i<l;i++){
+                if(ary[i]["_id"]==pid.toString()){
+                    return callback(err,ary[i]);
+                }
+            }
+            callback(err,null);
+        });
+
+}
 
 //
 function getProductsListByQuery(jsonReq,callback){
@@ -123,3 +141,4 @@ exports.getProductsListByQuery=getProductsListByQuery;
 exports.checkProductDocExist=checkProductDocExist;
 exports.AddRowToProductList=AddRowToProductList;
 exports.changeProduct=changeProduct;
+exports.getProduct=getProduct;

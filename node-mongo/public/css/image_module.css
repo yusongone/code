@@ -39,6 +39,8 @@
     border-bottom:1px solid #ddd;
     width:100%;
 }
+.module .editInput{
+}
 .imgBox{
     float:left;
     width:150px;
@@ -47,6 +49,23 @@
     text-align:center;
     background:#ddd;
     cursor:pointer;
+    position:relative;
+}
+.imgBox img{
+    max-width:100%;
+    max-height:100%;
+}
+.imgBox .imageEdit{
+    position:absolute;
+    top:5px;
+    right:5px;
+    background:#666;
+    width:20px;
+    height:20px;
+    text-indent:300px;
+    overflow:hidden;
+    cursor:pointer;
+    border:none;
 }
 .rightBox{
     float:left;
@@ -65,7 +84,7 @@
     float:left;
 }
 
-.rightBox .other{
+.rightBox .description{
     margin-top:20px;
     width:100%;
     float:left;

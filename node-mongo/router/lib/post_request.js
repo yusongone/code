@@ -51,9 +51,8 @@ function setApp(app){
         var reqBody=req.body;
         var jsonReq={};
             jsonReq.userId=req.session.userId;
-            console.log("ff",jsonReq.userId);
         if(checkLogind(req,res)){
-            ctrl.Product.getProductByUserId(jsonReq,function(err,json){
+            ctrl.Product.getProductsByUserId(jsonReq,function(err,json){
                 if(err){return res.send({"status":"error","message":err})}
                 res.send({"status":"ok","data":json});
             });
@@ -72,16 +71,24 @@ function setApp(app){
             jsonReq.productId=reqBody.productId;
 
             if(checkLogind(req,res)){
-                ctrl.Product.changeProduct(jsonReq,function(json){
-                    res.send(json);
+                ctrl.Product.changeProduct(jsonReq,function(err,json){
+                    if(json>0){
+                        res.send({"status":"ok"});
+                    }else{
+                        res.send({"status":"sorry"});
+                    }
                 });
             };
     });
 
     app.post("/uploadProductHeadImage",function(req,res){
+        var jsonReq={};
+        jsonReq.files=req.files.files;
+        jsonReq.productId=req.body.productId;
+        jsonReq.userId=req.session.userId;
         if(checkLogind(req,res)){
-            ctrl.Product.uploadProductHeadImage({},function(err,result){
-                
+            ctrl.Product.uploadProductHeadImage(jsonReq,function(err,result){
+                  
             });
         };
     });
@@ -151,11 +158,11 @@ function setApp(app){
             });
         };
     });
-    app.post('/deleteImage', function(req, res){
+    app.post('/deletePhoto', function(req, res){
         var cusInfoId=req.body.cusInfoId;
         var fileId=req.body.fileId;
         if(checkLogind(req,res)){
-            ctrl.Images.deleteImage({
+            ctrl.ImageLibs.deletePhoto({
                 cusInfoId:cusInfoId,
                 fileId:fileId,
                 userId:req.session.userId
