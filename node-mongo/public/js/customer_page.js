@@ -302,3 +302,16 @@ function _removeProduct(){
         }
     });
 }
+function _getProducts(){
+    $.ajax({
+        "type":"post",
+        "url":"/ajax_getProductsFromCustomer",
+        "dataType":"json",
+        "data":{
+            "cusInfoId":"527fcc612413c7cf24000001",
+        },
+        "success":function(data){
+            console.log(data);
+        }
+    });
+}

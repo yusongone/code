@@ -157,13 +157,14 @@ function setApp(app){
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
             ctrl.Customer.bindProductToCustomer(jsonReq,function(err,result){
-                console.log("bindProduct");
+                if(err){return res.send("status":"error","message":err)}
                 if(result){
                     res.send({"status":"ok"});
                 }
             });
         }
     });
+    //从customerInfo中删除product；
     app.post("/ajax_removeProductFromCustomer",function(req,res){
         var userId=req.session.userId;
         var jsonReq={};
@@ -172,13 +173,30 @@ function setApp(app){
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
             ctrl.Customer.removeProductFromCustomer(jsonReq,function(err,result){
-                console.log("removeProduct");
+                if(err){return res.send("status":"error","message":err)}
                 if(result){
                     res.send({"status":"ok"});
                 }
             });
         }
     });
+
+    //获取customerInfo下得所有模板 product
+    app.post("/ajax_getProductsFromCustomer",function(req,res){
+        var userId=req.session.userId;
+        var jsonReq={};
+            jsonReq.userId=userId;
+            jsonReq.cusInfoId=req.body.cusInfoId;
+        if(checkLogind(req,res)){
+            ctrl.Customer.getProductsFromCustomer(jsonReq,function(err,result){
+                if(err){return res.send("status":"error","message":err)}
+                if(result){
+                    res.send({"status":"ok","data":result});
+                }
+            });
+        }
+    });
+
     //获取客户列表
     app.post('/ajax_getCustomer', function(req, res){
         var username=req.session.username;
