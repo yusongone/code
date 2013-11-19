@@ -273,3 +273,32 @@ page.customer_des=(function(){
     }
 })();
 
+function _bindProduct(){
+    $.ajax({
+        "type":"post",
+        "url":"/ajax_bindProductToCustomer",
+        "dataType":"json",
+        "data":{
+            "cusInfoId":"527fcc612413c7cf24000001",
+            "productId":"528b83c6c56597d75500004d"
+        },
+        "success":function(data){
+            console.log(data);
+        }
+    });
+}
+
+function _removeProduct(){
+    $.ajax({
+        "type":"post",
+        "url":"/ajax_removeProductFromCustomer",
+        "dataType":"json",
+        "data":{
+            "cusInfoId":"527fcc612413c7cf24000001",
+            "productId":"528b83c6c56597d75500004d"
+        },
+        "success":function(data){
+            console.log(data);
+        }
+    });
+}

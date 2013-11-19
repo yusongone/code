@@ -203,6 +203,36 @@ function _createCustomerListForUser(jsonReq,callback){
             }
         });
 }
+
+//给用户绑定product
+function bindProductToCustomer(jsonReq,callback){
+    var database=jsonReq.database;
+    var cid=_createObjectId(jsonReq.cusInfoId);
+    var pid=_createObjectId(jsonReq.productId);
+    var uid=_createObjectId(jsonReq.userId);
+    if(!(cid&&pid&&uid)){return callback("create object Id error");}
+    var col=database.collection("customerInfo");
+        console.log("4");
+        col.update({"_id":cid,"userId":uid},{$addToSet:{products:{$each:[{"_id":pid}]}}},function(err,result){
+        console.log("5");
+            callback(err,result);
+        });
+}
+
+//删除用户绑定的product
+function removeProductFromCustomer(jsonReq,callback){
+    var database=jsonReq.database;
+    var cid=_createObjectId(jsonReq.cusInfoId);
+    var pid=_createObjectId(jsonReq.productId);
+    var uid=_createObjectId(jsonReq.userId);
+    if(!(cid&&pid&&uid)){return callback("create object Id error");}
+    var col=database.collection("customerInfo");
+        console.log("4");
+        col.update({"_id":cid,"userId":uid},{$pull:{products:{"_id":pid}}},function(err,result){
+        console.log("5");
+            callback(err,result);
+        });
+}
 /*
 function _searchCustomer(jsonReq,callback){
     var database=jsonReq.database;
@@ -225,3 +255,5 @@ exports.getImageLibsId=_getImageLibsId;
 exports.createCustomerListForUser=_createCustomerListForUser;
 exports.getUserAndCustomerRelation=getUserAndCustomerRelation;
 exports.getCustomerInfoData=_getCustomerInfoData;
+exports.bindProductToCustomer=bindProductToCustomer;
+exports.removeProductFromCustomer=removeProductFromCustomer;

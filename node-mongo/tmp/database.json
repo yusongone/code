@@ -65,7 +65,14 @@
     "products":[
         {"_id":"object(1239342739234592823474)","productId":"object('1235234624573455245')","":""},
         { "_id":"object(12348712023471234)","imgPath":"/private_images/125472831239348293423", "size":"20*15", "price":1200, "description":"asdf easda ewqw esadf asef aef" }
-        ]
+        ],
+    "category":{
+        "big":[{id:"",name:""},{}],
+        "small":[{id:"",name:""},{}]
+    },
+    "kit":{
+        "testOne":[{},{}]
+    }
 }
 
 

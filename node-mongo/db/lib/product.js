@@ -49,6 +49,7 @@ function addProductToList(jsonReq,callback){
 }
 
 
+
 //增加产品到列表
 /*
 function addProductToList(jsonReq,callback){

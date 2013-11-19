@@ -106,7 +106,7 @@ function setApp(app){
 
 
 
-//-------------------------------------- product --------------------------//
+//-------------------------------------- product end --------------------------//
 
     //查找用户 user
     app.post('/ajax_searchUser', function(req, res){
@@ -147,6 +147,37 @@ function setApp(app){
                 res.send(json);
             });
         };
+    });
+    //给customerInfo 绑定 product
+    app.post("/ajax_bindProductToCustomer",function(req,res){
+        var userId=req.session.userId;
+        var jsonReq={};
+            jsonReq.userId=userId;
+            jsonReq.productId=req.body.productId;
+            jsonReq.cusInfoId=req.body.cusInfoId;
+        if(checkLogind(req,res)){
+            ctrl.Customer.bindProductToCustomer(jsonReq,function(err,result){
+                console.log("bindProduct");
+                if(result){
+                    res.send({"status":"ok"});
+                }
+            });
+        }
+    });
+    app.post("/ajax_removeProductFromCustomer",function(req,res){
+        var userId=req.session.userId;
+        var jsonReq={};
+            jsonReq.userId=userId;
+            jsonReq.productId=req.body.productId;
+            jsonReq.cusInfoId=req.body.cusInfoId;
+        if(checkLogind(req,res)){
+            ctrl.Customer.removeProductFromCustomer(jsonReq,function(err,result){
+                console.log("removeProduct");
+                if(result){
+                    res.send({"status":"ok"});
+                }
+            });
+        }
     });
     //获取客户列表
     app.post('/ajax_getCustomer', function(req, res){

@@ -109,6 +109,37 @@ function _searchCustomer(json,callback){
     });
 }
 
+//给用户绑定模板
+function bindProductToCustomer(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if(err){ poolMain.release(database); return callback(err) };
+            console.log(jsonReq.userId);
+            if("creator"==result){
+                db.Customer.bindProductToCustomer(jsonReq,function(err,res){
+                    callback(err,res);
+                });
+            }
+        });
+    });
+}
+
+//删除用户绑定的模板
+function removeProductFromCustomer(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if(err){ poolMain.release(database); return callback(err) };
+            if("creator"==result){
+                db.Customer.removeProductFromCustomer(jsonReq,function(err,res){
+                    callback(err,res);
+                });
+            }
+        });
+    });
+}
+
 
 exports.addCustomer=_addCustomer;
 exports.getCustomerList=_getCustomerList;
@@ -116,3 +147,5 @@ exports.searchCustomer=_searchCustomer;
 exports.bindUser=_bindUser;
 exports.checkBind=_checkBind;
 exports.getCustomerInfoIdByBindUserId=_getCustomerInfoIdByBindUserId;
+exports.bindProductToCustomer=bindProductToCustomer;
+exports.removeProductFromCustomer=removeProductFromCustomer;
