@@ -190,3 +190,30 @@
     margin-left:5px;
 }
 
+.countBox{
+    position:absolute;
+    top:0;
+    margin-top:5px;
+    right:55px;
+}
+.countBox .subOne,
+.countBox .addOne{
+    float:left;
+    width:16px;
+    height:16px;
+    border:1px solid #ddd;
+    border-radius:3px;
+    text-align:center;
+}
+.countBox input{
+    float:left;
+    width:20px;
+    margin:0 5px;
+    height:16px;
+    line-height:16px;
+    text-align:center;
+    font-size:12px;
+    border:1px solid #ddd;
+    border-radius:3px;
+}
+

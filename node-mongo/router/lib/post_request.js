@@ -97,18 +97,6 @@ function setApp(app){
         };
     });
 
-    app.post('/getCustomerProduct', function(req, res){
-        var reqBody=req.body;
-        var jsonReq={};
-            jsonReq.userId=req.session.userId;
-        if(checkLogind(req,res)){
-            ctrl.Product.getProductList(jsonReq,function(err,json){
-                res.send(json);
-            });
-        };
-    });
-
-
 
 //-------------------------------------- product end --------------------------//
 
@@ -160,7 +148,7 @@ function setApp(app){
             jsonReq.productId=req.body.productId;
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
-            ctrl.Customer.bindProductToCustomer(jsonReq,function(err,result){
+            ctrl.Customer.addProductToCustomer(jsonReq,function(err,result){
                 if(err){return res.send({"status":"error","message":err})}
                 res.send({"status":"ok"});
             });
@@ -175,6 +163,21 @@ function setApp(app){
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
             ctrl.Customer.removeProductFromCustomer(jsonReq,function(err,result){
+                if(err){return res.send({"status":"error","message":err})}
+                res.send({"status":"ok"});
+            });
+        }
+    });
+
+    //减少1个，如果为0则会删除；
+    app.post("/ajax_subProductFromCustomer",function(req,res){
+        var userId=req.session.userId;
+        var jsonReq={};
+            jsonReq.userId=userId;
+            jsonReq.productId=req.body.productId;
+            jsonReq.cusInfoId=req.body.cusInfoId;
+        if(checkLogind(req,res)){
+            ctrl.Customer.subProductFromCustomer(jsonReq,function(err,result){
                 if(err){return res.send({"status":"error","message":err})}
                 res.send({"status":"ok"});
             });

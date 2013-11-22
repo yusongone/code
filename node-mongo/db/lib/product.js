@@ -66,7 +66,7 @@ function addProductToList(jsonReq,callback){
 }
 */
 
-function getProduct(jsonReq,callback){
+function getProductById(jsonReq,callback){
     var database=jsonReq.database,
         userId=jsonReq.userId,
         productId=jsonReq.productId;
@@ -133,4 +133,4 @@ exports.getProductsByUserId=getProductsByUserId;
 exports.checkProductDocExist=checkProductDocExist;
 exports.AddRowToProductList=AddRowToProductList;
 exports.changeProduct=changeProduct;
-exports.getProduct=getProduct;
+exports.getProductById=getProductById;

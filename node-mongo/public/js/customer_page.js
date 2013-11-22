@@ -313,6 +313,8 @@ var ProductBox=(function(){
             width:800,
             modal: true,
             "close":function(){
+                aList.html("");
+                pList.html("");
             },
             "beforeclose":function(){
             }
@@ -350,7 +352,6 @@ var ProductBox=(function(){
             success:function(data){
                 if(data.status=="ok"){
                 var ary=data.data;
-                    aList.html("");
                     for(var i=0,l=ary.length;i<l;i++){
                         var json=ary[i];
                             json.cusInfoId=cusInfoId;
@@ -388,7 +389,8 @@ var Product=(function(){
         if(json.type=="aList"){
             str="<div class='btnBlue add'>添加</div>";
         }else{
-            str="<div class='btnRed remove'>移除</div>";
+            str="<div class='countBox'><div class='subOne'>-</div><input id='count' value='"+(json.count||"NAN")+"'><div class='addOne'>+</div></div>"
+            str+="<div class='btnRed remove'>移除</div>";
         }
         var html="<li class='productLi'>"+str+
                     "<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
@@ -399,17 +401,39 @@ var Product=(function(){
            this.body=$(html); 
            var add=this.body.find(".add");
            var remove=this.body.find(".remove");
+           var addOne=this.body.find(".addOne");
+           var subOne=this.body.find(".subOne");
            add.click(function(){
                 _bindProduct(that.id,that.cusInfoId); 
            });
            remove.click(function(){
                 _removeProduct(that.id,that.cusInfoId); 
            });
+           addOne.click(function(){
+                _bindProduct(that.id,that.cusInfoId); 
+           });
+           subOne.click(function(){
+                _subProduct(that.id,that.cusInfoId); 
+           });
     }
     function _removeProduct(pid,cid){
         $.ajax({
             "type":"post",
             "url":"/ajax_removeProductFromCustomer",
+            "dataType":"json",
+            "data":{
+                "cusInfoId":cid,
+                "productId":pid
+            },
+            "success":function(data){
+                console.log(data);
+            }
+        });
+    }
+    function _subProduct(pid,cid){
+        $.ajax({
+            "type":"post",
+            "url":"/ajax_subProductFromCustomer",
             "dataType":"json",
             "data":{
                 "cusInfoId":cid,

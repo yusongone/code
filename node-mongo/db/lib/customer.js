@@ -1,4 +1,5 @@
 var mongodb=require("mongodb"),
+    Product=require("./product");
     objectId=mongodb.ObjectID;
 
 
@@ -31,7 +32,6 @@ function _getCustomerInfoData(jsonReq,callback){
         if(!bindUser){return callback("err")};
         tempObj["bindUser"]=bindUser;
     }
-    console.log(tempObj);
     var col=database.collection("customerInfo");
         col.findOne(tempObj,function(err,doc){
             if(err){return callback(err)};
@@ -120,7 +120,6 @@ function _bindUser(jsonReq,callback){
         _checkBind(jsonReq,function(err,result){
             if(!result){
                 col.update({"_id":cusId,"reserverMessage":reserverMessage},{$set:{"bindUser":userId}},function(err,item){
-                    console.log(item);
                         callback(err,item);
                 });
             }else{
@@ -212,15 +211,67 @@ function _createCustomerListForUser(jsonReq,callback){
         });
 }
 
+
+
 //给用户绑定product
-function bindProductToCustomer(jsonReq,callback){
+function addProductToCustomer(jsonReq,callback){
+    var database=jsonReq.database;
+    var cid=_createObjectId(jsonReq.cusInfoId);
+    var pid=_createObjectId(jsonReq.productId);
+
+    if(!(cid&&pid)){return callback("create object Id error");}
+    var col=database.collection("customerInfo");
+        col.findOne({"_id":cid,"products._id":pid},function(err,doc){
+            if(doc){
+                col.update( {"_id":cid,"products._id":pid},{ "$inc":{"products.$.count":1}},function(err,item){
+                    callback(err,item);
+                });
+            }else{
+                Product.getProductById(jsonReq,function(err,doc){
+                    var productObj=doc;
+                        productObj.count=1;
+                    col.update({"_id":cid},{$addToSet:{products:{$each:[productObj]}}},function(err,result){
+                        callback(err,result);
+                    });
+                });
+            }
+        });
+}
+
+function getProductFromCustomerById(jsonReq,callback){
+    var database=jsonReq.database;
+    var cid=_createObjectId(jsonReq.cusInfoId);
+    var pid=_createObjectId(jsonReq.productId);
+    var col=database.collection("customerInfo");
+        col.findOne({"_id":cid,"products._id":pid},function(err,doc){
+            var ary=doc.products;
+            for(var i=0,l=ary.length;i<l;i++){
+                if(ary[i]["_id"]==pid.toString()){
+                    return callback(err,ary[i]);
+                }
+            }
+            callback(err,null);
+        });
+
+}
+
+function subProductFromCustomer(jsonReq,callback){
     var database=jsonReq.database;
     var cid=_createObjectId(jsonReq.cusInfoId);
     var pid=_createObjectId(jsonReq.productId);
     if(!(cid&&pid)){return callback("create object Id error");}
     var col=database.collection("customerInfo");
-        col.update({"_id":cid},{$addToSet:{products:{$each:[{"_id":pid}]}}},function(err,result){
-            callback(err,result);
+        getProductFromCustomerById(jsonReq,function(err,doc){
+            if(!doc){return callback("no product")};
+           if(doc.count&&doc.count>1){
+                col.update({"_id":cid,"products._id":pid},{ "$inc":{"products.$.count":-1}},function(err,item){
+                    callback(err,item);
+                });
+           }else if(doc.count&&doc.count==1){
+               removeProductFromCustomer(jsonReq,function(err,result){
+                   callback(err,result);
+               });
+           }
         });
 }
 
@@ -271,6 +322,7 @@ exports.getImageLibsId=_getImageLibsId;
 exports.createCustomerListForUser=_createCustomerListForUser;
 exports.getUserAndCustomerRelation=getUserAndCustomerRelation;
 exports.getCustomerInfoData=_getCustomerInfoData;
-exports.bindProductToCustomer=bindProductToCustomer;
+exports.addProductToCustomer=addProductToCustomer;
 exports.removeProductFromCustomer=removeProductFromCustomer;
+exports.subProductFromCustomer=subProductFromCustomer;
 exports.getProductsFromCustomer=getProductsFromCustomer;

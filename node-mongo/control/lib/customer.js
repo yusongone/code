@@ -109,15 +109,21 @@ function _searchCustomer(json,callback){
     });
 }
 
+
+
+
+/**
+ *product 
+ */
+
 //给用户绑定模板
-function bindProductToCustomer(jsonReq,callback){
+function addProductToCustomer(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
             if(err){ poolMain.release(database); return callback(err) };
-            console.log(jsonReq.userId);
             if("creator"==result){
-                db.Customer.bindProductToCustomer(jsonReq,function(err,res){
+                db.Customer.addProductToCustomer(jsonReq,function(err,res){
                     poolMain.release(database);
                     callback(err,res);
                 });
@@ -125,6 +131,22 @@ function bindProductToCustomer(jsonReq,callback){
         });
     });
 }
+
+function subProductFromCustomer(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result){
+            if(err){ poolMain.release(database); return callback(err) };
+            if("creator"==result){
+                db.Customer.subProductFromCustomer(jsonReq,function(err,res){
+                    poolMain.release(database);
+                    callback(err,res);
+                });
+            }
+        });
+    });
+};
 
 //删除用户绑定的模板
 function removeProductFromCustomer(jsonReq,callback){
@@ -134,13 +156,14 @@ function removeProductFromCustomer(jsonReq,callback){
             if(err){ poolMain.release(database); return callback(err) };
             if("creator"==result){
                 db.Customer.removeProductFromCustomer(jsonReq,function(err,res){
+                    poolMain.release(database);
                     callback(err,res);
                 });
             }
         });
     });
 }
-
+/*
 //删除用户绑定的product
 function getProductsFromCustomer(jsonReq,callback){
     poolMain.acquire(function(err,database){
@@ -176,6 +199,29 @@ function getProductsFromCustomer(jsonReq,callback){
         });
     });
 }
+*/
+
+//删除用户绑定的product
+function getProductsFromCustomer(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result,resJson){
+                        console.log("eeff");
+            if(err){ poolMain.release(database); return callback(err) };
+            if("creator"==result||"binder"==result){
+                jsonReq.userId=resJson.userId;
+                db.Customer.getProductsFromCustomer(jsonReq,function(err,res){
+                    if(err){ poolMain.release(database);return callback(err);};
+                    callback(err,res);
+                });
+            }else{
+                poolMain.release(database);
+                console.log("not found");
+                callback("not found")
+            }
+        });
+    });
+}
 
 
 exports.addCustomer=_addCustomer;
@@ -184,6 +230,7 @@ exports.searchCustomer=_searchCustomer;
 exports.bindUser=_bindUser;
 exports.checkBind=_checkBind;
 exports.getCustomerInfoIdByBindUserId=_getCustomerInfoIdByBindUserId;
-exports.bindProductToCustomer=bindProductToCustomer;
+exports.addProductToCustomer=addProductToCustomer;
 exports.removeProductFromCustomer=removeProductFromCustomer;
 exports.getProductsFromCustomer=getProductsFromCustomer;
+exports.subProductFromCustomer=subProductFromCustomer;

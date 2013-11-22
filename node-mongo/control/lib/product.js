@@ -4,7 +4,7 @@ var Type=db.Common.Type;
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
 
-
+//添加一个Product
 function addProduct(jsonReq,_callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
@@ -30,7 +30,7 @@ function addProduct(jsonReq,_callback){
 function uploadProductHeadImage(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-        db.Product.getProduct(jsonReq,function(err,productObj){
+        db.Product.getProductById(jsonReq,function(err,productObj){
             if(err){return callback(err)};
             if(productObj&&productObj.imgPath){
                 jsonReq.fileId=productObj.imgPath;
@@ -81,27 +81,7 @@ function changeProduct(jsonReq,callback){
     });
 };
 
-function getCustomerProduct(jsonReq,callback){
-    poolMain.acquire(function(err,database){
-        jsonReq.database=database;
-        jsonReq.query={
-            cusInfoId:jsonReq.cusInfoId
-        }
-        db.Product.getCustomerProduct(jsonReq,function(err,doc){
-            poolMain.release(database);
-           if(doc){
-                callback(err,doc["_id"]); 
-           }else{
-                callback(err,null); 
-           }
-       });
-   });
-
-};
-
-
 exports.addProduct=addProduct;
-exports.getCustomerProduct=getCustomerProduct;
 exports.getProductsByUserId=getProductsByUserId;
 exports.changeProduct=changeProduct;
 exports.uploadProductHeadImage=uploadProductHeadImage;

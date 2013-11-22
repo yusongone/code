@@ -39,7 +39,7 @@
         }
     }
     products:[
-        {"pid":"objectId('asdffefefef')"},
+        {"_id":"objectId('asdffefefef')","imgPath":"asdf","count":"0"},
         {"pid":"objectId('asdffefefef')"},
         {"pid":"objectId('asdffefefef')"}
         ]
