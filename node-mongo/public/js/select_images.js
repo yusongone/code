@@ -13,7 +13,7 @@ var ajax_get=function(cusInfoId){
             var data=json.data;
             for(var i=0,l=data.length;i<l;i++){
                 var id=data[i].fileId; 
-                var img=$("<img/>",{"src":"/images/"+cusInfoId+"/"+id});
+                var img=$("<img/>",{"src":"/photo/"+cusInfoId+"/"+id+"?type=fill"});
                 var thu=$("<li/>",{"class":"thu"});
                 $(".imageList").append(thu.append(img));
             };

@@ -89,6 +89,7 @@ function getImagesListByCusInfoId(jsonReq,callback){
     var cid= _createObjectId(cusInfoId);
     if(!cid){return callback("err")};
     var col=database.collection("image_libs");
+    console.log(cid);
         col.findOne({"cusInfoId":cid},function(err,doc){
             if(doc){
               callback(err,doc.images);    

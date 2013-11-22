@@ -81,11 +81,19 @@ function _addCustomerToList(jsonReq,callback){
 //检测customerInfo 相信信息是否绑定用户;
 function _checkBind(jsonReq,callback){
     var database=jsonReq.database;
-    var cusId=jsonReq.cusId;
-    var cusId=_createObjectId(cusId);
-    if(!(cusId)){return callback("create ObjectId error")}
+    var cusId=_createObjectId(jsonReq.cusId);
+    var buser=_createObjectId(jsonReq.userId);
+    if(!(cusId&&buser)){return callback("create ObjectId error")}
     var col=database.collection("customerInfo");
-        col.find({"_id":cusId}).toArray(function(err,item){
+        col.findOne({"bindUser":buser},function(err,item){
+            if(item){
+                callback(err,true);
+            }else{
+                callback(err,false);
+            }
+        });
+/*
+        col.find({"bindUser":buser}).toArray(function(err,item){
             if(err){return callback(err)}
             if(item.length>0){
                 if(null==item[0].bindUser){
@@ -97,6 +105,7 @@ function _checkBind(jsonReq,callback){
                 callback(err,false);
             }
         });
+        */
 };
 //绑定用户Id到customerInfo表中；
 function _bindUser(jsonReq,callback){
@@ -118,7 +127,6 @@ function _bindUser(jsonReq,callback){
                 callback(err,"sorry already bind");    
             }
         });
-    
 }
 //增加一项客户具体信息
 function _addCustomerInfo(jsonReq,callback){
