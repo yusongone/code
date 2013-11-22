@@ -186,7 +186,7 @@ function setApp(app){
         if(checkLogind(req,res)){
             ctrl.Customer.getProductsFromCustomer(jsonReq,function(err,result){
                 if(err){return res.send({"status":"error","message":err})}
-                res.send({"status":"ok","data":result.products});
+                res.send({"status":"ok","data":result});
             });
         }
     });

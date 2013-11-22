@@ -12,7 +12,7 @@ page.bindEvent=function(){
     $("#addCustomer").click(function(){
         page.customer.openAddBox();
     });
-    Product.init();
+    ProductBox.init();
 };
 
 page.ajax_addCustomer=function(data,fun){
@@ -57,7 +57,8 @@ page.ajax_getCusList=function(cusId){
             if(data&&data.length>0){
                 var Lib=page.Lib
                 for(var i=0;i<data.length;i++){
-                    var lib=new Lib(data[i]);
+                    var json=data[i];
+                    var lib=new Lib(json);
                     $(".list").append(lib.body);
                 } 
             }
@@ -121,7 +122,7 @@ page.LibBar=(function(){
                 alert("http://makejs.com/bindlink/"+that.cusId);
             });
             json.setModle.click(function(){
-                Product.open(that.cusId);
+                ProductBox.open(that.cusId);
             });
     };
     return bar;
@@ -280,8 +281,8 @@ page.customer_des=(function(){
     }
 })();
 
-var Product=(function(){
-    var div=$("<div/>",{});  
+var ProductBox=(function(){
+    var cusInfoId=null;
     var html="<div class='product'>"+
                 "<div class='allProduct'>"+
                     "<ul class='pList'></ul>"+
@@ -297,21 +298,11 @@ var Product=(function(){
         z.dialog({
             autoOpen:false,
             resizable: true,
-            width:600,
+            width:800,
             modal: true,
-            buttons: {
-                "Delete all items": function() {
-                    $('#addCustomer').fileupload('clear');
-                },
-                Cancel: function() {
-                $( this ).dialog( "close" );
-                }
-            },
             "close":function(){
-                div.html("");
             },
             "beforeclose":function(){
-                
             }
         });
     }
@@ -329,7 +320,10 @@ var Product=(function(){
                 if(data.status=="ok"){
                 var ary=data.data;
                     for(var i=0,l=ary.length;i<l;i++){
-                       pList.append(ary[i]); 
+                        var json=ary[i];
+                        json.cusInfoId=cusInfoId;
+                       var p=new Product(json);
+                            pList.append(p.body);
                     };
                 }
             }
@@ -346,7 +340,11 @@ var Product=(function(){
                 var ary=data.data;
                     aList.html("");
                     for(var i=0,l=ary.length;i<l;i++){
-                       aList.append(ary[i].name); 
+                        var json=ary[i];
+                            json.cusInfoId=cusInfoId;
+                            json.type="aList";
+                       var p=new Product(json);
+                            aList.append(p.body);
                     };
                 }
             }
@@ -357,7 +355,8 @@ var Product=(function(){
         init:function(){
             _init();
         },
-        open:function(cusInfoId){
+        open:function(cusId){
+            cusInfoId=cusId;
             _getCusProducts(cusInfoId);
             _getAllProducts(cusInfoId);
             z.dialog("open");
@@ -365,32 +364,66 @@ var Product=(function(){
     } 
 })();
 
-function _bindProduct(){
-    $.ajax({
-        "type":"post",
-        "url":"/ajax_bindProductToCustomer",
-        "dataType":"json",
-        "data":{
-            "cusInfoId":"527fcc612413c7cf24000001",
-            "productId":"528b83c6c56597d75500004d"
-        },
-        "success":function(data){
-            console.log(data);
+var Product=(function(){
+    function product(json){
+        this.id=json["_id"];
+        this.cusInfoId=json.cusInfoId;
+        this.initUI(json);
+    }
+    product.prototype.initUI=function(json){
+        var that=this;
+        var str="";
+        if(json.type=="aList"){
+            str="<div class='btnBlue add'>添加</div>";
+        }else{
+            str="<div class='btnRed remove'>移除</div>";
         }
-    });
-}
+        var html="<li class='productLi'>"+str+
+                    "<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
+                    "<div class='name'>"+json.name+"</div>"+
+                    "<div class='size'>"+json.size+"</div>"+
+                    "<div class='description'>"+json.description+"</div>"+
+                "</li>";
+           this.body=$(html); 
+           var add=this.body.find(".add");
+           var remove=this.body.find(".remove");
+           add.click(function(){
+                _bindProduct(that.id,that.cusInfoId); 
+           });
+           remove.click(function(){
+                _removeProduct(that.id,that.cusInfoId); 
+           });
+    }
+    function _removeProduct(pid,cid){
+        $.ajax({
+            "type":"post",
+            "url":"/ajax_removeProductFromCustomer",
+            "dataType":"json",
+            "data":{
+                "cusInfoId":cid,
+                "productId":pid
+            },
+            "success":function(data){
+                console.log(data);
+            }
+        });
+    }
+    function _bindProduct(pid,cid){
+        $.ajax({
+            "type":"post",
+            "url":"/ajax_bindProductToCustomer",
+            "dataType":"json",
+            "data":{
+                "cusInfoId":cid,
+                "productId":pid
+            },
+            "success":function(data){
+                console.log(data);
+            }
+        });
+    }
+    return product;
+})();
 
-function _removeProduct(){
-    $.ajax({
-        "type":"post",
-        "url":"/ajax_removeProductFromCustomer",
-        "dataType":"json",
-        "data":{
-            "cusInfoId":"527fcc612413c7cf24000001",
-            "productId":"528b83c6c56597d75500004d"
-        },
-        "success":function(data){
-            console.log(data);
-        }
-    });
-}
+
+

@@ -235,7 +235,10 @@ function getProductsFromCustomer(jsonReq,callback){
     if(!(cid)){return callback("create object Id error");}
     var col=database.collection("customerInfo");
         col.findOne({"_id":cid},{"products":1},function(err,result){
-            callback(err,result);
+            if(result){
+                return callback(err,result.products);
+            }
+            callback(err,null);
         });
 }
 /*

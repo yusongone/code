@@ -146,17 +146,32 @@ function getProductsFromCustomer(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result,resJson){
+                        console.log("eeff");
             if(err){ poolMain.release(database); return callback(err) };
             if("creator"==result||"binder"==result){
                 jsonReq.userId=resJson.userId;
                 db.Customer.getProductsFromCustomer(jsonReq,function(err,res){
                     if(err){ poolMain.release(database);return callback(err);};
                     db.Product.getProductsByUserId(jsonReq,function(err,doc){
+                        if(err){ poolMain.release(database);return callback(err);};
                         poolMain.release(database);
-                        //des   doc
-                        console.log(doc);
+                        var tempAry=[];
+                        console.log("ff");
+                        if(!(res&&doc)){return callback(err,[])}
+                        for(var i=0;i<res.length;i++){
+                            for(var j=0;j<doc.length;j++){
+                                if(doc[j]["_id"].toString()==res[i]["_id"].toString()){
+                                    tempAry.push(doc[j]);
+                                }
+                            }
+                        }
+                        callback(err,tempAry);
                     });
                 });
+            }else{
+                poolMain.release(database);
+                console.log("not found");
+                callback("not found")
             }
         });
     });

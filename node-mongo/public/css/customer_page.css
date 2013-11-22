@@ -47,7 +47,6 @@
 }
 .add{
     float:right;
-    margin-top:5px;
 }
 .toolBar .td{
     width:20%;
@@ -139,15 +138,55 @@
 }
 .product .allProduct,
 .product .cusProduct{
-    width:250px;
-    height:380px;
+    width:370px;
+    height:480px;
     border:1px solid #ddd;
     border-radius:5px;
 }
 .product .allProduct{
     float:left;
 }
+.product .allProduct .pList{
+    overflow-y: scroll;
+    height: 480px;
+}
+.product .pList .thu img{
+    max-width:100%;
+    max-height:100%;
+}
+.product .pList .thu{
+    float:left;
+    width:70px;
+    height:70px;
+}
+.product .pList .remove,
+.product .pList .add{
+    margin-top:5px;
+    position:absolute;
+    right:5px;
+    top:0px;
+    font-size:12px;
+    height:18px;
+    line-height:18px;
+}
+.product .pList .name,
+.product .pList .size,
+.product .pList .description{
+    font-size:12px;
+    float:left;
+    width:260px;
+    margin-left:5px;
+    margin-bottom:5px;
+}
 .product .cusProduct{
     float:right;
+}
+.productLi{
+    position:relative;
+    width:345px;
+    float:left;
+    padding:5px 0;
+    border-bottom:1px solid #eee;
+    margin-left:5px;
 }
 
