@@ -14,7 +14,8 @@ function setApp(app){
         var jsonReq={};
         var cusId=req.body.cusId;
         var reserverMessage=req.body.reserverMessage;
-        if(!(reserverMessage&&cusId)){
+        var reqVcode=req.body.vcode;
+        if(!(reserverMessage&&cusId&&reqVcode)){
             res.send({"status":"error","message":"params error"});
             return ;
         }
@@ -22,12 +23,15 @@ function setApp(app){
             jsonReq.cusId=cusId;
             jsonReq.userId=req.session.userId;
             jsonReq.reserverMessage=reserverMessage;
+            if(reqVcode!=req.session.vcode){
+                return res.send({"stuats":"sorry","message":"vcode error"});
+            }
             ctrl.Customer.bindUser(jsonReq,function(err,json){
                 if(err){return res.send({"status":"sorry","message":err})}
                 if(json>0){
                     res.send({"status":"ok"});
                 }else{
-                    res.send({"status":"sorry"});
+                    res.send({"status":"sorry","message":"code error"});
                 }
             });
         };

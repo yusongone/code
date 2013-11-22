@@ -1,5 +1,5 @@
 var Canvas=require("canvas");
-var canvas = new Canvas(100, 30),
+var canvas = new Canvas(80, 24),
         ctx = canvas.getContext('2d'),
         items = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPRSTUVWXYZ23456789'.split(''),
         vcode = '',
@@ -7,18 +7,18 @@ var canvas = new Canvas(100, 30),
 
 
 function _getVcode(callback){
-    ctx.clearRect(0,0,100,30);
+    ctx.clearRect(0,0,80,24);
     var fillCo = Math.round(rnd * (textColors.length - 1));
     ctx.fillStyle =fillCo;
-    ctx.fillRect(0, 0, 100, 30);
-    ctx.font = 'bold 30px sans-serif';
-    ctx.globalAlpha =0.8;
+    ctx.fillRect(0, 0, 80,24);
+    ctx.globalAlpha =1;
     for (var i = 0; i < 4; i++) {
         var rnd = Math.random();
         var item = Math.round(rnd * (items.length - 1));
         var color = Math.round(rnd * (textColors.length - 1));
         ctx.fillStyle = textColors[color];
-        ctx.fillText(items[item], 5 + i*23, 25);
+        ctx.font ='bold 1000pt Arial';
+        ctx.fillText(items[item], 5 + i*18,15,50);
         vcode += items[item];
     }
     canvas.toBuffer(function(err, buf){

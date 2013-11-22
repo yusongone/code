@@ -106,7 +106,7 @@ page.LibBar=(function(){
     bar.prototype.initUI=function(tage,libJson){
         var that=this;
         var share=$("<a/>",{"text":"绑定链接"});
-        this.bindUserId?share.addClass("active")&&share.text("已绑定"):"";
+        this.bindUserId?share.addClass("active")&&share.text("已绑定")&&share.data("bd",true):"";
         var remove=$("<a/>",{"text":"删除"});
         var setModle=$("<a/>",{"text":"添加模板"});
         var setImage=$("<a/>",{"href":"/b/manage_image/"+that.cusId,"target":"_blank","text":"管理图片"});
@@ -119,7 +119,19 @@ page.LibBar=(function(){
     bar.prototype.bindEvent=function(json){
         var that=this;
             json.share.click(function(){
-                alert("http://makejs.com/bindlink/"+that.cusId);
+                if($(this).data("bd")){return false;};
+                var box=$("<box/>",{});
+                var src="http://chart.apis.google.com/chart?chs=200x200&cht=qr&chld=|1&chl="+location.host+"/bindlink/"+that.cusId;
+                var img=$("<img/>",{"src":src});
+                var input=$("<input/>",{"value":"http://"+location.host+"/bindlink/"+that.cusId});
+                box.append(img,input);
+                box.dialog({
+                    resizable:false,
+                    modal: true,
+                    close:function(){
+                        box.remove();
+                    }
+                });
             });
             json.setModle.click(function(){
                 ProductBox.open(that.cusId);
