@@ -4,7 +4,7 @@ var config=Common.config;
 var ctrl=Common.ctrl;
 var js_version=config.js_version;
 var css_version=config.css_version;
-var upload_max_size=1024*1024*2;
+var upload_max_size=1024*1024*10;
 
 var checkLogind=Common.checkLogind;
 
