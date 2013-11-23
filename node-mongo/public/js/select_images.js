@@ -20,11 +20,13 @@ var ajax_get=function(cusInfoId){
                 var id=data[i].fileId; 
                 var img=$("<img/>",{"src":"/photo/"+cusInfoId+"/"+id+"?size=300"});
                 var thu=$("<li/>",{"class":"thu"});
-                $("."+c[i%4]).append(thu.append(img));
+                var overBox=$("<div/>",{"class":"overBox"});
+                $("."+c[i%4]).append(thu.append(img,overBox));
                 thu.data("id",id);
                 thu.data("filename",data[i].filename);
                 thu.hover(function(){
-                    $(this).append(pThumList.data("thum",$(this)));
+                    var pThumb=ProductThumbList.getPThumb($(this)); 
+                    $(this).append(pThumb);
                 },function(){
                     //z.remove();
                 });
@@ -59,7 +61,7 @@ $(window).scroll(function(evt){
 });
 
 var ProductThumbList=(function(){
-    var charAry=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","O","R","S","T","U","V"];
+    var charAry=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","O","R","S","T","U","V","W","X","Y","Z"];
     var thumList=[];
     var productList=$("<div/>",{"class":"productList"});
     var signList=$("<ul/>",{"class":"signList"})
@@ -77,22 +79,44 @@ var ProductThumbList=(function(){
        var img=$("<img/>",{"class":"headImage","src":"/public_image/"+this.data.imgPath+"?size=100&type=fill"})
        this.body.append(img,name,this.count,sign);
        productList.append(this.body);
-   
+   }
+   Thum.prototype.subThu=function(thu){
+       var list=this.list;
+       var length=list.length;
+       for(var i=0;i<length;i++){
+           console.log(list[i],thu.data("id"));
+           if(list[i]==thu.data("id")){
+                list.splice(i,1);
+           } 
+       }
+        this.count.text(this.list.length)
    }
    Thum.prototype.addThu=function(thu){
-       this.list.push(thu.data("_id"));
+       var that=this;
+       this.list.push(thu.data("id"));
         this.count.text(this.list.length)
-        thu.css("opacity","0.7");
-        var div=$("<div/>",{"class":"over","text":charAry[this.data.index]})
-        thu.append(div);
+        var text=charAry[this.data.index];
+        var overSign=$("<div/>",{"class":"over "+text,"text":text})
+        var close=$("<div/>",{"class":"close fa fa-times"})
+        thu.find(".overBox").append(overSign.append(close));
+
+        close.click(function(){
+           that.subThu(thu); 
+           overSign.remove();
+            check(thu);
+        });
    }
    Thum.prototype.createSign=function(){
        var that=this;
-        this.sign=$("<li/>",{"class":"sign","text":charAry[this.data.index]});
+       var text=charAry[this.data.index];
+        this.sign=$("<li/>",{"class":"sign","text":text});
+        this.sign.data("text",text);
         signList.append(this.sign);
         this.sign.click(function(){
+            if($(this).data("enable")){return false;};
             var thu=signList.data("thum");
                 that.addThu(thu);
+                check(thu);
         });
    }
    Thum.prototype.bindEvent=function(){
@@ -107,13 +131,27 @@ var ProductThumbList=(function(){
             thumList.push(thum);
         } 
    }
-
+    function check(thu){
+            signList.find(".sign").each(function(){
+                var text=$(this).data("text");
+                console.log(thu.find("."+text).length);
+                if(thu.find("."+text).length>0){
+                    $(this).css({background:"red"});
+                    $(this).data("enable",1);
+                }else{
+                    $(this).data("enable",0);
+                    $(this).css({background:"blue"});
+                };
+            });
+    }
    return {
         init:function(ary){
             $(".productBox").append(productList);
             _createThumbList(ary);
         }
-        ,signList:signList
-   
+        ,getPThumb:function(thu){
+            check(thu);
+            return signList.data("thum",thu);
+        }
    }
 })();
