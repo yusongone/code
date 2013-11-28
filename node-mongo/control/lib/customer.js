@@ -77,6 +77,7 @@ function _addCustomer(jsonReq,callback){
         });
     });
 }
+
 //获取账户下所有客户
 function _getCustomerList(jsonReq,callback){
     var userId=jsonReq.userId;
@@ -115,6 +116,39 @@ function _searchCustomer(json,callback){
 /**
  *product 
  */
+
+function uploadSelectPhotoList(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+            var objStr=jsonReq.objStr;
+            var obj=JSON.parse(objStr);
+            if(!obj){
+                return callback("error object string");
+            }
+            var count=0;
+            var length=0;
+            for(var i in obj){
+                length++;
+            }
+            for(var i in obj){
+               jsonReq.productId=i; 
+               jsonReq.photoAry=obj[i];
+                db.Customer.uploadSelectPhotoList(jsonReq,function(err,result){
+                    count++;  
+                    if(err){
+                        poolMain.release(database);
+                        return callback("some one error");
+                    }
+                    if(count==length){
+                        poolMain.release(database);
+                        callback(err,{"status":"ok`"});
+                    }
+                });
+            }
+    });
+
+}
+
 
 //给用户绑定模板
 function addProductToCustomer(jsonReq,callback){
@@ -234,3 +268,4 @@ exports.addProductToCustomer=addProductToCustomer;
 exports.removeProductFromCustomer=removeProductFromCustomer;
 exports.getProductsFromCustomer=getProductsFromCustomer;
 exports.subProductFromCustomer=subProductFromCustomer;
+exports.uploadSelectPhotoList=uploadSelectPhotoList;

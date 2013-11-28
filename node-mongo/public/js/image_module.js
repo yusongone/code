@@ -118,6 +118,7 @@ pageSpace.Product=(function(){
         var that=this;
             var nameInput=$("<input/>",{"class":"text editInput"});
             var sizeInput=$("<input/>",{"class":"text editInput"});
+            var imgCountInput=$("<input/>",{"class":"text editInput"});
             var descriptionInput=$("<textarea/>",{"class":"text editInput",width:"650",height:"70"});
 
 
@@ -127,6 +128,7 @@ pageSpace.Product=(function(){
                 var jsonReq={
                     productId:that.id,
                     productName:nameInput.val(),
+                    imgCount:imgCountInput.val(),
                     size:sizeInput.val(),
                     description:descriptionInput.val()
                 };
@@ -138,6 +140,7 @@ pageSpace.Product=(function(){
                     body.find(".name .show").text(jsonReq.productName);
                     body.find(".size .show").text(jsonReq.size);
                     body.find(".description .show").text(jsonReq.description);
+                    body.find(".imgCount .show").text(jsonReq.imgCount);
                 });
             });
 
@@ -147,11 +150,13 @@ pageSpace.Product=(function(){
                 save.show();
                var body=that.body;
                var name=body.find(".name");
-               name.append(nameInput.val(name.text()));
+               name.append(nameInput.val(name.find(".show").text()));
                var size=body.find(".size");
-               size.append(sizeInput.val(size.text()));
+               size.append(sizeInput.val(size.find(".show").text()));
+               var imgCount=body.find(".imgCount");
+               imgCount.append(imgCountInput.val(imgCount.find(".show").text()));
                var description=body.find(".description");
-               description.append(descriptionInput.val(description.text()));
+               description.append(descriptionInput.val(description.find(".show").text()));
             });
 
             var imageEdit=$("<input/>",{"class":"imageEdit","type":"file"});
@@ -164,9 +169,10 @@ pageSpace.Product=(function(){
 
             var html="<div class='imgBox'><img src='/public_image/"+json.imgPath+"?type=fill' /> </div>"+
                         "<div class='rightBox'>"+
-                            "<div class='name'> <label class='show'>"+(json.name||"- -")+"</label></div>"+
-                                "<div class='size'> <label class='show'>"+(json.size||"- -")+"</label></div>"+
-                                "<div class='description'><p class='show'>"+(json.description||"- -")+"</p></div>"+
+                            "<div class='name'><lable>名称:</lable><label class='show'> "+(json.name||"- -")+"</label></div>"+
+                                "<div class='size'><lable>尺寸: </lable><label class='show'> "+(json.size||"- -")+"</label></div>"+
+                                "<div class='imgCount'><lable>图片数量: </lable><label class='show'> "+(json.imgCount||"- -")+"</label></div>"+
+                                "<div class='description'><lable>描述: </lable><p class='show'>"+(json.description||"- -")+"</p></div>"+
                             "</div> "+
                             "<div class='btnBar'></div>"+
                             "</div>";

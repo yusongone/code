@@ -1,8 +1,13 @@
 var pTop;
 $(document).ready(function(){
+    showSelectList.init();
    ajax_get($("#cusInfoId").val()); 
     ajax_getCusProducts($("#cusInfoId").val());
     pTop=$(".content").position().top;
+    $("#createList").click(function(){
+        ProductThumbList.createSelectPhoto();
+//    showSelectList.
+    });
 });
 var ajax_get=function(cusInfoId){
     console.log(cusInfoId);
@@ -66,16 +71,19 @@ var ProductThumbList=(function(){
     var productList=$("<div/>",{"class":"productList"});
     var signList=$("<ul/>",{"class":"signList"})
     function Thum(json){
+        this.id=json._id;
         this.data=json;
+        this.name=this.data.name;
         this.list=[];
         this.body=$("<li/>",{"class":"productLi","title":this.data.name});
         this.initUI();
         this.createSign();
     } 
    Thum.prototype.initUI=function(){
-       var name=$("<div/>",{"class":"textOver name","text":this.data.name});
+       console.log(this.data.imgCount);
+       var name=$("<div/>",{"class":"textOver name","text":this.name});
        var sign=$("<div/>",{"class":"sign","text":charAry[this.data.index]});
-       this.count=$("<div/>",{"class":"count","text":0});
+       this.count=$("<div/>",{"class":"count","text":0+"/"+this.data.imgCount});
        var img=$("<img/>",{"class":"headImage","src":"/public_image/"+this.data.imgPath+"?size=100&type=fill"})
        this.body.append(img,name,this.count,sign);
        productList.append(this.body);
@@ -89,12 +97,12 @@ var ProductThumbList=(function(){
                 list.splice(i,1);
            } 
        }
-        this.count.text(this.list.length)
+        this.count.text(this.list.length+"/"+this.data.imgCount)
    }
    Thum.prototype.addThu=function(thu){
        var that=this;
        this.list.push(thu.data("id"));
-        this.count.text(this.list.length)
+        this.count.text(this.list.length+"/"+this.data.imgCount)
         var text=charAry[this.data.index];
         var overSign=$("<div/>",{"class":"over "+text,"text":text})
         var close=$("<div/>",{"class":"close fa fa-times"})
@@ -153,5 +161,58 @@ var ProductThumbList=(function(){
             check(thu);
             return signList.data("thum",thu);
         }
+        ,createSelectPhoto:function(){
+            var obj={};
+            for(var i=0;i<thumList.length;i++){
+                var list=thumList[i].list;
+                var productId=thumList[i].id;
+                obj[productId]=list;
+            };
+            showSelectList.parseData(obj);
+            var c=JSON.stringify(obj)
+            ajax_upload({"objStr":c});
+        }
    }
 })();
+var ajax_upload=function(data){
+    $.ajax({
+        "url":"ajax_uploadSelectPhotoList",
+        "type":"post",
+        "data":data,
+        "success":function(data){
+            console.log(data);
+        }
+    });
+}
+var showSelectList=(function(){
+        var d;
+    function initDialog(){
+        d=$("<div/>",{});
+            d.dialog({
+                autoOpen:false
+            });
+    }
+    function createUI(data){
+        for(var i in data){
+            var z=$("<div/>");
+            var headline=$("<div/>",{"text":i})
+            var ul=$("<ul/>",{});
+            for(var j=0;j<data[i].length;j++){
+                var li=$("<li/>",{"text":data[i][j]});
+                ul.append(li);
+            }
+            d.append(z,headline,ul);
+        }
+    }
+
+    return {
+        init:function(){
+            initDialog();
+        },
+        parseData:function(data){
+            createUI(data);
+            d.dialog("open");
+        }
+    }
+})();
+

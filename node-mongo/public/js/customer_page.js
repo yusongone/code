@@ -392,10 +392,12 @@ var Product=(function(){
             str="<div class='countBox'><div class='subOne'>-</div><input id='count' value='"+(json.count||"NAN")+"'><div class='addOne'>+</div></div>"
             str+="<div class='btnRed remove'>移除</div>";
         }
+        console.log(json);
         var html="<li class='productLi'>"+str+
                     "<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
                     "<div class='name'>"+json.name+"</div>"+
                     "<div class='size'>"+json.size+"</div>"+
+                    "<div class='imgCount'>"+(json.imgCount||"1")+"</div>"+
                     "<div class='description'>"+json.description+"</div>"+
                 "</li>";
            this.body=$(html); 

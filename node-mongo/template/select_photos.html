@@ -3,6 +3,11 @@
     <head>
         <% include lib/header %>
         <link href="/css/select_images.css" rel="stylesheet">
+        <link href="/css/custom-theme/jquery-ui-1.10.3.custom.min.css?v=<%=css_version%>" rel="stylesheet" />
+        <script src="/js/vendor/jquery.ui.widget.js"></script>  
+        <script src="/js/vendor/jquery-ui.js"></script>  
+        <script src="/js/vendor/jquery.iframe-transport.js"></script>  
+        <script src="/js/vendor/jquery.fileupload.js"></script>  
         <script src="/js/select_images.js"></script>
     </head>
     <body class="page image_libs">
@@ -12,6 +17,7 @@
             <div class="topBox">
                 <div class="logoBox">LOGO</div>
                 <div class="buttonBox">
+                    <div class="btnBlue" id="createList">生成列表</div>
                 </div>
             </div>
             <div class="toolBar">

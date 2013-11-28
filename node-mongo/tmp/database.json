@@ -41,7 +41,7 @@
     products:[
         {"_id":"objectId('asdffefefef')","imgPath":"asdf","count":"0"},
         {"pid":"objectId('asdffefefef')"},
-        {"pid":"objectId('asdffefefef')"}
+        {"pid":"objectId('asdffefefef')","selectPhotos":["objectId('asdfefeaefa1243122312341234')"]}
         ]
 }
 

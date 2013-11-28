@@ -73,6 +73,7 @@ function setApp(app){
             jsonReq.imgPath=reqBody.imagePath;
             jsonReq.price=reqBody.price;
             jsonReq.productId=reqBody.productId;
+            jsonReq.imgCount=reqBody.imgCount;
 
             if(checkLogind(req,res)){
                 ctrl.Product.changeProduct(jsonReq,function(err,json){
@@ -109,11 +110,24 @@ function setApp(app){
         };
     });
 
-    //查找客户 
+    //查找客户
     app.post('/ajax_searchCustomer', function(req, res){
         if(checkLogind(req,res)){
             ctrl.Customer.searchCustomer({keyword:req.body.keyword},function(json){
                 res.send(json);
+            });
+        };
+    });
+
+    //查找客户
+    app.post('/ajax_uploadSelectPhotoList', function(req, res){
+        if(checkLogind(req,res)){
+            var jsonReq={};
+                jsonReq.objStr=req.body.objStr;
+                jsonReq.userId=req.session.userId; 
+            ctrl.Customer.uploadSelectPhotoList(jsonReq,function(err,result){
+                if(err){return res.send({"status":"error","message":err})};
+                res.send({"status":"ok"});
             });
         };
     });

@@ -170,6 +170,7 @@
     line-height:18px;
 }
 .product .pList .name,
+.product .pList .imgCount,
 .product .pList .size,
 .product .pList .description{
     font-size:12px;

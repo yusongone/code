@@ -237,6 +237,20 @@ function addProductToCustomer(jsonReq,callback){
             }
         });
 }
+//上传选片列表数据
+function uploadSelectPhotoList(jsonReq,callback){
+    var database=jsonReq.database;
+    var uid=_createObjectId(jsonReq.userId);
+    var pid=_createObjectId(jsonReq.productId);
+    var ary=jsonReq.photoAry;
+
+    if(!(uid&&pid)){return callback("create object Id error");}
+    var col=database.collection("customerInfo");
+        col.update({"bindUser":uid,"products._id":pid},{"$set":{"products.$.selectPhotos":ary}},function(err,doc){
+            console.log(doc,"ffd");
+            callback(err,doc);
+        });
+}
 
 function getProductFromCustomerById(jsonReq,callback){
     var database=jsonReq.database;
@@ -326,3 +340,4 @@ exports.addProductToCustomer=addProductToCustomer;
 exports.removeProductFromCustomer=removeProductFromCustomer;
 exports.subProductFromCustomer=subProductFromCustomer;
 exports.getProductsFromCustomer=getProductsFromCustomer;
+exports.uploadSelectPhotoList=uploadSelectPhotoList;

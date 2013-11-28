@@ -43,7 +43,7 @@ function addProductToList(jsonReq,callback){
     if(!uid){return callback("create object Id error");}
     var col=database.collection("productList");
     var _id=new objectId();
-        col.update({"userId":uid},{$addToSet:{products:{$each:[{"_id":_id,"name":name}]}}},{w:1},function(err){
+        col.update({"userId":uid},{$addToSet:{products:{$each:[{"_id":_id,"name":name,"imgCount":1}]}}},{w:1},function(err){
             callback(err,_id);
         });
 }
@@ -111,11 +111,13 @@ function changeProduct(jsonReq,callback){
         price=jsonReq.price,
         productId=jsonReq.productId,
         description=jsonReq.description;
+        imgCount=jsonReq.imgCount;
     var pid=_createObjectId(productId);
     var uid=_createObjectId(userId);
         if(!(uid&&pid)){return callback("create objectId err db/lib/products changeParoduct")}
     var col=database.collection("productList");
     var setObject={};
+        imgCount?setObject["products.$.imgCount"]=imgCount:"";
         name?setObject["products.$.name"]=name:"";
         imgPath?setObject["products.$.imgPath"]=imgPath:"";
         size?setObject["products.$.size"]=size:"";

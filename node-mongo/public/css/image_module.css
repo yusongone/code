@@ -67,6 +67,10 @@
     cursor:pointer;
     border:none;
 }
+.rightBox lable{
+    float:left;
+    width:70px;
+}
 .rightBox{
     float:left;
     width:600px;
@@ -85,7 +89,7 @@
 }
 
 .rightBox .description{
-    margin-top:20px;
+    margin-top:10px;
     width:100%;
     float:left;
 }
