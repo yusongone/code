@@ -96,6 +96,17 @@ function setApp(app){
         }
     })
     //b  ------------------- b ------
+
+    app.get("/b/calendar",function(req,res){
+        if(checkLogind(req,res,"get","/b/calendar")){
+            res.render("calendar",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "user":{"name":req.session.username},
+                "title":"事物管理"
+            });
+        }
+    });
     app.get("/b/image_module",function(req,res){
         if(checkLogind(req,res,"get","/b/image_module")){
             var jsonReq={};
