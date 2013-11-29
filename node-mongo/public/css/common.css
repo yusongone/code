@@ -4,7 +4,7 @@ body{color:#666;font-size:14px;font-family:'Open Sans', 'lucida grande', 'Segoe 
 img{border:none;}
 .hand{cursor:pointer;}
 input{color:#444;}
-a{cursor:pointer;}
+a{cursor:pointer;color:#09f;}
 .hide{display:none;}
 .text{float:left;height:24px;font-size:14px;border-radius:3px;text-indent:5px;line-height:24px;border:1px solid #ddd;}
 .toplink{position:absolute;top:0px;left:0px;width:100%;color:#999;}
@@ -30,6 +30,7 @@ a{cursor:pointer;}
     padding:0 10px;
     border-radius: 5px;
     float:left;
+    border:none;
 }
 .btnSmall.disable,.btnBlue.disable,.btnRed.disable{
     background:#ddd;
@@ -124,19 +125,19 @@ a{cursor:pointer;}
 }
 .right_area{float:right;width:830px;}
 
-.right_area .toolBar{
+.toolBar{
     float:left;
     width: 100%;
     height: 30px;
     background: #09f;
 }
-.right_area .topBox{
+.topBox{
     float:left;
     height:50px;
     width:100%;
     margin-top:30px;
 }
-.right_area .buttonBox{
+.buttonBox{
     float:right;
     width:690px;
     height:30px;
@@ -156,5 +157,38 @@ a{cursor:pointer;}
     width:100%;
     height: 150px;
     float: left;
-    background: #5A5A5A;
+    background: #e6e6e6;
+}
+.alert{
+    color:red;
+}
+
+.icon_error_small{
+    display:block;
+    width:16px;
+    height:16px;
+    background:url("/img/icon_a.png") no-repeat;
+    background-position:0px 0px;
+}
+
+.icon_error_big{
+    display:block;
+    width:32px;
+    height:32px;
+    background:url("/img/icon_a.png") no-repeat;
+    background-position:-28px 0px;
+}
+.icon_ok_small{
+    display:block;
+    width:16px;
+    height:16px;
+    background:url("/img/icon_a.png") no-repeat;
+    background-position:0px -200px;
+}
+.icon_ok_big{
+    display:block;
+    width:32px;
+    height:32px;
+    background:url("/img/icon_a.png") no-repeat;
+    background-position:-28px -200px;
 }

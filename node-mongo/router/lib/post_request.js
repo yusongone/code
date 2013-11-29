@@ -10,7 +10,6 @@ var checkLogind=Common.checkLogind;
 
 function setApp(app){
     app.post('/bindLink', function(req, res){
-        console.log(req.session.vcode);
         var jsonReq={};
         var cusId=req.body.cusId;
         var reserverMessage=req.body.reserverMessage;
@@ -325,17 +324,56 @@ function setApp(app){
             if("ok"==json.status){
                 req.session.username=req.body.username;
                 req.session.userId=json.userId;
+                res.send({"status":"ok","message":"登陆成功!"}); 
+            }else{
+                res.send({"status":"sorry","message":"用户名和密码不正确"}); 
             }
-            res.send(json); 
         });
+    });
+    //检测用户名 
+    app.post('/ajax_checkUsername', function(req, res){
+        var username=req.body.username;
+        if(!username){
+            return res.send({"status":"sorry","message":"参数不完整!"});
+        }
+        var jsonReq={};
+            jsonReq.username=username;
+        ctrl.Users.checkUsername(jsonReq,function(err,result){
+            if(err){
+                return res.send({"status":"error","message":err});
+            } 
+            if(result){
+                res.send({"status":"sorry","message":"用户名已经存在"});
+            }else{
+                res.send({"status":"ok","message":"可以使用"});
+            }
+
+        }); 
     });
     //注册
     app.post('/ajax_register', function(req, res){
-        ctrl.Users.insertUserName({
-            username:req.body.username,
-            pass:req.body.pass
-        },function(err,json){
-            res.send(json); 
+        if(!(req.body.username&&req.body.pass&&req.body.vcode)){
+            return res.send({"status":"sorry","message":"参数不完整!"});
+        }
+        var reqVcode=req.body.vcode;
+        if(reqVcode!=req.session.vcode){
+            return res.send({"status":"sorry","message":"验证码错误!"});
+        }
+
+        var jsonReq={};
+            jsonReq.username=req.body.username;
+            jsonReq.pass=req.body.pass
+        ctrl.Users.checkUsername(jsonReq,function(err,result){
+            if(err){
+                return res.send({"status":"error","message":err});
+            } 
+            if(result){
+                return res.send({"status":"sorry","message":"用户名已经存在"});
+            }else{
+                ctrl.Users.insertUserName(jsonReq,function(err,json){
+                    res.send(json); 
+                });
+            }
         });
     });
 }

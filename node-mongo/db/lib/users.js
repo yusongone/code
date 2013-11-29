@@ -39,7 +39,7 @@ var mongodb=require("mongodb"),
             if(item.length>0){
                 callback(err,{"status":"ok","userId":item[0]["_id"]});
             }else{
-                callback(err,{"status":"sorry","message":"用户名或密码不正确！"});
+                callback(err,{"status":"sorry"});
             }
         })
     }
@@ -55,6 +55,19 @@ var mongodb=require("mongodb"),
             callback(err,doc);
         });
     };
+    
+    var checkUsername=function(jsonReq,callback){
+        var database=jsonReq.database;
+        var username=jsonReq.username;
+        var col=database.collection("users");
+        col.findOne({"name":username},function(err,item){
+            var result=0;
+            if(item){
+                result=1;
+            }
+            callback(err,result);
+        });
+    }
 
 
 function _searchUser(jsonReq,callback){
@@ -71,3 +84,4 @@ exports.searchUser=_searchUser;
 exports.insertUserName=_insertUserName;
 exports.compareNameAndPass=_compareNameAndPass;
 exports.getUserInfoById=getUserInfoById;
+exports.checkUsername=checkUsername;

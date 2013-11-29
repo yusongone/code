@@ -46,8 +46,17 @@ function _insertUserName(jsonReq,callback){
         });
     });
 }
+function checkUsername(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Users.checkUsername(jsonReq,function(err,jsonRes){
+            callback(err,jsonRes); 
+        });
+    });
+}
 
 exports.searchUser=_searchUser;
 exports.insertUserName=_insertUserName;
 exports.login=_login;
+exports.checkUsername=checkUsername;
 
