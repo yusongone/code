@@ -214,6 +214,20 @@ function setApp(app){
         });
     });
 
+    app.get("/b/selects/:cusInfoId",function(req,res){
+        var cusInfoId=req.params.cusInfoId;
+        if(checkLogind(req,res,"get","/select_photos")){
+            res.render("selects",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "user":{"name":req.session.username},
+                "title":"列表",
+                "cusInfoId":cusInfoId
+            });
+        };
+    });
+
+
 
     app.get('/bindLink/:cusId', function(req, res){
         var jsonReq={};

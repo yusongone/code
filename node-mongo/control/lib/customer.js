@@ -240,7 +240,6 @@ function getProductsFromCustomer(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result,resJson){
-                        console.log("eeff");
             if(err){ poolMain.release(database); return callback(err) };
             if("creator"==result||"binder"==result){
                 jsonReq.userId=resJson.userId;
@@ -257,6 +256,22 @@ function getProductsFromCustomer(jsonReq,callback){
     });
 }
 
+function getSelects(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result,resJson){
+            if("creator"!=result){
+                return callback("no auth");
+            }
+            db.Customer.getProductsFromCustomer(jsonReq,function(err,result){
+                    if(err){ poolMain.release(database);return callback(err);};
+                    console.log(result);
+                    callback(err,result);
+            });
+        });
+    });
+}
+
 
 exports.addCustomer=_addCustomer;
 exports.getCustomerList=_getCustomerList;
@@ -269,3 +284,4 @@ exports.removeProductFromCustomer=removeProductFromCustomer;
 exports.getProductsFromCustomer=getProductsFromCustomer;
 exports.subProductFromCustomer=subProductFromCustomer;
 exports.uploadSelectPhotoList=uploadSelectPhotoList;
+exports.getSelects=getSelects;

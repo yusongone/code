@@ -119,7 +119,7 @@ function setApp(app){
         };
     });
 
-    //查找客户
+    //提交选片列表
     app.post('/ajax_uploadSelectPhotoList', function(req, res){
         if(checkLogind(req,res)){
             var jsonReq={};
@@ -128,6 +128,19 @@ function setApp(app){
             ctrl.Customer.uploadSelectPhotoList(jsonReq,function(err,result){
                 if(err){return res.send({"status":"error","message":err})};
                 res.send({"status":"ok"});
+            });
+        };
+    });
+
+    app.post('/ajax_getSelects', function(req, res){
+        if(checkLogind(req,res)){
+            var jsonReq={};
+                jsonReq.objStr=req.body.objStr;
+                jsonReq.userId=req.session.userId; 
+                jsonReq.cusInfoId=req.body.cusInfoId;
+            ctrl.Customer.getSelects(jsonReq,function(err,result){
+                if(err){return res.send({"status":"error","message":err})};
+                res.send({"status":"ok","data":result});
             });
         };
     });

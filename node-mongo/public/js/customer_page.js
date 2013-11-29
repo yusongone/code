@@ -82,12 +82,11 @@ page.Lib=(function(){
                 this.boy.name?name.append("<a class='boy bname'>"+this.boy.name+"</a>"):"";
                 this.girl.name?name.append("<a class='girl gname'>"+this.girl.name+"</a>"):"";
             var cus=$("<div/>",{"class":"td qq","text":json.qq||"--"});
-            var date=$("<div/>",{"class":"td email","text":json.email||"--"});
             var tel=$("<div/>",{"class":"td tel"});
                 this.boy.phone?tel.append("<a class='boy gphone'>"+this.boy.phone+"</a>"):"";
                 this.girl.phone?tel.append("<a class='girl gphone'>"+this.girl.phone+"</a>"):"";
             var play=$("<div/>",{"class":"td play"});
-            li.append(name,cus,date,tel,play);
+            li.append(name,cus,tel,play);
         this.body=li;
         this.playBox=play;
     }
@@ -110,7 +109,8 @@ page.LibBar=(function(){
         var remove=$("<a/>",{"text":"删除"});
         var setModle=$("<a/>",{"text":"添加模板"});
         var setImage=$("<a/>",{"href":"/b/manage_image/"+that.cusId,"target":"_blank","text":"管理图片"});
-            tage.append(share,remove,setModle,setImage);
+        var selectsList=$("<a/>",{"target":"_blank","href":"/b/selects/"+that.cusId,"text":"查看选片"});
+            tage.append(share,remove,setModle,setImage,selectsList);
             this.bindEvent({
                 share:share,
                 setModle:setModle
