@@ -477,7 +477,105 @@ function setApp(app){
             }
         });
     });
+
+
+
+    //---------------------------------- album ------------------------------------//
+    //创建相册
+    app.post('/createAlbum', function(req, res){
+        var name=req.body.name;
+        if(!name){
+            return res.send({"status":"sorry","message":"参数不完整!"});
+        }
+        if(checkLogind(req,res)){
+            var jsonReq={};
+                jsonReq.name=name;
+                jsonReq.userId=req.session.userId;
+            ctrl.Album.createAlbum(jsonReq,function(err,result){
+                if(result){
+                    res.send({"status":"ok","id":result._id});
+                }else{
+                    res.send({"status":"sorry"});
+                };
+            }); 
+        }
+    });
+    
+    //获取相册列表
+    app.post('/getAlbumList', function(req, res){
+        if(checkLogind(req,res)){
+            var jsonReq={};
+                jsonReq.userId=req.session.userId;
+            ctrl.Album.getAlbumList(jsonReq,function(err,result){
+                if(result){
+                    res.send({"status":"ok","data":result});
+                }else{
+                    res.send({"status":"sorry"});
+                };
+            }); 
+        }
+    });
+
+    //删除相册
+    app.post('/removeAlbum', function(req, res){
+        var jsonReq={};
+            jsonReq.albumId=req.body.albumId;
+            jsonReq.userId=req.session.userId;
+        if(checkLogind(req,res)){
+            ctrl.Album.removeAlbum(jsonReq,function(err,result){
+                if(result){
+                    res.send({"status":"ok","data":result});
+                }else{
+                    res.send({"status":"sorry"});
+                };
+            }); 
+        }
+    });
+    
+    //删除相册
+    app.post('/changeAlbum', function(req, res){
+        var jsonReq={};
+            jsonReq.albumId=req.body.albumId;
+            jsonReq.userId=req.session.userId;
+            jsonReq.name=req.body.name;
+        if(checkLogind(req,res)){
+            ctrl.Album.changeAlbum(jsonReq,function(err,result){
+                if(result){
+                    res.send({"status":"ok","data":result});
+                }else{
+                    res.send({"status":"sorry"});
+                };
+            }); 
+        }
+    });
+
+
+    //-------------------------------------  album end --------------------------------//
+
 }
 exports.initApp=function(app){
     setApp(app);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

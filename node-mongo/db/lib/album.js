@@ -4,66 +4,60 @@ var mongodb=require("mongodb"),
 
     var _createObjectId=Common.createObjectId;
 
-    var _addImageIdToLibs=function(jsonReq,callback){
+    //ÂΩìÂâçÁî®Êà∑ÂàõÂª∫‰∏Ä‰∏™Áõ∏ÂÜå
+    var createAlbum=function(jsonReq,callback){
         var database=jsonReq.database;
-        var userId=jsonReq.userId;
-        var cusInfoId=jsonReq.cusInfoId;
-        var fileId=jsonReq.fileId;
-            cusInfoId= _createObjectId(cusInfoId);
-            userId= _createObjectId(userId);
-            if(!(userId&&cusInfoId)){return callback("err")};
-        var filename=jsonReq.files[0].name;
-    //    var col=database.collection("image_libs");
-        var col=database.collection("customerInfo");
-            col.update({"_id":cusInfoId},{$addToSet:{images:{$each:[{"fileId":fileId,"filename":filename}]}}},{w:1},function(err){
-                    callback(err,{"status":"ok"});
-                });
+        var uid= _createObjectId(jsonReq.userId);
+            if(!uid){return callback("err")};
+        var col=database.collection("album");
+            col.insert({"userId":uid},function(err,docAry){
+                if(docAry){
+                    callback(err,docAry[0]); 
+                }else{
+                    callback(err,null);
+                }
+            });
     };
 
-    //Õ®π˝ cusInfoId ªÒ»° Õº∆¨¡–±Ì£ª
-    var getCustomerImages=function(jsonReq,callback){
-        var database=jsonReq.database;
-        var userId=jsonReq.userId;
-        var cusInfoId=jsonReq.cusInfoId;
-        var cid= _createObjectId(cusInfoId);
-        if(!cid){return callback("err")};
-        var col=database.collection("customerInfo");
-            col.findOne({"_id":cid},{"_id":0,"images":1},function(err,doc){
-                console.log(doc);
-                if(doc){
-                  callback(err,doc.images);    
-                }else{
-                  callback(err,null);    
-                };
+
+    var getAlbumList=function(jsonReq,callback){
+        var database=jsonReq.database; 
+        var uid= _createObjectId(jsonReq.userId);
+            if(!uid){return callback("err")};
+        var col=database.collection("album");
+            col.find({"userId":uid},{"userId":0}).toArray(function(err,docAry){
+                callback(err,docAry);
             });
     }
 
-    var checkImageInCustomer=function(jsonReq,callback){
-        var database=jsonReq.database;    
-        var cid=_createObjectId(jsonReq.cusInfoId);
-        var fid=_createObjectId(jsonReq.fileId);
-            if(!(fid&&cid)){return callback("err")};
-        var col=database.collection("customerInfo");
-            col.findOne({"_id":cid,"images":{$elemMatch:{"fileId":fid}}},function(err,doc){
-               if(err){return callback(err)} 
-               callback(err,doc);
-            });
-    }    
-
-    var removeImageFromImagelibs=function(jsonReq,callback){
-       var database=jsonReq.database; 
-        var userId=jsonReq.userId;
-        var cid= _createObjectId(jsonReq.cusInfoId);
-        var fid= _createObjectId(jsonReq.fileId);
-        if(!(cid&&fid)){return callback("err")};
-        var col=database.collection("customerInfo");
-            col.update({"_id":cid},{$pull:{images:{"fileId":fid}}},function(err,result){
-                if(err){return callback(err)} 
+    var removeAlbum=function(jsonReq,callback){
+        var database=jsonReq.database; 
+        var uid= _createObjectId(jsonReq.userId);
+        var albumId= _createObjectId(jsonReq.albumId);
+            if(!(uid&&albumId)){return callback("err")};
+        var col=database.collection("album");
+            col.remove({"_id":albumId,"userId":uid},function(err,result){
+                console.log(result);
                 callback(err,result);
             });
     }
 
-exports.addImageIdToLibs=_addImageIdToLibs;
-exports.getCustomerImages=getCustomerImages;
-exports.checkImageInCustomer=checkImageInCustomer;
-exports.removeImageFromImagelibs=removeImageFromImagelibs;
+    var changeAlbum=function(jsonReq,callback){
+        var database=jsonReq.database; 
+        var name=jsonReq.name;
+        var uid= _createObjectId(jsonReq.userId);
+        var albumId= _createObjectId(jsonReq.albumId);
+            if(!(uid&&albumId)){return callback("err")};
+        var col=database.collection("album");
+        console.log(albumId,uid);
+            col.update({"_id":albumId,"userId":uid},{"$set":{"name":name}},function(err,result){
+                console.log(result);
+                callback(err,result);
+            });
+    }
+
+
+exports.createAlbum=createAlbum;
+exports.getAlbumList=getAlbumList;
+exports.removeAlbum=removeAlbum;
+exports.changeAlbum=changeAlbum;

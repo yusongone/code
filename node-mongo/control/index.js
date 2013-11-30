@@ -6,6 +6,7 @@ var httpget=require("./lib/httpget");
 var oauth=require("./lib/oauth");
 var verifyCode=require("./lib/verifycode");
 var product=require("./lib/product");
+var album=require("./lib/album");
 
 exports.Customer=customer;
 exports.ImageLibs=imageLibs;
@@ -15,3 +16,4 @@ exports.HttpGet=httpget;
 exports.Oauth=oauth;
 exports.VerifyCode=verifyCode;
 exports.Product=product;
+exports.Album=album;
