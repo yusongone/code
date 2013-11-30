@@ -58,9 +58,42 @@ function checkUsername(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Users.checkUsername(jsonReq,function(err,jsonRes){
+            poolMain.release(database);
             callback(err,jsonRes); 
         });
     });
+}
+
+function newThirdparty(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Users.getUserByOpenId(jsonReq,function(err,result){
+            if(result){
+                poolMain.release(database);
+                callback(err,{"status":"sorry","message":"不是第一次登陆"}); 
+            }else{
+                db.Users.newThirdparty(jsonReq,function(err,jsonRes){
+                    poolMain.release(database);
+                    if(jsonRes.length>0){
+                        callback(err,{"status":"ok","userId":jsonRes[0]["_id"]}); 
+                    }else{
+                        callback(err,{"status":"sorry"}); 
+                    }
+                });
+            };
+        });
+    });
+}
+
+function getUserInfoById(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Users.getUserInfoById(jsonReq,function(err,doc){
+            poolMain.release(database);
+            callback(err,doc); 
+        });
+    });
+
 }
 
 exports.searchUser=_searchUser;
@@ -68,3 +101,5 @@ exports.insertUserName=_insertUserName;
 exports.login=_login;
 exports.checkUsername=checkUsername;
 exports.getUserByOpenId=_getUserByOpenId;
+exports.newThirdparty=newThirdparty;
+exports.getUserInfoById=getUserInfoById;

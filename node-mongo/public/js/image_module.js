@@ -37,7 +37,7 @@ pageSpace.ajax_getProductList=function(){
                 var ary=data.data;
                 var product=pageSpace.Product;
                 //for(var i=0,l=ary.length;i<l;i++){
-                for(var l=0,i=ary.length-1;i>l;i--){
+                for(var i=ary.length-1;i>-1;i--){
                     var d=new product(ary[i]);
                     $(".moduleList").append(d.body);
                 }

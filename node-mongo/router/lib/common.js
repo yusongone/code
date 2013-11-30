@@ -4,7 +4,7 @@ var ctrl=require("../../control");
 var config=require("../../config.json");
 
 function checkLogind(req,res,type,path){
-    if(req.session.username){
+    if(req.session.userId){
         return true;
     }else{
         if("get"==type){
@@ -17,18 +17,28 @@ function checkLogind(req,res,type,path){
     }
 }
 
-function checkStudio(req,res,type){
+function checkStudio(req,res,type,callback){
     if(req.session.studioId){
-        return true;
+        callback(null,{"status":"ok"}); 
     }else{
-        if("get"==type){
-            res.redirect("/applystudio");
-        }else{
-            res.send({"status":"sorry","message":"您还未申请工作室，请先申请。"});
-            return false;
-        }
+        var jsonReq={};
+        jsonReq.userId=req.session.userId;
+        ctrl.Users.getUserInfoById(jsonReq,function(err,result){
+            if(result.studioId){
+                req.session.studioId=result.studioId;
+                callback(err,{"status":"ok"}); 
+            }else{
+                if("get"==type){
+                    res.redirect("/applystudio");
+                    callback(err,{"status":"sorry"}); 
+                }else{
+                    callback(err,{"status":"sorry"}); 
+                }
+            } 
+        });    
     }
 }
+
 
 exports.checkLogind=checkLogind;
 exports.checkStudio=checkStudio;

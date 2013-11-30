@@ -8,7 +8,7 @@ var _qq={
         var path="https://graph.qq.com/oauth2.0/authorize";
         var response_type="code";
         var client_id="100550929";
-        var redirect_uri="http://makejs.com/callback";
+        var redirect_uri="http://makejs.com/qq_callback";
             redirect_uri=encodeURIComponent(redirect_uri);
         var state="1";
         var url=path+"?response_type="+response_type+"&client_id="+client_id+"&redirect_uri="+redirect_uri+"&state="+state;
@@ -21,7 +21,7 @@ var _qq={
         var client_id="100550929";
         var client_secret="88641a170b4d51d2b47bc33ddaf0dcdd";
         var code=Acode;
-        var redirect_uri="http://makejs.com/callback";
+        var redirect_uri="http://makejs.com/qq_callback";
         var url=path+"?grant_type="+grant_type+"&client_id="+client_id+"&client_secret="+client_secret+"&code="+code+"&redirect_uri="+redirect_uri;
         //res.redirect(url);
         return url;

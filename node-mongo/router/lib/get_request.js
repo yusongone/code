@@ -25,8 +25,7 @@ function setApp(app){
         var url=ctrl.Oauth.QQ.getPath();
         res.redirect(url);
     });
-
-    app.get("/callback",function(req,res){
+    app.get("/qq_callback",function(req,res){
         var Acode=req.query.code;
         var qq=ctrl.Oauth.QQ;
         var url=qq.packagePathToGetToken(Acode);
@@ -36,8 +35,11 @@ function setApp(app){
                         if(result.status=="ok"){
                             var clientId=result.data.client_id,
                                 openId=result.data.openid;
-                            req.session.openId=openId;
-                            req.session.clientId=clientId;
+                            req.session.thirdparty={
+                                openIdType:"qq",
+                                openId:openId,
+                                clientId:clientId
+                            }
                             var jsonReq={};
                                 jsonReq.openId=openId;
                             ctrl.Users.getUserByOpenId(jsonReq,function(err,result){
@@ -48,6 +50,9 @@ function setApp(app){
                                     });
                                 }
                                 if(result){
+                                    req.session.userId=result._id;
+                                    req.session.username=result.name;
+                                    req.session.studioId=result.studioId;
                                     res.redirect("/");
                                 }else{
                                     res.redirect("/first_login");
@@ -62,10 +67,11 @@ function setApp(app){
                 }
             });
     });
+    //qq login ========= end 
     app.get('/first_login', function(req,res){
         var path=req.query.path;
         if(path){path=path.toString()};
-        if(!req.session.openId){
+        if(!(req.session.thirdparty&&req.session.thirdparty.openId)){
             return showError({
                 "message":"您没有通过第三方帐号登录;",
                 "res":res
@@ -94,7 +100,6 @@ function setApp(app){
             "title":"注册"
         });
     });
-    //qq login ========= end 
 
    function showError(json){
                     json.res.render("error",{
@@ -256,106 +261,175 @@ function setApp(app){
 
     //事物管理
     app.get("/b/studio_set",function(req,res){
-        if(checkLogind(req,res,"get","/b/studio_set")&&checkStudio(req,res,"get")){
-            res.render("studio_set",{
-                "js_version":js_version,
-                "css_version":css_version,
-                "user":{"name":req.session.username},
-                "title":"工作室设置"
+        if(checkLogind(req,res,"get","/b/studio_set")){
+            checkStudio(req,res,"get",function(err,result){
+                if(err){
+                    return showError({
+                        "message":err,
+                        "res":res
+                    });
+                }
+                if(result.status=="ok"){
+                    res.render("studio_set",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "user":{"name":req.session.username},
+                        "title":"工作室设置"
+                    });
+                }
             });
         }
     });
     
     //事物管理
     app.get("/b/calendar",function(req,res){
-        if(checkLogind(req,res,"get","/b/calendar")&&checkStudio(req,res,"get")){
-        //if(checkLogind(req,res,"get","/b/calendar")){
-            res.render("calendar",{
-                "js_version":js_version,
-                "css_version":css_version,
-                "user":{"name":req.session.username},
-                "title":"事物管理"
+        if(checkLogind(req,res,"get","/b/calendar")){
+            checkStudio(req,res,"get",function(err,result){
+                if(err){
+                    return showError({
+                        "message":err,
+                        "res":res
+                    });
+                }
+                if(result.status=="ok"){
+                    res.render("calendar",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "user":{"name":req.session.username},
+                        "title":"事物管理"
+                    });
+                }
             });
         }
     });
 
     app.get("/b/image_module",function(req,res){
-        if(checkLogind(req,res,"get","/b/image_module")&&checkStudio(req,res,"get")){
-        //if(checkLogind(req,res,"get","/b/image_module")){
-            var jsonReq={};
-                jsonReq.userId=req.session.userId;
-            ctrl.Customer.getCustomerInfoIdByBindUserId(jsonReq,function(err,cusInfoId){
-                var cusId=cusInfoId||"";
-                res.render("image_module",{
-                    "js_version":js_version,
-                    "css_version":css_version,
-                    "user":{"name":req.session.username},
-                    "title":"模板管理",
-                    "cusInfoId":cusId
-                });
+        if(checkLogind(req,res,"get","/b/image_module")){
+            checkStudio(req,res,"get",function(err,result){
+                if(err){
+                    return showError({
+                        "message":err,
+                        "res":res
+                    });
+                }
+                if(result.status=="ok"){
+                    var jsonReq={};
+                        jsonReq.userId=req.session.userId;
+                    ctrl.Customer.getCustomerInfoIdByBindUserId(jsonReq,function(err,cusInfoId){
+                        var cusId=cusInfoId||"";
+                        res.render("image_module",{
+                            "js_version":js_version,
+                            "css_version":css_version,
+                            "user":{"name":req.session.username},
+                            "title":"模板管理",
+                            "cusInfoId":cusId
+                        });
+                    });
+                }
             });
         }
     });
 
     app.get('/b/image_library', function(req, res){
-        if(checkLogind(req,res,"get","/b/image_library")&&checkStudio(req,res,"get")){
-            res.render("image_library",{
-                "js_version":js_version,
-                "css_version":css_version,
-                "P_css":"image_libs",
-                "P_js":"image_libs",
-                "user":{"name":"song","qq":"20126162"},
-                "title":"图片库"
-            });
+        if(checkLogind(req,res,"get","/b/image_library")){
+            checkStudio(req,res,"get",function(err,result){
+                if(err){
+                    return showError({
+                        "message":err,
+                        "res":res
+                    });
+                }
+                if(result.status=="ok"){
+                    res.render("image_library",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "P_css":"image_libs",
+                        "P_js":"image_libs",
+                        "user":{"name":"song","qq":"20126162"},
+                        "title":"图片库"
+                    });
+                }
+        });
         }
     });
     app.get('/b/manage_image/:cusInfoId', function(req, res){
         if(!req.params.cusInfoId){ res.redirect("/404"); };
-        if(checkLogind(req,res,"get","/b/manage_image"+req.params.id)&&checkStudio(req,res,"get")){
-            var jsonReq={}
-                jsonReq.cusInfoId=req.params.cusInfoId,
-                jsonReq.userId=req.session.userId
-            //检测本用户下是否存在此库
-            ctrl.ImageLibs.getCustomerImages(jsonReq,function(err,result){
-                var r;
-                if(result&&result.length>0){
-                    r=1;
-                }else{
-                    r=0;
-                }
-                    res.render("manage_image",{
-                        "js_version":js_version,
-                        "css_version":css_version,
-                        "title":"图片管理",
-                        "id":req.params.cusInfoId,
-                        "result":r
+        if(checkLogind(req,res,"get","/b/manage_image"+req.params.id)){
+            checkStudio(req,res,"get",function(err,result){
+                if(err){
+                    return showError({
+                        "message":err,
+                        "res":res
                     });
+                }
+                if(result.status=="ok"){
+                    var jsonReq={}
+                        jsonReq.cusInfoId=req.params.cusInfoId,
+                        jsonReq.userId=req.session.userId;
+                        jsonReq.studioId=req.session.studioId;
+                    //检测本用户下是否存在此库
+                    ctrl.ImageLibs.getCustomerImages(jsonReq,function(err,result){
+                        var r;
+                        if(result&&result.length>0){
+                            r=1;
+                        }else{
+                            r=0;
+                        }
+                            res.render("manage_image",{
+                                "js_version":js_version,
+                                "css_version":css_version,
+                                "title":"图片管理",
+                                "id":req.params.cusInfoId,
+                                "result":r
+                            });
+                    });
+                }
             });
         }
     });
     app.get('/b/customer', function(req, res){
-        if(checkLogind(req,res,"get","/b/customer")&&checkStudio(req,res,"get")){
-            res.render("customer",{
-                "js_version":js_version,
-                "css_version":css_version,
-                "title":"客户管理",
-                "user":{"name":req.session.username,"qq":"20126162"},
-                "id":req.query.id
+        if(checkLogind(req,res,"get","/b/customer")){
+            checkStudio(req,res,"get",function(err,result){
+                if(err){
+                    return showError({
+                        "message":err,
+                        "res":res
+                    });
+                }
+                if(result.status=="ok"){
+                    res.render("customer",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "title":"客户管理",
+                        "user":{"name":req.session.username,"qq":"20126162"},
+                        "id":req.query.id
+                    });
+                }
             });
         }
     });
 
     app.get("/b/selects/:cusInfoId",function(req,res){
         var cusInfoId=req.params.cusInfoId;
-        if(checkLogind(req,res,"get","/select_photos")&&checkStudio(req,res,"get")){
-            res.render("selects",{
-                "js_version":js_version,
-                "css_version":css_version,
-                "user":{"name":req.session.username},
-                "title":"列表",
-                "cusInfoId":cusInfoId
+        if(checkLogind(req,res,"get","/select_photos")){
+            checkStudio(req,res,"get",function(err,result){
+                if(err){
+                    return showError({
+                        "message":err,
+                        "res":res
+                    });
+                }
+                if(result.status=="ok"){
+                    res.render("selects",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "user":{"name":req.session.username},
+                        "title":"列表",
+                        "cusInfoId":cusInfoId
+                    });
+                };
             });
-        };
+        }
     });
 //---------------------------------------------------------------- studio end---------------------------------------------------//
 

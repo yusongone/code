@@ -106,6 +106,7 @@ function getUserAndCustomerRelation(jsonReq,callback){
         });
 }
 
+/*
 //在 客户关系表中增加一项 客户具体信息 的索引
 function _addCustomerToList(jsonReq,callback){
     var database=jsonReq.database;
@@ -116,6 +117,7 @@ function _addCustomerToList(jsonReq,callback){
             callback(err,{"status":"ok"});
         });
 };
+*/
 //检测customerInfo 相信信息是否绑定用户;
 function _checkBind(jsonReq,callback){
     var database=jsonReq.database;
@@ -393,7 +395,7 @@ exports.searchCustomer=_searchCustomer;
 
 exports.bindUser=_bindUser;
 exports.checkBind=_checkBind;
-exports.addCustomerToList=_addCustomerToList;
+//exports.addCustomerToList=_addCustomerToList;
 exports.getCustomerList=_getCustomerList;
 exports.addCustomerInfo=_addCustomerInfo;
 exports.getImageLibsId=_getImageLibsId;

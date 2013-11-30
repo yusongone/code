@@ -13,6 +13,20 @@ function _createObjectId(str){
         }
 };
 
+    var _newThirdparty=function(jsonReq,callback){
+        var database=jsonReq.database; 
+        var type=jsonReq.idType;//QQ weibo ..
+        var insertObj={};
+            insertObj[type]=jsonReq.openId;
+            
+            console.log(insertObj);
+        var col=database.collection("users");
+        col.insert(insertObj,function(err,res){
+            if(err){return callback(err)};
+            callback(err,res);
+        });
+    };
+
     var _getUserByOpenId=function(jsonReq,callback){
         var database=jsonReq.database;
         var openId=jsonReq.openId;
@@ -47,8 +61,8 @@ function _createObjectId(str){
 
     var _compareNameAndPass=function(jsonReq,callback){
         var database=jsonReq.database;
-        var username=jsonReq.username;
-        var pass=jsonReq.pass;
+        var username=jsonReq.username||"--";
+        var pass=jsonReq.pass||"--";
 
         var col=database.collection("users");
         var md5=crypto.createHash("md5");
@@ -71,7 +85,6 @@ function _createObjectId(str){
         if(!uid){return callback("create uid error at getUserInfoById")}
         col.findOne({"_id":uid},function(err,doc){
             if(err){return callback(err)}
-            console.log(doc);
             callback(err,doc);
         });
     };
@@ -121,3 +134,4 @@ exports.getUserInfoById=getUserInfoById;
 exports.checkUsername=checkUsername;
 exports.addStudioId=addStudioId;
 exports.getUserByOpenId=_getUserByOpenId;
+exports.newThirdparty=_newThirdparty;

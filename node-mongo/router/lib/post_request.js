@@ -44,9 +44,16 @@ function setApp(app){
             jsonReq.userId=req.session.userId;
             jsonReq.name=reqBody.productName;
         if(checkLogind(req,res)){
-            ctrl.Product.addProduct(jsonReq,function(err,json){
-                if(err){return res.send({"status":"error","message":err})}
-                res.send({"status":"ok","id":json});
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Product.addProduct(jsonReq,function(err,json){
+                        if(err){return res.send({"status":"error","message":err})}
+                        res.send({"status":"ok","id":json});
+                    });
+                }
             });
         };
     });
@@ -56,9 +63,16 @@ function setApp(app){
         var jsonReq={};
             jsonReq.userId=req.session.userId;
         if(checkLogind(req,res)){
-            ctrl.Product.getProductsByUserId(jsonReq,function(err,json){
-                if(err){return res.send({"status":"error","message":err})}
-                res.send({"status":"ok","data":json});
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Product.getProductsByUserId(jsonReq,function(err,json){
+                        if(err){return res.send({"status":"error","message":err})}
+                        res.send({"status":"ok","data":json});
+                    });
+                }
             });
         };
     });
@@ -76,13 +90,20 @@ function setApp(app){
             jsonReq.imgCount=reqBody.imgCount;
 
             if(checkLogind(req,res)){
-                ctrl.Product.changeProduct(jsonReq,function(err,json){
-                    if(json>0){
-                        res.send({"status":"ok"});
-                    }else{
-                        res.send({"status":"sorry"});
-                    }
-                });
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Product.changeProduct(jsonReq,function(err,json){
+                        if(json>0){
+                            res.send({"status":"ok"});
+                        }else{
+                            res.send({"status":"sorry"});
+                        }
+                    });
+                }
+            });
             };
     });
 
@@ -91,9 +112,19 @@ function setApp(app){
         jsonReq.files=req.files.files;
         jsonReq.productId=req.body.productId;
         jsonReq.userId=req.session.userId;
+        jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
-            ctrl.Product.uploadProductHeadImage(jsonReq,function(err,result){
-                  
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Product.uploadProductHeadImage(jsonReq,function(err,result){
+                        if(result){
+                            res.send({"status":"ok"});      
+                        }
+                    });
+                }
             });
         };
     });
@@ -133,14 +164,21 @@ function setApp(app){
     });
 
     app.post('/ajax_getSelects', function(req, res){
+        var jsonReq={};
+            jsonReq.objStr=req.body.objStr;
+            jsonReq.userId=req.session.userId; 
+            jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
-            var jsonReq={};
-                jsonReq.objStr=req.body.objStr;
-                jsonReq.userId=req.session.userId; 
-                jsonReq.cusInfoId=req.body.cusInfoId;
-            ctrl.Customer.getSelects(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})};
-                res.send({"status":"ok","data":result});
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Customer.getSelects(jsonReq,function(err,result){
+                        if(err){return res.send({"status":"error","message":err})};
+                        res.send({"status":"ok","data":result});
+                    });
+                }
             });
         };
     });
@@ -162,9 +200,16 @@ function setApp(app){
             jsonReq.message=reqBody.message;
             jsonReq.address=reqBody.address;
 
-        if(checkLogind(req,res)&&checkStudio(req,res,"post")){
-            ctrl.Customer.addCustomer(jsonReq,function(err,json){
-                res.send(json);
+        if(checkLogind(req,res)){
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Customer.addCustomer(jsonReq,function(err,json){
+                        res.send(json);
+                    });
+                }
             });
         };
     });
@@ -176,9 +221,16 @@ function setApp(app){
             jsonReq.productId=req.body.productId;
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
-            ctrl.Customer.addProductToCustomer(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
-                res.send({"status":"ok"});
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Customer.addProductToCustomer(jsonReq,function(err,result){
+                        if(err){return res.send({"status":"error","message":err})}
+                        res.send({"status":"ok"});
+                    });
+                }
             });
         }
     });
@@ -190,9 +242,16 @@ function setApp(app){
             jsonReq.productId=req.body.productId;
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
-            ctrl.Customer.removeProductFromCustomer(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
-                res.send({"status":"ok"});
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Customer.removeProductFromCustomer(jsonReq,function(err,result){
+                        if(err){return res.send({"status":"error","message":err})}
+                        res.send({"status":"ok"});
+                    });
+                }
             });
         }
     });
@@ -205,9 +264,16 @@ function setApp(app){
             jsonReq.productId=req.body.productId;
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
-            ctrl.Customer.subProductFromCustomer(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
-                res.send({"status":"ok"});
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Customer.subProductFromCustomer(jsonReq,function(err,result){
+                        if(err){return res.send({"status":"error","message":err})}
+                        res.send({"status":"ok"});
+                    });
+                }
             });
         }
     });
@@ -232,29 +298,43 @@ function setApp(app){
         var jsonReq={};
             jsonReq.userId=req.session.userId;
             jsonReq.studioId=req.session.studioId;
-        if(checkLogind(req,res)&&checkStudio(req,res,"post")){
-            ctrl.Customer.getCustomerList(jsonReq,function(err,json){
-                res.send(json);
-            });
+        if(checkLogind(req,res)){
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Customer.getCustomerList(jsonReq,function(err,json){
+                        res.send(json);
+                    });
+                }
+            })
         };
     });
+    //删除上传照片
     app.post('/deletePhoto', function(req, res){
         var cusInfoId=req.body.cusInfoId;
         var fileId=req.body.fileId;
         if(checkLogind(req,res)){
-            ctrl.ImageLibs.deletePhoto({
-                cusInfoId:cusInfoId,
-                fileId:fileId,
-                userId:req.session.userId
-            },function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
-                res.send({"status":"ok","cusInfoId":cusInfoId}); 
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.ImageLibs.deletePhoto({
+                        cusInfoId:cusInfoId,
+                        fileId:fileId,
+                        userId:req.session.userId
+                    },function(err,result){
+                        if(err){return res.send({"status":"error","message":err})}
+                        res.send({"status":"ok","cusInfoId":cusInfoId}); 
+                    });
+                }
             });
         }
     });
     //上传图片
     app.post('/uploadImageToImagesLib', function(req, res){
-        if(checkLogind(req,res)){
             var jsonReq={};
                 jsonReq.files=req.files.files;
                 jsonReq.cusInfoId=req.body.cusInfoId;
@@ -263,8 +343,16 @@ function setApp(app){
                 if(parseInt(ImageSize)>upload_max_size){
                     return res.send({"stuats":"sorry","message":"Image too large"});
                 }
-            ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(err,json){
-                res.send(json);
+        if(checkLogind(req,res)){
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(err,json){
+                        res.send(json);
+                    });
+                }
             });
         };
     });
@@ -340,6 +428,21 @@ function setApp(app){
         }
     });
     */
+    app.post('/ajax_newThirdparty', function(req, res){
+        var jsonReq={};
+            jsonReq.idType=req.session.thirdparty.openIdType;
+            jsonReq.openId=req.session.thirdparty.openId;
+        ctrl.Users.newThirdparty(jsonReq,function(err,result){
+            if(err){
+                return res.send({"status":"error","message":err});
+            } 
+            if(result.status=="ok"){
+                console.log(result.userId);
+                req.session.userId=result.userId;
+            }
+            res.send(result);
+        });
+    });
 
     //登录
     app.post('/ajax_login', function(req, res){
@@ -352,6 +455,7 @@ function setApp(app){
                 req.session.username=req.body.username;
                 req.session.userId=json.data._id;
                 req.session.studioId=json.data.studioId||null;
+                req.session.thirdparty={};
                 res.send({"status":"ok","message":"登陆成功!"}); 
             }else{
                 res.send({"status":"sorry","message":"用户名和密码不正确"}); 
