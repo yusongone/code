@@ -132,6 +132,7 @@ function _bindUser(jsonReq,callback){
 function _addCustomerInfo(jsonReq,callback){
     var database=jsonReq.database;
     var userId=jsonReq.userId;
+    var studioId=jsonReq.studioId;
         boy={
             "name":jsonReq.boyName||null,
             "phone":jsonReq.boyPhone||null,
@@ -150,7 +151,7 @@ function _addCustomerInfo(jsonReq,callback){
         var userId=_createObjectId(userId);
         var imagesLibId=new objectId();
         if(!userId){return callback("create ObjectId error")};
-        col.insert({"_id":id,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
+        col.insert({"_id":id,"studioId":studioId,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
             callback(err,{"cusInfoId":id,"imageLibId":imagesLibId});
         });
 }
@@ -169,6 +170,7 @@ function _getImageLibsId(jsonReq,callback){
         }
     });
 }
+/*
 //通过用户Id 获取 客户关系表
 function _getCustomerList(jsonReq,callback){
     var database=jsonReq.database;
@@ -189,6 +191,16 @@ function _getCustomerList(jsonReq,callback){
     
         
     });
+};
+*/
+//通过用户Id 获取 客户关系表
+function _getCustomerList(jsonReq,callback){
+    var database=jsonReq.database;
+    var studioId=jsonReq.studioId;
+        var coll=database.collection("customerInfo");
+        coll.find({"studioId":studioId},{"reserverMessage":1,member:1,bindUser:1}).toArray(function(err,item){
+            callback(err,item);
+        });
 };
 
 //在customerList表中创建账号对应的客户关系表

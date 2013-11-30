@@ -47,6 +47,7 @@ function _checkBind(jsonReq,callback){
    }); 
 };
 
+/*
 //账户增加客户
 function _addCustomer(jsonReq,callback){
     poolMain.acquire(function(err,database){
@@ -77,6 +78,37 @@ function _addCustomer(jsonReq,callback){
         });
     });
 }
+*/
+function _addCustomer(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        //假设customer表中不存在登陆者的客户关系，将创建，如果存在，将插入数据；
+                //创建图片库
+                db.Customer.addCustomerInfo(jsonReq,function(err,result){
+                   jsonReq.cusInfoId=result.cusInfoId;
+                   jsonReq.imageLibId=result.imageLibId;
+                    db.ImageLibs.createImageLibs(jsonReq,function(err,result){
+                        poolMain.release(database);
+                        if(err){
+                            return callback(err);
+                        }
+                        callback(err,result);
+                        /*
+                        db.Customer.addCustomerToList(jsonReq,function(err,result){
+                            poolMain.release(database);
+                            if(err){
+                                return callback(err);
+                            }
+                            callback(err,result);
+                        });
+                        */
+                    });
+               });
+    });
+
+};
+
+
 
 //申请工作室
 function _applyStudio(jsonReq,callback){
@@ -102,12 +134,9 @@ function _applyStudio(jsonReq,callback){
 
 //获取账户下所有客户
 function _getCustomerList(jsonReq,callback){
-    var userId=jsonReq.userId;
     poolMain.acquire(function(err,database){
-        db.Customer.getCustomerList({
-            database:database,
-            userId:userId
-        },function(err,json){
+        jsonReq.database=database;
+        db.Customer.getCustomerList(jsonReq,function(err,json){
             poolMain.release(database);
             if(err){
                 return callback(err);

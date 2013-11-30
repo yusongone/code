@@ -151,6 +151,7 @@ function setApp(app){
         var jsonReq={};
             jsonReq.username=req.session.username;
             jsonReq.userId=req.session.userId;
+            jsonReq.studioId=req.session.studioId;
 
             jsonReq.boyName=reqBody.boyName;
             jsonReq.boyPhone=reqBody.boyPhone;
@@ -161,7 +162,7 @@ function setApp(app){
             jsonReq.message=reqBody.message;
             jsonReq.address=reqBody.address;
 
-        if(checkLogind(req,res)){
+        if(checkLogind(req,res)&&checkStudio(req,res,"post")){
             ctrl.Customer.addCustomer(jsonReq,function(err,json){
                 res.send(json);
             });
@@ -228,9 +229,11 @@ function setApp(app){
     //获取客户列表
     app.post('/ajax_getCustomer', function(req, res){
         var username=req.session.username;
-        var userId=req.session.userId;
-        if(checkLogind(req,res)){
-            ctrl.Customer.getCustomerList({userId:userId},function(err,json){
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+            jsonReq.studioId=req.session.studioId;
+        if(checkLogind(req,res)&&checkStudio(req,res,"post")){
+            ctrl.Customer.getCustomerList(jsonReq,function(err,json){
                 res.send(json);
             });
         };
