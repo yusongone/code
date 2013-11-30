@@ -65,9 +65,9 @@ var _uploadBuffer=function(jsonReq,callback){
 function uploadImage(jsonReq,callback){
     var database=jsonReq.database;
     var file=jsonReq.files[0];
-        var attr=jsonReq.attr||{};
-            attr.content_type="image/png";
-            attr.chunkSize=file.size;
+    var attr=jsonReq.attr||{};
+        attr.content_type="image/png";
+        attr.chunkSize=file.size;
     var gs=new gridStore(database,new objectId(),"w",attr);
     gs.open(function(err,gs){
         gs.writeFile(file.path,function(err,doc){

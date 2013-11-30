@@ -72,18 +72,60 @@ var mongodb=require("mongodb"),
         var albumId= _createObjectId(jsonReq.albumId);
             if(!(uid&&albumId)){return callback("err")};
         var col=database.collection("album");
-        console.log(albumId,uid);
-            col.update({"_id":albumId,"userId":uid},{"$set":{"name":name}},function(err,result){
-                console.log(result);
-                callback(err,result);
+            col.findOne({"_id":albumId,"userId":uid},{"photos":1},function(err,doc){
+                callback(err,doc.photos);
             });
          
     }
+
+    var addPhotoIdToAlbum=function(jsonReq,callback){
+        var database=jsonReq.database; 
+        var name=jsonReq.name;
+        var fileId=jsonReq.fileId;
+        var uid= _createObjectId(jsonReq.userId);
+        var albumId= _createObjectId(jsonReq.albumId);
+            if(!(uid&&albumId)){return callback("err")};
+        var col=database.collection("album");
+            col.update({"_id":albumId,"userId":uid},{"$addToSet":{"photos":{"id":fileId}}},function(err,doc){
+                callback(err,doc);
+            });
+         
+    }
+
+    var checkAlbumAuth=function(jsonReq,callback){
+        var database=jsonReq.database; 
+        var name=jsonReq.name;
+        var uid= _createObjectId(jsonReq.userId);
+        var albumId= _createObjectId(jsonReq.albumId);
+            if(!(uid&&albumId)){return callback("err")};
+        var col=database.collection("album");
+            col.findOne({"_id":albumId,"userId":uid},{"photos":0},function(err,doc){
+                callback(err,doc);
+            });
+    }
+
+    var checkPhotoInAlbum=function(jsonReq,callback){
+        var database=jsonReq.database; 
+        var name=jsonReq.name;
+        var uid= _createObjectId(jsonReq.userId);
+        var fid= _createObjectId(jsonReq.fileId);
+        var albumId= _createObjectId(jsonReq.albumId);
+            if(!(uid&&albumId&&fid)){return callback("err")};
+        var col=database.collection("album");
+        console.log(albumId,uid,fid);
+            col.findOne({"_id":albumId,"userId":uid,"photos.id":fid},{"id":1},function(err,doc){
+                console.log("ff"+doc);
+                callback(err,doc);
+            });
+    }
+
 
 
 exports.createAlbum=createAlbum;
 exports.getAlbumList=getAlbumList;
 exports.removeAlbum=removeAlbum;
 exports.changeAlbum=changeAlbum;
-
-
+exports.checkAlbumAuth=checkAlbumAuth;
+exports.addPhotoIdToAlbum=addPhotoIdToAlbum;
+exports.getPhotosFromAlbum=getPhotosFromAlbum;
+exports.checkPhotoInAlbum=checkPhotoInAlbum;

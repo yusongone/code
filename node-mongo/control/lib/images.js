@@ -6,6 +6,30 @@ var getPool=db.Common.getPool;
 var poolMain=getPool("main");
 var poolThumbnail=getPool("thumbnail");
 
+var getAlbumImage=function(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Album.checkPhotoInAlbum(jsonReq,function(err,result){
+            if(err){ poolMain.release(database); return callback(err) };
+            if(result){
+                _getThumbnailImage(jsonReq,function(err,buf){
+                    if(err){return callback(err)};
+                    if(buf){
+                        console.log("cache");
+                        callback(err,buf);
+                    }else{
+                        console.log("crop");
+                        getOriginalImage(jsonReq,function(err,buf){
+                            callback(err,buf);
+                        }); 
+                    }
+                });
+            }else{
+                callback("no auth");
+            }
+        });
+    });
+}
 
 var getPublicImage=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
@@ -224,3 +248,4 @@ function save2(canvas){
 
 exports.getImage=_getImage;
 exports.getPublicImage=getPublicImage;
+exports.getAlbumImage=getAlbumImage;

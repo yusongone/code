@@ -549,6 +549,37 @@ function setApp(app){
         }
     });
 
+    app.post("/uploadPhotoToAlbum",function(req,res){
+        var jsonReq={};
+        jsonReq.files=req.files.files;
+        jsonReq.albumId=req.body.albumId;
+        jsonReq.userId=req.session.userId;
+        if(checkLogind(req,res)){
+            ctrl.Album.uploadPhotoToAlbum(jsonReq,function(err,result){
+                if(result){
+                    res.send({"status":"ok"});      
+                }else{
+                    res.send({"status":"sorry"});      
+                }
+            });
+        };
+    });
+
+    app.post("/getPhotosFromAlbum",function(req,res){
+        var jsonReq={};
+        jsonReq.albumId=req.body.albumId;
+        jsonReq.userId=req.session.userId;
+        if(checkLogind(req,res)){
+            ctrl.Album.getPhotosFromAlbum(jsonReq,function(err,result){
+                if(result){
+                    res.send({"status":"ok","data":result});      
+                }else{
+                    res.send({"status":"sorry"});      
+                }
+            });
+        };
+    });
+
 
     //-------------------------------------  album end --------------------------------//
 

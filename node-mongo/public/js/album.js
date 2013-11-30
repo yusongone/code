@@ -1,17 +1,38 @@
-var pageSpace;
+var page={};
 $(document).ready(function(){
-        //pageSpace._btn_fileUp=$("#fileUp");
-       // pageSpace.bindEvent();
         UP.init();
+        bindFileUpload();
+        page.ajax_getPhotosFromAlbum();
+});
 
+page.ajax_getPhotosFromAlbum=function(){
+    $.ajax({
+        "type":"post",
+        "url":"/getPhotosFromAlbum",
+        "data":{"albumId":$("#albumId").val()},
+        "dataType":"json",
+        "success":function(data){
+            if(data.status=="ok"){
+                var ary=data.data;
+                for(var i=0;i<ary.length;i++){
+                    var json=ary[i];
+                        json.albumId=$("#albumId").val();
+                    var imgObj=new imageObj(ary[i]);
+                        $(".photoList").append(imgObj.initUI(ary[i]));
+                }
+            }
+        }
+    });
+};
 
+function bindFileUpload(){
 //测试
     $('#upload').fileupload({
         autoUpload: true,//是否自动上传
-        url:"/ab",//上传地址
+        url:"/uploadPhotoToAlbum",//上传地址
         acceptFileTypes: /(\.|\/)(gif|jpeg|png)$/i,
         dataType: 'json',
-        formData:{"cusInfoId":$("#cusInfo_id").attr("value"),"filename":"na"},
+        formData:{"albumId":$("#albumId").val()},
         done: function (e, data) {//设置文件上传完毕事件的回调函数
             var upl=data.context.data("object");
                 upl.done();
@@ -35,7 +56,7 @@ $(document).ready(function(){
             var progress = parseInt(data.loaded / data.total * 100, 10);
         }
     });
-});
+}
 
 
 var UP=(function(){
@@ -115,13 +136,14 @@ var imageObj=(function(){
     
     }
     image.prototype.initUI=function(json){
-        var cusInfoId=this.cusInfoId=json.cusInfoId;
+        var albumId=this.albumId=json.albumId;
         var id=this.fileId=json.id;
-        var thu=$("<li/>",{"class":"thu"});
-        var imgBox=$("<p/>",{"class":"imgBox"});
-            var img=$("<img/>",{"src":"/photo/"+cusInfoId+"/"+id+"?type=fill"});
+        var thu=$("<li/>",{"class":"photo"});
+        var imgBox=$("<div/>",{"class":"imgBox"});
+            var img=$("<img/>",{"src":"/album_photo/"+albumId+"/"+id+"?type=fill"});
             var del=$("<div/>",{"class":"delete fa fa-trash-o"})
-            imgBox.append(img,del);
+            var date=$("<div/>",{"class":"count"})
+            imgBox.append(img,del,date);
         thu.append(imgBox);
         this.thu=thu;
         this.bindEvent({"del":del});
