@@ -160,6 +160,7 @@ function setApp(app){
                 "js_version":js_version,
                 "css_version":css_version,
                 "user":{"name":req.session.username},
+                "albumId":albumId,
                 "title":"照片"
             });
         };
