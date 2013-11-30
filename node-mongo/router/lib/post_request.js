@@ -362,27 +362,11 @@ function setApp(app){
             });
         };
     });
-    //获取选片图片列表
-    app.post('/getSelectImages', function(req, res){
-        if(checkLogind(req,res)){
-            var jsonReq={};
-                jsonReq.cusInfoId=req.body.cusInfoId;
-                jsonReq.userId=req.session.userId;
-            ctrl.ImageLibs.getSelectPhotos(jsonReq,function(err,result){
-                if(result&&result.status=="ok"){
-                    res.send({"status":"ok","data":result.data});
-                }else{
-                    res.send({"status":"sorry","data":[]});
-                }
-            });
-        };
-    });
     //根据图片库Id获取图片列表
     app.post('/getCustomerImages', function(req, res){
         if(checkLogind(req,res)){
-            var cusInfoId=req.body.cusInfoId;
             var jsonReq={};
-                jsonReq.cusInfoId=cusInfoId;
+                jsonReq.cusInfoId=req.body.cusInfoId;
                 jsonReq.userId=req.session.userId;
             ctrl.ImageLibs.getCustomerImages(jsonReq,function(err,result){
                 if(result&&result.status=="ok"){
@@ -413,27 +397,6 @@ function setApp(app){
             });
         };
     });
-    /*
-    //创建图片库
-    app.post('/ajax_createImageLibs', function(req, res){
-        if(checkLogind(req,res)){
-            ctrl.ImageLibs.createImageLibs({
-                "username":req.session.username,
-                "libname":req.body.libname
-            },function(json){
-                res.send(json);
-            });
-        }
-    });
-    //获取图片库列表
-    app.post('/ajax_getImageLibs', function(req, res){
-        if(checkLogind(req,res)){
-            ctrl.ImageLibs.getImageLibs(req.session.username,function(json){
-                res.send(json);
-            });
-        }
-    });
-    */
     app.post('/ajax_newThirdparty', function(req, res){
         var jsonReq={};
             jsonReq.idType=req.session.thirdparty.openIdType;

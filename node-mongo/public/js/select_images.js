@@ -13,7 +13,7 @@ var ajax_get=function(cusInfoId){
     console.log(cusInfoId);
     $.ajax({
         "type":"post",
-        "url":"/getSelectImages",
+        "url":"/getCustomerImages",
         "datatype":"json",
         "data":{"cusInfoId":cusInfoId},
         "success":function(json){

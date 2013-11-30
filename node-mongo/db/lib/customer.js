@@ -53,21 +53,6 @@ function getUserAndCustomerRelation(jsonReq,callback){
     var col=database.collection("customerInfo");
         col.findOne({"_id":cid},function(err,doc){
             var ID;
-            /*
-            if(doc){
-              if(doc.bindUser&&(uid.toString())==(doc.bindUser.toString())){
-                  ID="binder";
-              }else if(doc.userId&&(uid.toString())==(doc.userId.toString())){
-                  ID="creator";
-              }else{
-                  ID="none";
-              }
-                callback(err,ID,{"userId":doc.userId});
-            }else{
-                  ID="none";
-            }
-                callback(err,ID);
-                */
             var uidStr=uid.toString();
             if(doc){
               if(doc.bindUser&&(uid.toString())==(doc.bindUser.toString())){
@@ -75,11 +60,10 @@ function getUserAndCustomerRelation(jsonReq,callback){
                     callback(err,ID,{"userId":doc.userId});
               }else{
                 var studioId=doc.studioId;
-                var col=database.collection("userCustomer");
+                var col=database.collection("studio");
                    var s= _createObjectId(studioId);
                     col.findOne({"_id":s},function(err,docc){
                         if(docc){
-                            console.log("dd",docc);
                            var admin=docc.userId;  
                            var managerAry=docc.manager;
                            if((admin.toString())==uidStr){
@@ -112,7 +96,7 @@ function _addCustomerToList(jsonReq,callback){
     var database=jsonReq.database;
     var cusId=jsonReq.cusInfoId;
     var userId=jsonReq.userId;
-    var col=database.collection("userCustomer");
+    var col=database.collection("studio");
         col.update({"userId":userId},{$addToSet:{customerList:{$each:[{"cusId":cusId}]}}},{w:1},function(err,doc){
             callback(err,{"status":"ok"});
         });
@@ -209,29 +193,6 @@ function _getImageLibsId(jsonReq,callback){
         }
     });
 }
-/*
-//通过用户Id 获取 客户关系表
-function _getCustomerList(jsonReq,callback){
-    var database=jsonReq.database;
-    var userId=jsonReq.userId;
-    var col=database.collection("userCustomer");
-    col.find({userId:userId}).toArray(function(err,item){
-        if(item.length==0){return callback(err,[])};
-        var ary=item[0].customerList;
-        var tempAry=[];
-        for(var i=0;i<ary.length;i++){
-            var cusId=_createObjectId(ary[i].cusId);
-            tempAry.push(cusId);
-        }
-        var coll=database.collection("customerInfo");
-        coll.find({"_id":{$in:tempAry}},{"reserverMessage":1,member:1,bindUser:1}).toArray(function(err,item){
-            callback(err,item);
-        });
-    
-        
-    });
-};
-*/
 //通过用户Id 获取 客户关系表
 function _getCustomerList(jsonReq,callback){
     var database=jsonReq.database;
@@ -252,7 +213,7 @@ function _createCustomerListForUser(jsonReq,callback){
         },function(err,item){
             if(err){return callback(err)}
             if(item.length==0){
-                var col=database.collection("userCustomer");
+                var col=database.collection("studio");
                 col.insert({userId:userId},function(err,item){
                     if(err){return callback(err)}
                     callback(err,"create Ok");
@@ -263,12 +224,12 @@ function _createCustomerListForUser(jsonReq,callback){
         });
 }
 
-//创建一个工作室(userCustomer)
+//创建一个工作室(studio)
 function addStudio(jsonReq,callback){
     var database=jsonReq.database;
     var userId=jsonReq.userId;
     var name=jsonReq.name;
-    var col=database.collection("userCustomer");
+    var col=database.collection("studio");
         col.insert({userId:userId,name:name},function(err,item){
             var studioId=item[0]._id;
             callback(err,studioId); 
