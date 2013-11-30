@@ -77,3 +77,13 @@ exports.getPool=function(type){
     };
     return pool;
 }
+exports.createObjectId=function(str){
+    try{
+        str=str.toString();
+        return  new objectId(str);
+    }catch(err){
+        console.error("createObjectId:",err);
+        return false;
+    }
+};
+

@@ -1,16 +1,8 @@
+var Common=require("./common");
 var mongodb=require("mongodb"),
     objectId=mongodb.ObjectID;
 
-
-function _createObjectId(str){
-        try{
-            str=str.toString();
-            return  new objectId(str);
-        }catch(err){
-            console.error("createObjectId:",err);
-            return false;
-        }
-};
+    var _createObjectId=Common.createObjectId;
 
 function checkProductDocExist(jsonReq,callback){
     var database=jsonReq.database;

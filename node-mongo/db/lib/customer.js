@@ -1,17 +1,10 @@
+var Common=require("./common");
 var mongodb=require("mongodb"),
     Product=require("./product");
     objectId=mongodb.ObjectID;
 
+    var _createObjectId=Common.createObjectId;
 
-function _createObjectId(str){
-        try{
-            str=str.toString();
-            return  new objectId(str);
-        }catch(err){
-            console.error("createObjectId:",err);
-            return false;
-        }
-};
 /*
 **返回customerInfo 详细信息；
 *根据

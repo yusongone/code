@@ -1,17 +1,10 @@
+var Common=require("./common");
 var mongodb=require("mongodb"),
     format=require("util").format,
     objectId=mongodb.ObjectID,
     crypto=require("crypto");
 
-function _createObjectId(str){
-        try{
-            str=str.toString();
-            return  new objectId(str);
-        }catch(err){
-            console.log(err);
-            return false;
-        }
-};
+    var _createObjectId=Common.createObjectId;
 
     var _newThirdparty=function(jsonReq,callback){
         var database=jsonReq.database; 

@@ -1,16 +1,10 @@
+var Common=require("./common");
 var mongodb=require("mongodb"),
     objectId=mongodb.ObjectID,
     gridStore=mongodb.GridStore;
 
-function _createObjectId(str){
-        try{
-            str=str.toString();
-            return  new objectId(str);
-        }catch(err){
-            console.log(err);
-            return false;
-        }
-};
+    var _createObjectId=Common.createObjectId;
+
 
 var _getImageInfoById=function(jsonReq,callback){
     var database=jsonReq.database;
