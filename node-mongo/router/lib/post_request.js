@@ -6,7 +6,8 @@ var js_version=config.js_version;
 var css_version=config.css_version;
 var upload_max_size=1024*1024*10;
 
-var checkLogind=Common.checkLogind;
+var checkLogind=Common.checkLogind,
+    checkStudio=Common.checkStudio;
 
 function setApp(app){
     app.post('/bindLink', function(req, res){
@@ -295,6 +296,27 @@ function setApp(app){
             });
         };
     });
+
+    app.post("/applystudio",function(req,res){
+        var jsonReq={};
+            jsonReq.name=req.name;
+        if(checkLogind(req,res)){
+            if(checkStudio(req,res,"post")){
+                res.send({"status":"sorry","message":"已经存在!"});
+            };
+            jsonReq.userId=req.session.userId;
+            ctrl.Customer.applyStudio(jsonReq,function(err,result){
+                if(err){return res.send({"status":"error","message":err})}
+                if(result.status=="ok"){
+                    req.session.studioId=result.studioId;
+                    res.send({"status":"ok"});
+                }else{
+                    res.send(result);
+                }
+            });
+        };
+    });
+    /*
     //创建图片库
     app.post('/ajax_createImageLibs', function(req, res){
         if(checkLogind(req,res)){
@@ -314,6 +336,8 @@ function setApp(app){
             });
         }
     });
+    */
+
     //登录
     app.post('/ajax_login', function(req, res){
             var path=req.body.path;
@@ -323,7 +347,8 @@ function setApp(app){
         },function(err,json){
             if("ok"==json.status){
                 req.session.username=req.body.username;
-                req.session.userId=json.userId;
+                req.session.userId=json.data._id;
+                req.session.studioId=json.data.studioId||null;
                 res.send({"status":"ok","message":"登陆成功!"}); 
             }else{
                 res.send({"status":"sorry","message":"用户名和密码不正确"}); 

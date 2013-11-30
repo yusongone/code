@@ -17,7 +17,21 @@ function checkLogind(req,res,type,path){
     }
 }
 
+function checkStudio(req,res,type){
+    if(req.session.studioId){
+        return true;
+    }else{
+        if("get"==type){
+            res.redirect("/applystudio");
+        }else{
+            res.send({"status":"sorry","message":"您还未申请工作室，请先申请。"});
+            return false;
+        }
+    }
+}
+
 exports.checkLogind=checkLogind;
+exports.checkStudio=checkStudio;
 exports.ejs=ejs;
 exports.fs=fs;
 exports.ctrl=ctrl;

@@ -78,6 +78,28 @@ function _addCustomer(jsonReq,callback){
     });
 }
 
+//申请工作室
+function _applyStudio(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Users.getUserInfoById(jsonReq,function(err,doc){
+            if(doc&&doc.studioId){
+                poolMain.release(database);
+                return callback({"status":"sorry","message":"已经存在!","studioId":doc.studioId});
+            }else{
+                db.Customer.addStudio(jsonReq,function(err,result){
+                    jsonReq.studioId=result;
+                    db.Users.addStudioId(jsonReq,function(err,result){
+                        poolMain.release(database);
+                        callback({"status":"ok","studioId":jsonReq.studioId}); 
+                    });
+                });
+            }
+        });
+        return;
+    });
+}
+
 //获取账户下所有客户
 function _getCustomerList(jsonReq,callback){
     var userId=jsonReq.userId;
@@ -285,3 +307,4 @@ exports.getProductsFromCustomer=getProductsFromCustomer;
 exports.subProductFromCustomer=subProductFromCustomer;
 exports.uploadSelectPhotoList=uploadSelectPhotoList;
 exports.getSelects=getSelects;
+exports.applyStudio=_applyStudio;

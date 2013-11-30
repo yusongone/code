@@ -3,6 +3,16 @@ var mongodb=require("mongodb"),
     objectId=mongodb.ObjectID,
     crypto=require("crypto");
 
+function _createObjectId(str){
+        try{
+            str=str.toString();
+            return  new objectId(str);
+        }catch(err){
+            console.log(err);
+            return false;
+        }
+};
+
 
 //user collection;
     var _insertUserName=function(jsonReq,callback){
@@ -37,7 +47,7 @@ var mongodb=require("mongodb"),
 
         col.find({"name":username,"pass":md5Pass}).toArray(function(err,item){
             if(item.length>0){
-                callback(err,{"status":"ok","userId":item[0]["_id"]});
+                callback(err,{"status":"ok","data":item[0]});
             }else{
                 callback(err,{"status":"sorry"});
             }
@@ -48,13 +58,30 @@ var mongodb=require("mongodb"),
         var database=jsonReq.database;
         var userId=jsonReq.userId;
         var col=database.collection("users");
-        var uid=_createObject(userId);
+        var uid=_createObjectId(userId);
         if(!uid){return callback("create uid error at getUserInfoById")}
         col.findOne({"_id":uid},function(err,doc){
             if(err){return callback(err)}
+            console.log(doc);
             callback(err,doc);
         });
     };
+
+    var addStudioId=function(jsonReq,callback){
+        var database=jsonReq.database;
+        var userId=jsonReq.userId;
+        var col=database.collection("users");
+        console.log("aa");
+        var uid=_createObjectId(userId);
+        console.log("baa");
+        var studioId=_createObjectId(jsonReq.studioId);
+        console.log(uid,studioId,jsonReq.studioId,"fdfd");
+        if(!uid){return callback("create uid error at getUserInfoById")}
+        col.update({"_id":uid},{"$set":{"studioId":studioId}},function(err,doc){
+            if(err){return callback(err)}
+            callback(err,doc);
+        });
+    }
     
     var checkUsername=function(jsonReq,callback){
         var database=jsonReq.database;
@@ -85,3 +112,4 @@ exports.insertUserName=_insertUserName;
 exports.compareNameAndPass=_compareNameAndPass;
 exports.getUserInfoById=getUserInfoById;
 exports.checkUsername=checkUsername;
+exports.addStudioId=addStudioId;

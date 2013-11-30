@@ -61,10 +61,11 @@ function getUserAndCustomerRelation(jsonReq,callback){
               }else{
                   ID="none";
               }
+                callback(err,ID,{"userId":doc.userId});
             }else{
                   ID="none";
             }
-            callback(err,ID,{"userId":doc.userId});
+                callback(err,ID);
         });
 }
 
@@ -211,6 +212,18 @@ function _createCustomerListForUser(jsonReq,callback){
         });
 }
 
+//创建一个工作室(userCustomer)
+function addStudio(jsonReq,callback){
+    var database=jsonReq.database;
+    var userId=jsonReq.userId;
+    var name=jsonReq.name;
+    var col=database.collection("userCustomer");
+        col.insert({userId:userId,name:name},function(err,item){
+            var studioId=item[0]._id;
+            callback(err,studioId); 
+        });
+}
+
 
 
 //给用户绑定product
@@ -343,3 +356,4 @@ exports.removeProductFromCustomer=removeProductFromCustomer;
 exports.subProductFromCustomer=subProductFromCustomer;
 exports.getProductsFromCustomer=getProductsFromCustomer;
 exports.uploadSelectPhotoList=uploadSelectPhotoList;
+exports.addStudio=addStudio;
