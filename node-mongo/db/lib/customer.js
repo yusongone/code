@@ -53,6 +53,7 @@ function getUserAndCustomerRelation(jsonReq,callback){
     var col=database.collection("customerInfo");
         col.findOne({"_id":cid},function(err,doc){
             var ID;
+            /*
             if(doc){
               if(doc.bindUser&&(uid.toString())==(doc.bindUser.toString())){
                   ID="binder";
@@ -66,6 +67,42 @@ function getUserAndCustomerRelation(jsonReq,callback){
                   ID="none";
             }
                 callback(err,ID);
+                */
+            var uidStr=uid.toString();
+            if(doc){
+              if(doc.bindUser&&(uid.toString())==(doc.bindUser.toString())){
+                    ID="binder";
+                    callback(err,ID,{"userId":doc.userId});
+              }else{
+                var studioId=doc.studioId;
+                var col=database.collection("userCustomer");
+                   var s= _createObjectId(studioId);
+                    col.findOne({"_id":s},function(err,docc){
+                        if(docc){
+                            console.log("dd",docc);
+                           var admin=docc.userId;  
+                           var managerAry=docc.manager;
+                           if((admin.toString())==uidStr){
+                                return callback(err,"creator",{"userId":uid});
+                           }else{
+                                if(managerAry){
+                                    for(var i=0;i<managerAry.length;i++){
+                                        var str= managerAry[i].userId.toString();
+                                        if(str==uiStr){
+                                            return callback(err,"manager");    
+                                        }
+                                    }
+                                }
+                           }
+                        }else{
+                            return callback(err,"none");    
+                        }
+                    });
+              }
+            }else{
+                ID="none" 
+                callback(err,ID);
+            }
         });
 }
 

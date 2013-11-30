@@ -82,28 +82,18 @@ function _addCustomer(jsonReq,callback){
 function _addCustomer(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-        //假设customer表中不存在登陆者的客户关系，将创建，如果存在，将插入数据；
-                //创建图片库
-                db.Customer.addCustomerInfo(jsonReq,function(err,result){
-                   jsonReq.cusInfoId=result.cusInfoId;
-                   jsonReq.imageLibId=result.imageLibId;
-                    db.ImageLibs.createImageLibs(jsonReq,function(err,result){
-                        poolMain.release(database);
-                        if(err){
-                            return callback(err);
-                        }
-                        callback(err,result);
-                        /*
-                        db.Customer.addCustomerToList(jsonReq,function(err,result){
-                            poolMain.release(database);
-                            if(err){
-                                return callback(err);
-                            }
-                            callback(err,result);
-                        });
-                        */
-                    });
-               });
+        //创建图片库
+        db.Customer.addCustomerInfo(jsonReq,function(err,result){
+           jsonReq.cusInfoId=result.cusInfoId;
+           jsonReq.imageLibId=result.imageLibId;
+            db.ImageLibs.createImageLibs(jsonReq,function(err,result){
+                poolMain.release(database);
+                if(err){
+                    return callback(err);
+                }
+                callback(err,result);
+            });
+       });
     });
 
 };
@@ -248,43 +238,6 @@ function removeProductFromCustomer(jsonReq,callback){
         });
     });
 }
-/*
-//删除用户绑定的product
-function getProductsFromCustomer(jsonReq,callback){
-    poolMain.acquire(function(err,database){
-        jsonReq.database=database;
-        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result,resJson){
-                        console.log("eeff");
-            if(err){ poolMain.release(database); return callback(err) };
-            if("creator"==result||"binder"==result){
-                jsonReq.userId=resJson.userId;
-                db.Customer.getProductsFromCustomer(jsonReq,function(err,res){
-                    if(err){ poolMain.release(database);return callback(err);};
-                    db.Product.getProductsByUserId(jsonReq,function(err,doc){
-                        if(err){ poolMain.release(database);return callback(err);};
-                        poolMain.release(database);
-                        var tempAry=[];
-                        console.log("ff");
-                        if(!(res&&doc)){return callback(err,[])}
-                        for(var i=0;i<res.length;i++){
-                            for(var j=0;j<doc.length;j++){
-                                if(doc[j]["_id"].toString()==res[i]["_id"].toString()){
-                                    tempAry.push(doc[j]);
-                                }
-                            }
-                        }
-                        callback(err,tempAry);
-                    });
-                });
-            }else{
-                poolMain.release(database);
-                console.log("not found");
-                callback("not found")
-            }
-        });
-    });
-}
-*/
 
 //删除用户绑定的product
 function getProductsFromCustomer(jsonReq,callback){
