@@ -178,6 +178,8 @@ function setApp(app){
         }
     });
 
+    //------------------------  get photos start ---------------------------
+
     //获取公共图片
     app.get("/album_photo/:albumId/:imageId",function(req,res){
         var albumId=req.params.albumId;
@@ -245,6 +247,7 @@ function setApp(app){
             }
         }
     });
+    //------------------------  get photos end ---------------------------
 
     //验证码图片
     app.get("/verifyCode",function(req,res){

@@ -12,6 +12,13 @@ var getAlbumImage=function(jsonReq,callback){
         db.Album.checkPhotoInAlbum(jsonReq,function(err,result){
             if(err){ poolMain.release(database); return callback(err) };
             if(result){
+                if(jsonReq.size=="origin"){
+                        db.Images.getImage(jsonReq,function(err,buf){
+                            poolMain.release(database);
+                            callback(err,buf);
+                        });
+                    return;
+                }
                 _getThumbnailImage(jsonReq,function(err,buf){
                     if(err){return callback(err)};
                     if(buf){
@@ -37,6 +44,13 @@ var getPublicImage=function(jsonReq,callback){
         db.Images.getImageInfoById(jsonReq,function(err,result){
             poolMain.release(database);
             if(result&&result.metadata&&result.metadata.property=="public"){
+                if(jsonReq.size=="origin"){
+                        db.Images.getImage(jsonReq,function(err,buf){
+                            poolMain.release(database);
+                            callback(err,buf);
+                        });
+                    return;
+                }
                 _getThumbnailImage(jsonReq,function(err,buf){
                     if(err){return callback(err)};
                     if(buf){
