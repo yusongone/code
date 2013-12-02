@@ -10,7 +10,7 @@ var checkLogind=Common.checkLogind;
 
 function setApp(app){
      app.get('/', function(req, res){
-            res.redirect("/photos");
+            res.redirect("/albums");
             res.render("index",{
                 "js_version":js_version,
                 "css_version":css_version,
@@ -85,9 +85,20 @@ function setApp(app){
         }
     });
 
-    app.get("/photos",function(req,res){
-        if(checkLogind(req,res,"get","/photos")){
-            res.render("photos",{
+    app.get("/album/:albumId",function(req,res){
+        var albumId=req.params.albumId;
+        if(checkLogind(req,res,"get","/album/"+albumId)){
+            res.render("album",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "user":{"name":req.session.username},
+                "title":"照片"
+            });
+        };
+    });
+    app.get("/album_list",function(req,res){
+        if(checkLogind(req,res,"get","/album_list")){
+            res.render("album_list",{
                 "js_version":js_version,
                 "css_version":css_version,
                 "user":{"name":req.session.username},

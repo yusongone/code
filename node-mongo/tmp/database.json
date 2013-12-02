@@ -1,7 +1,7 @@
 //users
 [
 { "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5","qq":"20126161","email":"yusongone@gmail.com"}
-{ "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5","qq":"", }
+{ "_id":"Object(123123123123)","studio":"1","name":"用户名称", "pass":"用户密码MD5","qq":"", }
 { "_id":"Object(123123123123)", "name":"用户名称", "pass":"用户密码MD5","qq":"","customerListId":"Object(123456789123)"}
 ]
 

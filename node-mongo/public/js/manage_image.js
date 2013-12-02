@@ -157,7 +157,7 @@ var imageObj=(function(){
         var thu=$("<li/>",{"class":"thu"});
         var imgBox=$("<p/>",{"class":"imgBox"});
             var img=$("<img/>",{"src":"/photo/"+cusInfoId+"/"+id+"?type=fill"});
-            var del=$("<div/>",{"class":"delete"})
+            var del=$("<div/>",{"class":"delete fa fa-trash-o"})
             imgBox.append(img,del);
         thu.append(imgBox);
         this.thu=thu;

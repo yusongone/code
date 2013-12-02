@@ -30,17 +30,24 @@
 .content .thu .imgBox{
     position:relative;
 }
+.content .thu .imgBox:hover .delete{
+    display:block;
+
+}
 .content .thu .delete:hover{
-    background:#888;
+    color:#333;
 }
 .content .thu .delete{
+    display:none;
     cursor:pointer;
     position:absolute;
-    top:0;
-    right:0;
-    background:#ddd;
+    top:3px;
+    right:3px;
+    color:#ddd;
     width:25px;
     height:25px;
+    font-size:28px;
+    color:#666;
 }
 .content .thu img{
     max-width:100%;

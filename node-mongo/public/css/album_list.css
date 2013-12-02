@@ -1,0 +1,53 @@
+.albumList{
+
+}
+.albumList .album{
+    width:140px;
+    height:200px;
+    float:left;
+    border:1px solid #ddd;
+    margin:5px 8px;
+    position:relative;
+    border-left:5px solid #eee;
+    border-top-left-radius:5px;
+    border-bottom-left-radius:5px;
+}
+.album .name,
+.album .date{
+    float: left;
+    width: 118px;
+    height: 20px;
+    margin: 0 10px;
+    text-align: right;
+}
+.album .imgBox{
+    width:120px;
+    height:120px;
+    background:#999;
+    margin:10px;
+}
+.album .imgBox img{
+    width:100%;
+    height:100%;
+}
+.album .count{
+    position:absolute;
+    top:0px;
+    left:18px;
+    width:0px;
+    line-height:24px;
+    text-align:center;
+    color:#333;
+    border-left: 12px solid #ddd;
+    border-bottom: 12px solid transparent;
+    border-right: 12px solid #ddd;
+    text-indent: -7px;
+    opacity: 0.9;
+}
+.album .name{
+    font-weight:bold;
+    color:#666;
+}
+.album .date{
+    color:#aaa;
+}

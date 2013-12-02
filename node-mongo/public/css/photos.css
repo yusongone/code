@@ -1,0 +1,15 @@
+.photoList{
+
+}
+.photo{
+    width:180px;
+    margin:5px 10px;
+    float:left;
+    border:1px solid #ddd;
+    background:#efefef;
+}
+.date{
+    width:160px;
+    margin:5px 10px;
+    text-align:right;
+}
