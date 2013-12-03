@@ -1,0 +1,9 @@
+.right_area{
+    width:100%;
+}
+.content{
+    width:500px;
+    overflow:hidden;
+    margin:0 auto;
+    min-height:500px;
+}

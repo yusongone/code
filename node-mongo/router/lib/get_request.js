@@ -11,7 +11,7 @@ var checkLogind=Common.checkLogind,
 
 function setApp(app){
      app.get('/', function(req, res){
-            res.redirect("/albums");
+            res.redirect("/album_list");
             res.render("index",{
                 "js_version":js_version,
                 "css_version":css_version,
@@ -34,7 +34,25 @@ function setApp(app){
                 if(json.status=="ok"){
                     qq.getOpenId(json.data,function(result){
                         if(result.status=="ok"){
-                            res.redirect("/");
+                            var clientId=result.data.client_id,
+                                openId=result.data.openid;
+                            req.session.openId=openId;
+                            req.session.clientId=clientId;
+                            var jsonReq={};
+                                jsonReq.openId=openId;
+                            ctrl.Users.getUserByOpenId(jsonReq,function(err,result){
+                                if(err){
+                                    return showError({
+                                        "message":"此对象已经进行过绑定，请不要重复绑定;",
+                                        "res":res
+                                    });
+                                }
+                                if(result){
+                                    res.redirect("/");
+                                }else{
+                                    res.redirect("/first_login");
+                                }
+                            });
                         }else{
                             res.send(result.message);
                         }
@@ -43,6 +61,21 @@ function setApp(app){
                     res.send(json.message);
                 }
             });
+    });
+    app.get('/first_login', function(req,res){
+        var path=req.query.path;
+        if(path){path=path.toString()};
+        if(!req.session.openId){
+            return showError({
+                "message":"您没有通过第三方帐号登录;",
+                "res":res
+            });
+        }
+        res.render("first_login",{
+            "js_version":js_version,
+            "css_version":css_version,
+            "title":"第一次登录",
+        });
     });
     app.get('/login', function(req,res){
         var path=req.query.path;
@@ -62,7 +95,15 @@ function setApp(app){
         });
     });
     //qq login ========= end 
-    
+
+   function showError(json){
+                    json.res.render("error",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "title":"Error",
+                        "message":json.message
+                    });    
+   } 
 //---------------------------------------------------------------- user begin ---------------------------------------------------//
     app.get('/bindLink/:cusId', function(req, res){
         var jsonReq={};
@@ -78,12 +119,10 @@ function setApp(app){
                         "title":"绑定用户"
                     });
                 }else{
-                    res.render("error",{
-                        "js_version":js_version,
-                        "css_version":css_version,
-                        "title":"Error",
-                        "message":"此对象已经进行过绑定，请不要重复绑定；"
-                    });    
+                    showError({
+                        "message":"此对象已经进行过绑定，请不要重复绑定;",
+                        "res":res
+                    });
                 }
             });
         };
@@ -194,6 +233,9 @@ function setApp(app){
 
     //申请工作室
     app.get("/applystudio",function(req,res){
+        if(req.session.studioId){
+            res.redirect("/b/customer");
+        }
         if(checkLogind(req,res,"get","/b/calendar")){
         //if(checkLogind(req,res,"get","/b/calendar")){
             res.render("applystudio",{
@@ -212,6 +254,17 @@ function setApp(app){
 
 //---------------------------------------------------------------- studio begin ---------------------------------------------------//
 
+    //事物管理
+    app.get("/b/studio_set",function(req,res){
+        if(checkLogind(req,res,"get","/b/studio_set")&&checkStudio(req,res,"get")){
+            res.render("studio_set",{
+                "js_version":js_version,
+                "css_version":css_version,
+                "user":{"name":req.session.username},
+                "title":"工作室设置"
+            });
+        }
+    });
     
     //事物管理
     app.get("/b/calendar",function(req,res){

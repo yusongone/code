@@ -49,9 +49,9 @@ var ajax_getCusProducts=function(cusInfoId){
             "cusInfoId":cusInfoId
         },
         "success":function(data){
-            if(data.status=="ok"){
+            if(data.status=="ok"&&data.data){
             var ary=data.data;
-            ProductThumbList.init(ary);
+                ProductThumbList.init(ary);
             }
         }
     });

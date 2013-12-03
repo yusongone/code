@@ -31,6 +31,7 @@ a{cursor:pointer;color:#09f;}
     border-radius: 5px;
     float:left;
     border:none;
+    text-align:center;
 }
 .btnSmall.disable,.btnBlue.disable,.btnRed.disable{
     background:#ddd;

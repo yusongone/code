@@ -304,7 +304,7 @@ function setApp(app){
         var jsonReq={};
             jsonReq.name=req.name;
         if(checkLogind(req,res)){
-            if(checkStudio(req,res,"post")){
+            if(req.session.studioId){
                 res.send({"status":"sorry","message":"已经存在!"});
             };
             jsonReq.userId=req.session.userId;

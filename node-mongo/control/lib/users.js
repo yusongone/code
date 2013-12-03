@@ -3,6 +3,14 @@ var parse=require("./common").parse;
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
 
+function _getUserByOpenId(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Users.getUserByOpenId(jsonReq,function(err,result){
+            callback(err,result);
+        });
+    });
+}
 
 function _searchUser(json,callback){
     poolMain.acquire(function(err,database){
@@ -59,4 +67,4 @@ exports.searchUser=_searchUser;
 exports.insertUserName=_insertUserName;
 exports.login=_login;
 exports.checkUsername=checkUsername;
-
+exports.getUserByOpenId=_getUserByOpenId;

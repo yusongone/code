@@ -17,8 +17,8 @@ function _getVcode(callback){
         var item = Math.round(rnd * (items.length - 1));
         var color = Math.round(rnd * (textColors.length - 1));
         ctx.fillStyle = textColors[color];
-        ctx.font ='bold 1000pt Arial';
-        ctx.fillText(items[item], 5 + i*18,15,50);
+        ctx.font ='bold 20px Arial';
+        ctx.fillText(items[item], 5 + i*18,20,50);
         vcode += items[item];
     }
     canvas.toBuffer(function(err, buf){

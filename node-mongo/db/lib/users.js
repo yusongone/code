@@ -13,6 +13,15 @@ function _createObjectId(str){
         }
 };
 
+    var _getUserByOpenId=function(jsonReq,callback){
+        var database=jsonReq.database;
+        var openId=jsonReq.openId;
+        var col=database.collection("users");
+        col.findOne({$or:[{"qq":openId},{"weibo":openId}]},function(err,doc){
+            callback(err,doc);
+        });
+    
+    };
 
 //user collection;
     var _insertUserName=function(jsonReq,callback){
@@ -71,9 +80,7 @@ function _createObjectId(str){
         var database=jsonReq.database;
         var userId=jsonReq.userId;
         var col=database.collection("users");
-        console.log("aa");
         var uid=_createObjectId(userId);
-        console.log("baa");
         var studioId=_createObjectId(jsonReq.studioId);
         console.log(uid,studioId,jsonReq.studioId,"fdfd");
         if(!uid){return callback("create uid error at getUserInfoById")}
@@ -113,3 +120,4 @@ exports.compareNameAndPass=_compareNameAndPass;
 exports.getUserInfoById=getUserInfoById;
 exports.checkUsername=checkUsername;
 exports.addStudioId=addStudioId;
+exports.getUserByOpenId=_getUserByOpenId;
