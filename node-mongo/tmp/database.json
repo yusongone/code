@@ -68,7 +68,6 @@
 
 
 //table fs.files and fs.chunks
-//用户添加“未注册”用户到customer，储存email，先去users表中查找，如果没有，为没有绑定或注册的邮件。如果有，在users查找相应详细信息，返回username；给customerList；
 {
     "_id":"object(123952348323456)",
     "metadata":{
@@ -96,12 +95,15 @@
     }
 }
 
-
-
-//日程表
+//albums
 {
-    _id:"ObjectId(102485283489598)",
-    userId:"ObjectId(9382984459293457)",
-    description:"feasefdafefasdgesdfd",
-    
+    "_id":"Object(123923448234)",
+    "userId":"Object(123123123123)",
+    "name":"十月的回忆",
+    "photos":[
+            "123923292342341",
+            "993298457234592345",
+            "123923292342341"
+        ]
 }
+
