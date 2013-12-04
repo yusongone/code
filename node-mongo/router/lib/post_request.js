@@ -42,6 +42,7 @@ function setApp(app){
         var reqBody=req.body;
         var jsonReq={};
             jsonReq.userId=req.session.userId;
+            jsonReq.studioId=req.session.studioId;
             jsonReq.name=reqBody.productName;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
@@ -62,6 +63,7 @@ function setApp(app){
         var reqBody=req.body;
         var jsonReq={};
             jsonReq.userId=req.session.userId;
+            jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
                 if(err){
@@ -80,6 +82,7 @@ function setApp(app){
     app.post('/changeProduct', function(req, res){
         var reqBody=req.body;
         var jsonReq={};
+            jsonReq.studioId=req.session.studioId;
             jsonReq.userId=req.session.userId;
             jsonReq.name=reqBody.productName;
             jsonReq.size=reqBody.size;
@@ -220,6 +223,7 @@ function setApp(app){
             jsonReq.userId=userId;
             jsonReq.productId=req.body.productId;
             jsonReq.cusInfoId=req.body.cusInfoId;
+            jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
                 if(err){
@@ -241,6 +245,7 @@ function setApp(app){
             jsonReq.userId=userId;
             jsonReq.productId=req.body.productId;
             jsonReq.cusInfoId=req.body.cusInfoId;
+            jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
                 if(err){
@@ -263,6 +268,7 @@ function setApp(app){
             jsonReq.userId=userId;
             jsonReq.productId=req.body.productId;
             jsonReq.cusInfoId=req.body.cusInfoId;
+            jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
                 if(err){
@@ -390,7 +396,7 @@ function setApp(app){
 
     app.post("/applystudio",function(req,res){
         var jsonReq={};
-            jsonReq.name=req.name;
+            jsonReq.name=req.body.name;
         if(checkLogind(req,res)){
             if(req.session.studioId){
                 res.send({"status":"sorry","message":"已经存在!"});

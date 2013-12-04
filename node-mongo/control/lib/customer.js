@@ -107,13 +107,13 @@ function _applyStudio(jsonReq,callback){
         db.Users.getUserInfoById(jsonReq,function(err,doc){
             if(doc&&doc.studioId){
                 poolMain.release(database);
-                return callback({"status":"sorry","message":"已经存在!","studioId":doc.studioId});
+                return callback(null,{"status":"sorry","message":"已经存在!","studioId":doc.studioId});
             }else{
                 db.Customer.addStudio(jsonReq,function(err,result){
                     jsonReq.studioId=result;
                     db.Users.addStudioId(jsonReq,function(err,result){
                         poolMain.release(database);
-                        callback({"status":"ok","studioId":jsonReq.studioId}); 
+                        callback(err,{"status":"ok","studioId":jsonReq.studioId}); 
                     });
                 });
             }

@@ -14,22 +14,19 @@ function _createObjectId(str){
 
 function checkProductDocExist(jsonReq,callback){
     var database=jsonReq.database;
-    var userId=jsonReq.userId;
-    var uid=_createObjectId(userId);
-    if(!uid){return callback(err)};
+    var studioId=jsonReq.studioId;
     var col=database.collection("productList");
-    col.findOne({"userId":uid},function(err,result){
+    col.findOne({"studioId":studioId},function(err,result){
         callback(err,result);
     });
 }
 
 function AddRowToProductList(jsonReq,callback){
     var database=jsonReq.database;
-    var userId=jsonReq.userId;
-    var uid=_createObjectId(userId);
-    if(!uid){return callback(err)};
+    var studioId=jsonReq.studioId;
+    var uid=_createObjectId(jsonReq.userId);
     var col=database.collection("productList");
-        col.insert({"userId":uid,products:[]},function(err,doc){
+        col.insert({"studioId":studioId,userId:uid,products:[]},function(err,doc){
            callback(err,doc); 
         });
 };
@@ -38,12 +35,10 @@ function AddRowToProductList(jsonReq,callback){
 function addProductToList(jsonReq,callback){
     var database=jsonReq.database;
     var name=jsonReq.name;
-    var userId=jsonReq.userId;
-    var uid=_createObjectId(userId);
-    if(!uid){return callback("create object Id error");}
+    var studioId=jsonReq.studioId;
     var col=database.collection("productList");
     var _id=new objectId();
-        col.update({"userId":uid},{$addToSet:{products:{$each:[{"_id":_id,"name":name,"imgCount":1}]}}},{w:1},function(err){
+        col.update({"studioId":studioId},{$addToSet:{products:{$each:[{"_id":_id,"name":name,"imgCount":1}]}}},{w:1},function(err){
             callback(err,_id);
         });
 }
@@ -70,10 +65,11 @@ function getProductById(jsonReq,callback){
     var database=jsonReq.database,
         userId=jsonReq.userId,
         productId=jsonReq.productId;
+    var studioId=jsonReq.studioId;
     var uid=_createObjectId(userId);
     var pid=_createObjectId(productId);
     var col=database.collection("productList");
-        col.findOne({"userId":uid,"products._id":pid},function(err,doc){
+        col.findOne({"studioId":studioId,"products._id":pid},function(err,doc){
             var ary=doc.products;
             for(var i=0,l=ary.length;i<l;i++){
                 if(ary[i]["_id"]==pid.toString()){
@@ -88,11 +84,10 @@ function getProductById(jsonReq,callback){
 //
 function getProductsByUserId(jsonReq,callback){
     var database=jsonReq.database;
-    var uid=_createObjectId(jsonReq.userId);
-    if(!uid){return callback("creat object error at getProductsListByQuery function")}
+    var studioId=jsonReq.studioId;
     var col=database.collection("productList");
         //col.find({"cusInfoId":cid}).toArray(function(err,itemArray){
-        col.findOne({"userId":uid},{},function(err,itemArray){
+        col.findOne({"studioId":studioId},{},function(err,itemArray){
             if(itemArray){
                 return callback(err,itemArray.products);
             }
@@ -104,6 +99,7 @@ function getProductsByUserId(jsonReq,callback){
 //修改产品
 function changeProduct(jsonReq,callback){
     var database=jsonReq.database;
+    var studioId=jsonReq.studioId;
     var name=jsonReq.name,
         userId=jsonReq.userId,
         imgPath=jsonReq.imgPath||null,
@@ -124,7 +120,7 @@ function changeProduct(jsonReq,callback){
         price?setObject["products.$.price"]=price:"";
         description?setObject["products.$.description"]=description:"";
         console.log(setObject);
-        col.update( {"userId":uid,"products._id":pid},{ "$set":setObject },function(err,item){
+        col.update( {"studioId":studioId,"products._id":pid},{ "$set":setObject },function(err,item){
                     callback(err,item);
         });
 }

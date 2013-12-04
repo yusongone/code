@@ -6,6 +6,7 @@
     overflow:hidden;
     margin:0 auto;
     min-height:500px;
+    clear:both;
 }
 .content .headline{
     font-size:18px;
