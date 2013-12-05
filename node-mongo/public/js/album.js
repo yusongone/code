@@ -2,14 +2,13 @@ var pageSpace;
 $(document).ready(function(){
         //pageSpace._btn_fileUp=$("#fileUp");
        // pageSpace.bindEvent();
-        ajax_get($("#cusInfo_id").attr("value"));
         UP.init();
 
 
 //测试
-    $('#addCustomer').fileupload({
+    $('#upload').fileupload({
         autoUpload: true,//是否自动上传
-        url:"/uploadImageToImagesLib",//上传地址
+        url:"/ab",//上传地址
         acceptFileTypes: /(\.|\/)(gif|jpeg|png)$/i,
         dataType: 'json',
         formData:{"cusInfoId":$("#cusInfo_id").attr("value"),"filename":"na"},
@@ -110,41 +109,6 @@ var UP=(function(){
 })();
 
 
-
-var ajax_get=function(cusInfoId){
-    $.ajax({
-        "type":"post",
-        "url":"/getCustomerImages",
-        "datatype":"json",
-        "data":{"cusInfoId":cusInfoId},
-        "success":function(json){
-            if("sorry"==json.status){alert(json.message);return false;};
-            var data=json.data;
-            for(var i=0,l=data.length;i<l;i++){
-                var imgObj=new imageObj();
-                    var thu=imgObj.initUI({
-                        cusInfoId:cusInfoId,
-                        id:data[i].fileId
-                    });
-                $(".imageList").append(thu);
-            };
-        }
-    });
-};
-
-var ajax_deleteImage=function(cusInfoId,fileId,callback){
-    $.ajax({
-        "type":"post",
-        "url":"/deletePhoto",
-        "datatype":"json",
-        "data":{"cusInfoId":cusInfoId,fileId:fileId},
-        "success":function(json){
-            if("sorry"==json.status){alert(json.message);return false;};
-            callback();
-        }
-    });
-
-};
 
 var imageObj=(function(){
     function image(){

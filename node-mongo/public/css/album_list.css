@@ -12,6 +12,12 @@
     border-top-left-radius:5px;
     border-bottom-left-radius:5px;
 }
+.album a{
+    display: block;
+    height: 100%;
+    width: 100%;
+    float: left;
+}
 .album .name,
 .album .date{
     float: left;
@@ -51,3 +57,34 @@
 .album .date{
     color:#aaa;
 }
+.album:hover .remove{
+    display:block;
+}
+.album .remove{
+    width: 24px;
+    height: 24px;
+    background:#efefef;
+    border-radius: 15px;
+    position: absolute;
+    top: -12px;
+    right: -10px;
+    display:none;
+}
+.toolbox{
+    overflow:hidden;
+    padding:15px 0;
+}
+.toolbox label{
+    float:left;
+    margin:0 10px;
+    line-height:24px;
+    font-size:14px;
+}
+.toolbox .btnBlue{
+    float:left;
+    margin-left:10px;
+}
+
+
+
+

@@ -10,9 +10,12 @@ var mongodb=require("mongodb"),
     var createAlbum=function(jsonReq,callback){
         var database=jsonReq.database;
         var uid= _createObjectId(jsonReq.userId);
+        var name=jsonReq.name;
+        var date=new Date();
+        var dateStr=date.getYear()+"-"+date.getMonth()+"-"+date.getDate();
             if(!uid){return callback("err")};
         var col=database.collection("album");
-            col.insert({"userId":uid},function(err,docAry){
+            col.insert({"userId":uid,"name":name},function(err,docAry){
                 if(docAry){
                     callback(err,docAry[0]); 
                 }else{
