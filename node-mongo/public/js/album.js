@@ -40,12 +40,10 @@ function bindFileUpload(){
         done: function (e, data) {//设置文件上传完毕事件的回调函数
             var upl=data.context.data("object");
                 upl.done();
-                upl.done(function(){
-                    alert("bcd");
-                });
         },
         fail:function(e,data){
             var upl=data.context.data("object");
+                upl.fail(data);
         },
         add:function(e,data){
             data.context=UP.createAupload({name:data.files[0].name,"data":data});
@@ -75,9 +73,6 @@ var UP=(function(){
             buttons: {
                 "Delete all items": function() {
                     $('#addCustomer').fileupload('clear');
-                },
-                Cancel: function() {
-                $( this ).dialog( "close" );
                 }
             },
             "close":function(){
@@ -100,7 +95,7 @@ var UP=(function(){
         this.progress=$("<div/>",{});
         var submit=$("<div/>",{"text":"取消","class":"cancel"});
         p.append(this.progress.append(name,submit));
-        this.progress.progressbar({value:0});
+        this.progress.progressbar({value:10});
         this.progress.addClass("progress");
         div.append(p);
         submit.click(function(){
@@ -121,7 +116,6 @@ var UP=(function(){
         });
     }
     uploadLi.prototype.setValue=function(val){
-        console.log("efefe");
         this.progress.progressbar({value:val});
     }
 
@@ -151,9 +145,10 @@ var imageObj=(function(){
         var imgBox=$("<div/>",{"class":"imgBox"});
             var img=$("<img/>",{"src":"/album_photo/"+albumId+"/"+id+"?type=fill"});
             var del=$("<div/>",{"class":"delete fa fa-trash-o"})
-            var date=$("<div/>",{"class":"count"})
-            imgBox.append(img,del,date);
-        thu.append(imgBox);
+            var name=$("<div/>",{"class":"nameBox"});
+                name.append(del);
+            imgBox.append(img);
+        thu.append(imgBox,name);
         this.thu=thu;
         this.bindEvent({"del":del});
         return thu;
