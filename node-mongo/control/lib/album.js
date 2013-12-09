@@ -20,10 +20,20 @@ var createAlbum=function(jsonReq,callback){
 var getAlbumList=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-        db.Album.getAlbumList(jsonReq,function(err,result){
+        db.Album.getAlbumList(jsonReq,function(err,resultAry){
             if(err){ poolMain.release(database); return callback(err) };
+            var resAry=[];
+            for(var i=0;i<resultAry.length;i++){
+                var tempObj=resultAry[i];
+                var resObj={};
+                    resObj.count=tempObj.photos?tempObj.photos.length:0;
+                    resObj.img=tempObj.photos&&tempObj.photos.length>0?tempObj.photos[0].id:"none";
+                    resObj._id=tempObj._id;
+                    resObj.name=tempObj.name;
+                    resAry.push(resObj);
+            } 
             poolMain.release(database);
-            callback(err,result);
+            callback(err,resAry);
         });
     });
 }
@@ -58,7 +68,9 @@ var uploadPhotoToAlbum=function(jsonReq,callback){
         jsonReq.database=database;
         db.Album.checkAlbumAuth(jsonReq,function(err,result){
             if(result){
+                console.log("abc");
                 db.Images.uploadImage(jsonReq,function(err,fileId){
+                console.log("bc");
                     if(err){
                         poolMain.release(database);
                         return callback(err);
@@ -74,6 +86,9 @@ var uploadPhotoToAlbum=function(jsonReq,callback){
                     });
                 });       
                 
+            }else{
+                poolMain.release(database);
+                callback(err,result);
             }
         });
         return;
@@ -84,8 +99,9 @@ var getPhotosFromAlbum=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Album.getPhotosFromAlbum(jsonReq,function(err,result){
-            if(err){ poolMain.release(database); return callback(err) };
             poolMain.release(database);
+            console.log("efff");
+            if(err){return callback(err) };
             callback(err,result);
         });
     });

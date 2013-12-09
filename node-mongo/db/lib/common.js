@@ -21,10 +21,11 @@ var poolMain = poolModule.Pool({
          }, //当超时则释放连接
         max      : 100,   //最大连接数
         idleTimeoutMillis : 30000,  //超时时间
-        //log : true,  
-        log : false
+        log : true,  
+        //log : false
     });
-
+var z=0;
+var t=0;
 var poolThumbnail = poolModule.Pool({
         name     : 'thumbnail',
         create   : function(callback) {
@@ -40,8 +41,8 @@ var poolThumbnail = poolModule.Pool({
          }, //当超时则释放连接
         max      : 100,   //最大连接数
         idleTimeoutMillis : 30000,  //超时时间
-        //log : true,  
-        log : false
+        log : true,  
+        //log : false
     });
 
 

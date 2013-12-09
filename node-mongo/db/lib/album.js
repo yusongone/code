@@ -73,9 +73,9 @@ var mongodb=require("mongodb"),
             if(!(uid&&albumId)){return callback("err")};
         var col=database.collection("album");
             col.findOne({"_id":albumId,"userId":uid},{"photos":1},function(err,doc){
+                console.log(err,doc);
                 callback(err,doc.photos);
             });
-         
     }
 
     var addPhotoIdToAlbum=function(jsonReq,callback){

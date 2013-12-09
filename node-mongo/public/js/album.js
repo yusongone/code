@@ -36,11 +36,12 @@ function bindFileUpload(){
         done: function (e, data) {//设置文件上传完毕事件的回调函数
             var upl=data.context.data("object");
                 upl.done();
+                upl.done(function(){
+                    alert("bcd");
+                });
         },
         fail:function(e,data){
             var upl=data.context.data("object");
-                console.log("fail");
-                upl.fail();
         },
         add:function(e,data){
             data.context=UP.createAupload({name:data.files[0].name,"data":data});
@@ -103,16 +104,20 @@ var UP=(function(){
             that.cancel();
         });
     }
-    uploadLi.prototype.fail=function(val){
+    uploadLi.prototype.fail=function(callback){
         this.progress.find("div").eq(-1).css("background","red");
     }
     uploadLi.prototype.cancel=function(val){
         this.progress.find("div").eq(-1).css("background","yellow");
     }
-    uploadLi.prototype.done=function(val){
+    uploadLi.prototype.done=function(callback){
         this.progress.find("div").eq(-1).css("background","green");
+        this.progress.find("div").eq(-1).click(function(){
+            callback();
+        });
     }
     uploadLi.prototype.setValue=function(val){
+        console.log("efefe");
         this.progress.progressbar({value:val});
     }
 
@@ -157,10 +162,7 @@ var imageObj=(function(){
                 that.thu.remove();
             });
         });
-    
     }
-
-
 
 
     return image;

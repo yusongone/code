@@ -18,6 +18,8 @@ var getAlbumImage=function(jsonReq,callback){
                             callback(err,buf);
                         });
                     return;
+                }else{
+                    poolMain.release(database);
                 }
                 _getThumbnailImage(jsonReq,function(err,buf){
                     if(err){return callback(err)};

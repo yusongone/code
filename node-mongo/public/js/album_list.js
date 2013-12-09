@@ -77,7 +77,7 @@ page.album=(function(){
     album.prototype.initUI=function(json){
         var htmlStr="<a href='/album/"+json._id+"'>"+
             "<div class='imgBox'>"+
-                "<img src='/photo/5285c19e0ab0b0c936000008/52860a818a38454039000047?type=fill'>"+
+                "<img src='/album_photo/"+json._id+"/"+json.img+"?type=fill'>"+
             "</div>"+
             "<div class='name textOver'>"+(json.name||"--")+"</div>"+
             "<div class='count'>"+(json.count||"0")+"</div>"+
@@ -127,14 +127,6 @@ page.initAddAlbumBox=(function(){
         }
     }
 })();
-
-
-
-
-
-
-
-
 
 
 
