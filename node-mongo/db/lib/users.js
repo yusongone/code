@@ -12,7 +12,6 @@ var mongodb=require("mongodb"),
         var insertObj={};
             insertObj[type]=jsonReq.openId;
             
-            console.log(insertObj);
         var col=database.collection("users");
         col.insert(insertObj,function(err,res){
             if(err){return callback(err)};
@@ -88,7 +87,6 @@ var mongodb=require("mongodb"),
         var col=database.collection("users");
         var uid=_createObjectId(userId);
         var studioId=_createObjectId(jsonReq.studioId);
-        console.log(uid,studioId,jsonReq.studioId,"fdfd");
         if(!uid){return callback("create uid error at getUserInfoById")}
         col.update({"_id":uid},{"$set":{"studioId":studioId}},function(err,doc){
             if(err){return callback(err)}

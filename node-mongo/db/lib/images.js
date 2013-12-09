@@ -22,9 +22,9 @@ var _getImageInfo=function(jsonReq,callback){
     var database=jsonReq.database;
     var col=database.collection("fs.files");
         var queryObj=jsonReq.queryObj;
-        col.findOne(queryObj,function(err,result){
+        col.find(queryObj).toArray(function(err,result){
             callback(err,result);
-        });;
+        });
 
 }
 //Í¨¹ýId¶ÁÈ¡Í¼Æ¬
@@ -84,7 +84,6 @@ function uploadImage(jsonReq,callback){
 
 function deleteImage(jsonReq,callback){
     var database=jsonReq.database;
-    var col=database.collection("fs.files");
     var fileId=jsonReq.fileId; 
     var fid= _createObjectId(fileId);
     if(!fid){return callback("err")};

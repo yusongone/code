@@ -2,6 +2,7 @@ var db=require("../../db");
 var parse=require("./common").parse;
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
+var Thumbnail=require("./thumbnail");
 
 //
 
@@ -19,6 +20,7 @@ var _deletePhoto=function(jsonReq,callback){
                             db.ImageLibs.removeImageFromImagelibs(jsonReq,function(err,result){
                                 if(err){ poolMain.release(database); return callback(err); }
                                     callback(err,result); 
+                                    Thumbnail.removeThumbnailByOriginId(jsonReq);
                             });
                         }); 
                     }else{

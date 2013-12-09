@@ -2,6 +2,7 @@ var db=require("../../db");
 var parse=require("./common").parse;
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
+var Thumbnail=require("./thumbnail");
 
 //
 
@@ -68,9 +69,7 @@ var uploadPhotoToAlbum=function(jsonReq,callback){
         jsonReq.database=database;
         db.Album.checkAlbumAuth(jsonReq,function(err,result){
             if(result){
-                console.log("abc");
                 db.Images.uploadImage(jsonReq,function(err,fileId){
-                console.log("bc");
                     if(err){
                         poolMain.release(database);
                         return callback(err);
@@ -95,12 +94,31 @@ var uploadPhotoToAlbum=function(jsonReq,callback){
     });
 }
 
+var deletePhotoFromAlbum=function(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Album.checkAlbumAuth(jsonReq,function(err,result){
+            if(result){
+                db.Images.deleteImage(jsonReq,function(err,fileId){
+                    if(err){return callback(err)}
+                    db.Album.deletePhotoIdFromAlbum(jsonReq,function(err,result){
+                        callback(err,result);
+                        Thumbnail.removeThumbnailByOriginId(jsonReq);
+                    });
+                });
+            }else{
+                poolMain.release(database);
+                callback(err,result);
+            }
+        });
+    }); 
+}
+
 var getPhotosFromAlbum=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Album.getPhotosFromAlbum(jsonReq,function(err,result){
             poolMain.release(database);
-            console.log("efff");
             if(err){return callback(err) };
             callback(err,result);
         });
@@ -116,3 +134,4 @@ exports.removeAlbum=removeAlbum;
 exports.changeAlbum=changeAlbum;
 exports.uploadPhotoToAlbum=uploadPhotoToAlbum;
 exports.getPhotosFromAlbum=getPhotosFromAlbum;
+exports.deletePhotoFromAlbum=deletePhotoFromAlbum;

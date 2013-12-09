@@ -29,7 +29,7 @@ var mongodb=require("mongodb"),
         if(!cid){return callback("err")};
         var col=database.collection("customerInfo");
             col.findOne({"_id":cid},{"_id":0,"images":1},function(err,doc){
-                console.log(doc);
+                console.log(doc,"fefe");
                 if(doc){
                   callback(err,doc.images);    
                 }else{

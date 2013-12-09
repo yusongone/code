@@ -34,7 +34,7 @@ app.configure(function(){
 //               maxAge:300000
         },
         "store":store
-//        "store":MemoryStore
+        //"store":MemoryStore
     }));
     app.use(express.bodyParser());
 

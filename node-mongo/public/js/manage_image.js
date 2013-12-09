@@ -135,7 +135,7 @@ var ajax_get=function(cusInfoId){
 var ajax_deleteImage=function(cusInfoId,fileId,callback){
     $.ajax({
         "type":"post",
-        "url":"/deletePhoto",
+        "url":"/deleteCustomerPhoto",
         "datatype":"json",
         "data":{"cusInfoId":cusInfoId,fileId:fileId},
         "success":function(json){

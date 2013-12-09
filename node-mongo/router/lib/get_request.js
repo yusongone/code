@@ -391,22 +391,12 @@ function setApp(app){
                         jsonReq.cusInfoId=req.params.cusInfoId,
                         jsonReq.userId=req.session.userId;
                         jsonReq.studioId=req.session.studioId;
-                    //检测本用户下是否存在此库
-                    ctrl.ImageLibs.getCustomerImages(jsonReq,function(err,result){
-                        var r;
-                        if(result&&result.length>0){
-                            r=1;
-                        }else{
-                            r=0;
-                        }
-                            res.render("manage_image",{
-                                "js_version":js_version,
-                                "css_version":css_version,
-                                "title":"图片管理",
-                                "id":req.params.cusInfoId,
-                                "result":r
-                            });
-                    });
+                        res.render("manage_image",{
+                            "js_version":js_version,
+                            "css_version":css_version,
+                            "title":"图片管理",
+                            "id":req.params.cusInfoId
+                        });
                 }
             });
         }

@@ -308,7 +308,7 @@ function setApp(app){
         };
     });
     //删除上传照片
-    app.post('/deletePhoto', function(req, res){
+    app.post('/deleteCustomerPhoto', function(req, res){
         var cusInfoId=req.body.cusInfoId;
         var fileId=req.body.fileId;
         if(checkLogind(req,res)){
@@ -557,12 +557,29 @@ function setApp(app){
         };
     });
 
+    app.post("/deletePhotoFromAlbum",function(req,res){
+        var jsonReq={};
+        jsonReq.albumId=req.body.albumId;
+        jsonReq.userId=req.session.userId;
+        jsonReq.fileId=req.body.fileId;
+        if(checkLogind(req,res)){
+            ctrl.Album.deletePhotoFromAlbum(jsonReq,function(err,result){
+                if(err){return res.send({"status":"sorry","message":err})}
+                if(result){
+                    res.send({"status":"ok"});      
+                }else{
+                    res.send({"status":"sorry"});      
+                }
+            });
+        };
+    });
+
+
     app.post("/getPhotosFromAlbum",function(req,res){
         var jsonReq={};
         jsonReq.albumId=req.body.albumId;
         jsonReq.userId=req.session.userId;
         if(checkLogind(req,res)){
-                console.log("gegegegetttttttttttttttttttttttttttttttttabcerror");
             ctrl.Album.getPhotosFromAlbum(jsonReq,function(err,result){
                 console.log("abcerror");
                 if(err){return res.send({"status":"sorry","message":err})}

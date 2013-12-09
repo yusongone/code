@@ -111,7 +111,6 @@ function changeProduct(jsonReq,callback){
         size?setObject["products.$.size"]=size:"";
         price?setObject["products.$.price"]=price:"";
         description?setObject["products.$.description"]=description:"";
-        console.log(setObject);
         col.update( {"studioId":studioId,"products._id":pid},{ "$set":setObject },function(err,item){
                     callback(err,item);
         });

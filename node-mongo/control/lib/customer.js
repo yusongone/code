@@ -235,7 +235,6 @@ function getSelects(jsonReq,callback){
             }
             db.Customer.getProductsFromCustomer(jsonReq,function(err,result){
                     if(err){ poolMain.release(database);return callback(err);};
-                    console.log(result);
                     callback(err,result);
             });
         });

@@ -265,7 +265,6 @@ function uploadSelectPhotoList(jsonReq,callback){
     if(!(uid&&pid)){return callback("create object Id error");}
     var col=database.collection("customerInfo");
         col.update({"bindUser":uid,"products._id":pid},{"$set":{"products.$.selectPhotos":ary}},function(err,doc){
-            console.log(doc,"ffd");
             callback(err,doc);
         });
 }
@@ -326,7 +325,6 @@ function getProductsFromCustomer(jsonReq,callback){
     if(!(cid)){return callback("create object Id error");}
     var col=database.collection("customerInfo");
         col.findOne({"_id":cid},{"products":1},function(err,result){
-            console.log(result);
             if(result){
                 return callback(err,result.products);
             }

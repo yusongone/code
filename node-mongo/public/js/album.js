@@ -157,8 +157,7 @@ var imageObj=(function(){
     image.prototype.bindEvent=function(json){
         var that=this;
         json.del.click(function(){
-            alert(that.fileId);
-            ajax_deleteImage(that.cusInfoId,that.fileId,function(){
+            ajax_deleteImage(that.albumId,that.fileId,function(){
                 that.thu.remove();
             });
         });
@@ -167,6 +166,38 @@ var imageObj=(function(){
 
     return image;
 })();
+
+var ajax_deleteImage=function(albumId,fileId,callback){
+   $.ajax({
+        "type":"post",
+        "url":"/deletePhotoFromAlbum",
+        "data":{albumId:albumId,fileId:fileId},
+        "dataType":"json",
+        "success":function(data){
+            callback();
+        }
+   }); 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

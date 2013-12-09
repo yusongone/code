@@ -42,10 +42,10 @@ var mongodb=require("mongodb"),
             if(!(uid&&albumId)){return callback("err")};
         var col=database.collection("album");
             col.remove({"_id":albumId,"userId":uid},function(err,result){
-                console.log(result);
                 callback(err,result);
             });
     }
+    
 
     var changeAlbum=function(jsonReq,callback){
         var database=jsonReq.database; 
@@ -54,9 +54,7 @@ var mongodb=require("mongodb"),
         var albumId= _createObjectId(jsonReq.albumId);
             if(!(uid&&albumId)){return callback("err")};
         var col=database.collection("album");
-        console.log(albumId,uid);
             col.update({"_id":albumId,"userId":uid},{"$set":{"name":name}},function(err,result){
-                console.log(result);
                 callback(err,result);
             });
     }
@@ -72,9 +70,8 @@ var mongodb=require("mongodb"),
         var albumId= _createObjectId(jsonReq.albumId);
             if(!(uid&&albumId)){return callback("err")};
         var col=database.collection("album");
-            col.findOne({"_id":albumId,"userId":uid},{"photos":1},function(err,doc){
-                console.log(err,doc);
-                callback(err,doc.photos);
+            col.findOne({"_id":albumId,"userId":uid},{"name":1,"photos":1},function(err,doc){
+                callback(err,doc);
             });
     }
 
@@ -90,6 +87,18 @@ var mongodb=require("mongodb"),
                 callback(err,doc);
             });
          
+    }
+
+    var deletePhotoIdFromAlbum=function(jsonReq,callback){
+        var database=jsonReq.database; 
+        var uid= _createObjectId(jsonReq.userId);
+        var albumId= _createObjectId(jsonReq.albumId);
+        var fileId=_createObjectId(jsonReq.fileId);
+            if(!(uid&&albumId)){return callback("err")};
+        var col=database.collection("album");
+            col.update({"_id":albumId,"userId":uid},{$pull:{photos:{"id":fileId}}},function(err,result){
+                callback(err,result);
+            });
     }
 
     var checkAlbumAuth=function(jsonReq,callback){
@@ -112,9 +121,7 @@ var mongodb=require("mongodb"),
         var albumId= _createObjectId(jsonReq.albumId);
             if(!(uid&&albumId&&fid)){return callback("err")};
         var col=database.collection("album");
-        console.log(albumId,uid,fid);
             col.findOne({"_id":albumId,"userId":uid,"photos.id":fid},{"id":1},function(err,doc){
-                console.log("ff"+doc);
                 callback(err,doc);
             });
     }
@@ -129,3 +136,4 @@ exports.checkAlbumAuth=checkAlbumAuth;
 exports.addPhotoIdToAlbum=addPhotoIdToAlbum;
 exports.getPhotosFromAlbum=getPhotosFromAlbum;
 exports.checkPhotoInAlbum=checkPhotoInAlbum;
+exports.deletePhotoIdFromAlbum=deletePhotoIdFromAlbum;
