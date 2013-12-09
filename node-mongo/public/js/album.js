@@ -13,8 +13,12 @@ page.ajax_getPhotosFromAlbum=function(){
         "dataType":"json",
         "success":function(data){
             if(data.status=="ok"){
-                var ary=data.data;
-                for(var i=0;i<ary.length;i++){
+                var ary=data.data.photos;
+                var name=data.data.name;
+                var count=ary.length;
+                $(".toolBar .albumName").text(name);
+                $(".toolBar .num").text(count);
+                for(var i=0;i<count;i++){
                     var json=ary[i];
                         json.albumId=$("#albumId").val();
                     var imgObj=new imageObj(ary[i]);

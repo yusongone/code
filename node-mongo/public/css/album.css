@@ -1,0 +1,29 @@
+.photo{
+    float:left;
+    position:relative;
+    margin:10px 10px;
+}
+.photo .imgBox .delete{
+    position:absolute;
+    top:0px;
+    right:0px;
+}
+
+.toolBar .albumName{
+   font-size:18px; 
+   color:#fff;
+   margin-left:22px;
+   float:left;
+}
+
+.toolBar .count {
+    float:left;
+    color:#fff;
+    line-height:32px;
+    margin-left:500px;
+}
+.toolBar .count .num {
+    margin-left:5px;
+    font-size:12px;
+}
+

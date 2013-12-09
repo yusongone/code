@@ -3,7 +3,7 @@
     <head>
         <% include lib/header %>
         <link href="/css/custom-theme/jquery-ui-1.10.3.custom.min.css?v=<%=css_version%>" rel="stylesheet" />
-        <link rel="stylesheet" href="/css/photos.css">
+        <link rel="stylesheet" href="/css/album.css">
         <script src="/js/vendor/jquery.ui.widget.js"></script>  
         <script src="/js/vendor/jquery-ui.js"></script>  
         <script src="/js/vendor/jquery.iframe-transport.js"></script>  
@@ -20,10 +20,15 @@
             <div class="topBox">
                 <div class="logoBox">LOGO</div>
                 <div class="buttonBox">
-                    <input id="upload" class="btnBlue file" type="file" multiple value="添加照片">
+                    <div class="fileBtnBox">
+                        <div class="btnBlue">添加照片</div>
+                        <input id="upload" class="file" type="file" multiple>
+                    </div>
                 </div>
             </div>
             <div class="toolBar">
+                <div class="albumName">name</div>
+                <div class="count"><i class="fa fa-picture-o fa-2"></i><label class="num">35</label></div>
             </div>
             <div class="bottom_line"></div>
             <div class="content">

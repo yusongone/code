@@ -10,6 +10,9 @@ var _getThumbnailImage=require("./thumbnail").getThumbnailImage;
 
 var getAlbumImage=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
+        if(!database){
+            return callback("no err"); 
+        }
         jsonReq.database=database;
         db.Album.checkPhotoInAlbum(jsonReq,function(err,result){
             if(err){ poolMain.release(database); return callback(err) };
@@ -35,6 +38,9 @@ var getAlbumImage=function(jsonReq,callback){
 
 var getPublicImage=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
+        if(!database){
+            return callback("no err"); 
+        }
         jsonReq.database=database;
         db.Images.getImageInfoById(jsonReq,function(err,result){
             poolMain.release(database);

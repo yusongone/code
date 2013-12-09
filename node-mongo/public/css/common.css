@@ -21,6 +21,25 @@ a{cursor:pointer;color:#09f;}
     -webkit-text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
 }
+.fileBtnBox{
+    position:relative;
+    overflow:hidden;
+    width:80px;
+    float:right;
+}
+.file{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    opacity: 0;
+    -ms-filter: 'alpha(opacity=0)';
+    direction: ltr;
+    cursor: pointer;
+    cursor: pointer;
+    width: 80px;
+    height: 30px;
+}
 
 .btnSmall,.btnBlue,.btnRed{
     cursor:pointer;
