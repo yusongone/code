@@ -42,11 +42,30 @@ var getAlbumList=function(jsonReq,callback){
 var removeAlbum=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
-        db.Album.removeAlbum(jsonReq,function(err,result){
-            if(err){ poolMain.release(database); return callback(err) };
-            poolMain.release(database);
-            callback(err,result);
+        getPhotosFromAlbum(jsonReq,function(err,result){
+            if(result&&result.photos&&result.photos.length>0){
+                jsonReq.photoIdAry=result.photos;
+                console.log(result.photos);
+                deletePhotosFromAlbum(jsonReq,function(err,failAry){
+                    if(failAry.length>0){
+                        console.log("delete Album error fail list",failAry);
+                        callback("delete image error",failAry); 
+                    }else{
+                        _removeAlbum(jsonReq,callback);     
+                    }
+                });
+            }else{
+                console.log("album no image");
+                _removeAlbum(jsonReq,callback);     
+            }
         });
+        function _removeAlbum(jsonReq,callback){
+            db.Album.removeAlbum(jsonReq,function(err,result){
+                if(err){ poolMain.release(database); return callback(err) };
+                poolMain.release(database);
+                callback(err,result);
+            });
+        }
     });
 }
 
@@ -93,8 +112,53 @@ var uploadPhotoToAlbum=function(jsonReq,callback){
         return;
     });
 }
+//删除多个照片
+var deletePhotosFromAlbum=function(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        var photoIdAry=jsonReq.photoIdAry;
+        var length=photoIdAry.length;
+        var count=0;
+        var failAry=[];
+        for(var i=0;i<length;i++){
+            var temp={};
+            //不能多次使用同一个jsonReq对象，所以clone一下
+            for(var key in jsonReq){
+                temp[key]=jsonReq[key];
+            }
+            temp.fileId=photoIdAry[i].id;
+            remove(temp,function(err,result,fileId){
+                 count++;
+                 if(!result){
+                    failAry.push(fileId);
+                 }
+                 console.log(count,result);
+                 if(count==length){
+                    callback(null,failAry);
+                    poolMain.release(database);
+                 }
+            });
+        }
+        function remove(jsonReq,callback){
+            db.Album.checkAlbumAuth(jsonReq,function(err,result){
+                if(result){
+                    db.Images.deleteImage(jsonReq,function(err,fileId){
+                        if(err){return callback(err)}
+                        db.Album.deletePhotoIdFromAlbum(jsonReq,function(err,result){
+                            callback(err,result);
+                            Thumbnail.removeThumbnailByOriginId(jsonReq);
+                        });
+                    });
+                }else{
+                    callback(err,result,jsonReq.fileId);
+                }
+            });
+        }
+    }); 
+}
 
-var deletePhotoFromAlbum=function(jsonReq,callback){
+
+var deleteOnePhotoFromAlbum=function(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
         db.Album.checkAlbumAuth(jsonReq,function(err,result){
@@ -134,4 +198,5 @@ exports.removeAlbum=removeAlbum;
 exports.changeAlbum=changeAlbum;
 exports.uploadPhotoToAlbum=uploadPhotoToAlbum;
 exports.getPhotosFromAlbum=getPhotosFromAlbum;
-exports.deletePhotoFromAlbum=deletePhotoFromAlbum;
+exports.deleteOnePhotoFromAlbum=deleteOnePhotoFromAlbum;
+exports.deletePhotosFromAlbum=deletePhotosFromAlbum;

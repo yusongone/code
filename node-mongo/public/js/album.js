@@ -13,11 +13,11 @@ page.ajax_getPhotosFromAlbum=function(){
         "dataType":"json",
         "success":function(data){
             if(data.status=="ok"){
-                var ary=data.data.photos;
+                var ary=data.data.photos||[];
                 var name=data.data.name;
                 var count=ary.length;
                 $(".toolBar .albumName").text(name);
-                $(".toolBar .num").text(count);
+                $(".count label").text(count);
                 for(var i=0;i<count;i++){
                     var json=ary[i];
                         json.albumId=$("#albumId").val();
@@ -169,7 +169,7 @@ var imageObj=(function(){
 var ajax_deleteImage=function(albumId,fileId,callback){
    $.ajax({
         "type":"post",
-        "url":"/deletePhotoFromAlbum",
+        "url":"/deleteOnePhotoFromAlbum",
         "data":{albumId:albumId,fileId:fileId},
         "dataType":"json",
         "success":function(data){
