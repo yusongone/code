@@ -10,13 +10,17 @@
     overflow:hidden;
 }
 
+.pageSS .close:hover{
+    color:#fff;
+}
 .pageSS .close{
     width: 64px;
     height: 64px;
-    background: red;
     position: absolute;
     top: 0px;
     right: 0px;
+    z-index:9999;
+    font-size:64px;
 }
 .pageSS .slideCon{
     width:100%;
@@ -27,4 +31,44 @@
     position:absolute;
     top:50%;
     left:50%;
+}
+.pageSS .imgBox i{
+    font-size: 128px;
+    top: 50%;
+    position: absolute;
+    left: 50%;
+    margin-left: -64px;
+    margin-top: -64px;
+}
+.pageSS .next,
+.pageSS .prev{
+    width:50%;
+    height:100%;
+    position:absolute;
+    top:0;
+}
+.pageSS .next i,
+.pageSS .prev i{
+    width:64px;
+    height:64px;
+    top:50%;
+    font-size:64px;
+    position:absolute;
+}
+.pageSS .next i{
+    right:0;
+}
+.pageSS .prev i{
+    left:0;
+}
+.pageSS .next:hover i,
+.pageSS .prev:hover i{
+    color:#fff;
+}
+
+.pageSS .next{
+    right:0;
+}
+.pageSS .prev{
+    left:0;
 }

@@ -102,6 +102,7 @@ var uploadPhotoToAlbum=function(jsonReq,callback){
                         if(err){
                             return callback(err);
                         }
+                        result.img=jsonReq.img;
                         callback(err,result);
                     });
                 });       

@@ -32,7 +32,13 @@ var SlideShow=window.slideShow||(function(){
                 h=(max/oriWidth)*oriHeight;
                 w=max;
             }
+            var load=$("<i/>",{"src":src,"class":"fa fa-spinner fa-spin"});
             var img=$("<img/>",{"src":src});
+                imgBox.append(load);
+                img.load(function(){
+                    load.remove();
+                    imgBox.append(img);
+                });
 
             imgBox.css({
                 "width":w+"px",
@@ -40,31 +46,69 @@ var SlideShow=window.slideShow||(function(){
                 "margin-left":(-w/2)+"px",
                 "margin-top":(-h/2)+"px"
             });
-            imgBox.append(img);
             return imgBox;
         }
 
         function slideshow(){
             this.images=[]; 
             this.showStatus=0;
-            this.active=null;
+            this.activeIndex=null;
+            this.activeImgDOM=null;
             this.body=$("<div/>",{"class":"pageSS"});
             this.initUI(); 
         }
         _extend(slideshow,basic);
         slideshow.prototype.initUI=function(){
             var that=this;
-            var close=$("<div/>",{"class":"fa fa-close-o close"});
+            var close=$("<div/>",{"class":"fa fa-times-circle close"});
             this.content=$("<div/>",{"class":"slideCon"});
-            this.body.append(this.content,close);
-
+                var left=$("<i/>",{"class":"fa fa-arrow-left"});
+            var prev=$("<div/>",{"class":"prev"}).append(left);
+                var right=$("<i/>",{"class":"fa fa-arrow-right"});
+            var next=$("<div/>",{"class":"next"}).append(right);;
+            this.body.append(this.content,close,prev,next);
+            
             close.click(function(){
                 that.hide();
+                that.content.html("");
             });
+
+            prev.click(function(){
+                that.to(++that.activeIndex); 
+            });
+
+            next.click(function(){
+                that.to(--that.activeIndex); 
+            });
+            this.prev=prev;
+            this.next=next;
         }
+        slideshow.prototype.checkBtn=function(){
+            var that=this;
+                if(that.activeIndex>that.images.length-2){
+                    that.prev.hide();
+                }else{
+                    that.prev.show();
+                }
+                if(that.activeIndex<1){
+                    that.next.hide();
+                }else{
+                    that.next.show();
+                }
+         }
         slideshow.prototype.to=function(index){
-            var images=_createPage.call(this,index);
-            this.content.html("").append(images); 
+            var that=this;
+            this.activeIndex=index;
+            var imagesDOM=_createPage.call(this,index);
+            if(this.activeImgDOM){
+            this.activeImgDOM.animate({"opacity":0},200,function(){
+                that.content.html("").append(imagesDOM); 
+            });
+            }else{
+                that.content.html("").append(imagesDOM); 
+            }
+            this.activeImgDOM=imagesDOM
+            that.checkBtn();
         }
         slideshow.prototype.hide=function(index){
                 this.body.hide();

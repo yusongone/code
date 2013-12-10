@@ -21,32 +21,13 @@ page.ajax_getPhotosFromAlbum=function(){
                 $(".count label").text(count);
                 for(var i=0;i<count;i++){
                     var json=ary[i];
-                    var imgObj=new imageObj(json);
+                    var imgObj=imageFactory.createImg(json);
                 }
-                var ssData=_createSlideshowData(ary);
-                page.ss=SlideShow.getPageSS({
-                    images:ssData
-                });
             }
         }
     });
 };
 
-function _createSlideshowData(ary){
-    var tempAry=[];
-    for(var i=0;i<ary.length;i++){
-        var tempJson={};
-        var tempObj=ary[i];
-        var src="/album_photo/"+page.albumId+"/"+tempObj.id+"?size=600";
-        tempJson.src=src;
-        tempJson.max=600;
-        tempJson.id=tempObj.id;
-        tempJson.width=tempObj.width;
-        tempJson.height=tempObj.height;
-        tempAry.push(tempJson);
-    }
-    return tempAry;
-}
 
 function bindFileUpload(){
 //测试
@@ -69,7 +50,7 @@ function bindFileUpload(){
             data.jqXHR.done(function(reqData){
                 if(reqData.status=="ok"){
                     var upl=data.context.data("object");
-                        upl.done(reqData);
+                        upl.done(reqData.data);
                 }
             });
         },
@@ -142,7 +123,7 @@ var UP=(function(){
     uploadLi.prototype.done=function(data){
         this.progress.addClass("done");
         this.btnCancel.hide();
-        var imgObj=new imageObj({id:data.fileId});
+        var imgObj=imageFactory.createImg({id:data.fileId,width:data.img.width,height:data.img.height});
             imgObj.insertAnimate();
     }
     uploadLi.prototype.setValue=function(val){
@@ -162,44 +143,94 @@ var UP=(function(){
     } 
 })();
 
+page.setImageCount=function(count){
+    $(".toolBar .count label").text(count);
+}
 
-
-var imageObj=(function(){
+var imageFactory=(function(){
     var imgList=[];
+    var slideshowData=[];
+
+                page.ss=SlideShow.getPageSS({
+                    images:slideshowData
+                });
+
+    function _addSlideshowData(json){
+            var tempObj=json;
+            var tempJson={};
+            var src="/album_photo/"+page.albumId+"/"+tempObj.id+"?size=600";
+            tempJson.src=src;
+            tempJson.max=600;
+            tempJson.id=tempObj.id;
+            tempJson.width=tempObj.width;
+            tempJson.height=tempObj.height;
+            slideshowData.push(tempJson);
+    }
+    
+    function _removeMe(){
+        var that=this;
+        var index=_getMeIndex.call(that);
+        imgList.splice(index,1);
+        slideshowData.splice(index,1);
+        page.setImageCount(imgList.length);
+    }
+    function _getMeIndex(){
+        var that=this;
+        for(var i=0;i<imgList.length;i++){
+            if(imgList[i]==that){
+                return i;
+            }
+        }
+    }
+
     function image(json){
-        this.index=imgList.push(this)-1;
         this.body=$("<li/>",{"class":"photo"});
+        _addSlideshowData(json);
+        this.id=json.id;
         this.initUI(json); 
     }
     image.prototype.insertAnimate=function(){
         this.body.css({"width":"0px"}).animate({"width":"160px"},1500);
     };
     image.prototype.initUI=function(json){
-        var albumId=this.albumId=page.albumId;
-        var id=this.fileId=json.id;
+        var that=this;
         var imgBox=$("<div/>",{"class":"imgBox"});
-            var img=$("<img/>",{"src":"/album_photo/"+albumId+"/"+id+"?type=fill"});
-            var del=$("<div/>",{"class":"delete fa fa-trash-o"})
+            var img=$("<img/>",{"src":"/album_photo/"+page.albumId+"/"+that.id+"?type=fill"});
+            var del=$("<i/>",{"class":"delete fa fa-trash-o"});
+            var download=$("<i/>",{"class":"download fa fa-download"});
             var name=$("<div/>",{"class":"nameBox"});
-                name.append(del);
+                name.append(del,download);
             imgBox.append(img);
         this.body.append(imgBox,name);
-        this.bindEvent({"del":del});
+        this.bindEvent({"del":del,"imgBox":imgBox,"download":download});
         $(".photoList").prepend(this.body);
     }
     image.prototype.bindEvent=function(json){
         var that=this;
         json.del.click(function(){
-            ajax_deleteImage(that.albumId,that.fileId,function(){
+            ajax_deleteImage(page.albumId,that.id,function(){
                 that.body.remove();
+                _removeMe.call(that); 
             });
         });
-
-        this.body.click(function(){
-            page.ss.show().to(that.index);
+        json.imgBox.click(function(){
+            var index=_getMeIndex.call(that);
+            console.log("myIndex",index);
+            page.ss.show().to(index);
+        });
+        json.download.click(function(){
+            window.location="/album_photo/download/"+page.albumId+"/"+that.id+"/liantu"; 
+            return false;
         });
     }
-    return image;
+    return {
+        createImg:function(json){
+            var imgObj=new image(json);
+                imgList.push(imgObj);
+                page.setImageCount(imgList.length);
+                return imgObj;
+        }
+    }
 })();
 
 var ajax_deleteImage=function(albumId,fileId,callback){

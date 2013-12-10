@@ -24,15 +24,17 @@
     height:30px;
     float:left;
     margin-top:5px;
+    visibility:hidden;
 }
-.photo:hover .nameBox .delete{
-    display:block;
+.photo:hover .nameBox{
+    visibility:visible;
 }
+.photo .nameBox .download:hover,
 .photo .nameBox .delete:hover{
     color:#333;
 }
+.photo .nameBox .download,
 .photo .nameBox .delete{
-    display:none;
     width: 14px;
     height: 14px;
     padding:5px;
@@ -44,7 +46,7 @@
 
 .toolBar .albumName{
    font-size:18px; 
-   color:#333;
+   color:#eee;
    margin-left:22px;
    float:left;
    height:30px;
@@ -57,7 +59,7 @@
 }
 .toolBar .tool{
     float:left;
-    color:#333;
+    color:#eee;
     line-height:32px;
     margin:0 7px;
     text-align:center;

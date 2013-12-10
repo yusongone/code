@@ -629,7 +629,7 @@ function setApp(app){
                     return;
                 }
                 if(result){
-                    res.send({"status":"ok","fileId":result.fileId});      
+                    res.send({"status":"ok","data":result});      
                 }else{
                     res.send({"status":"sorry"});      
                 }

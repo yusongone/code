@@ -200,6 +200,24 @@ function setApp(app){
                 res.end(data, 'binary');
             });
     });
+    //
+    app.get("/album_photo/download/:albumId/:imageId/:type",function(req,res){
+        var albumId=req.params.albumId;
+        var imageId=req.params.imageId;
+        var userId=req.session.userId;
+        var size="origin";
+        var type="normal";
+            ctrl.Images.getAlbumImage({
+                "albumId":albumId,
+                "fileId":imageId,
+                "userId":userId,
+                "imageType":type,
+                "size":size
+            },function(err,data){
+                res.writeHead(206, 'Partial Content', { 'Content-Type' : 'application/octet-stream', });
+                res.end(data,'binary');
+            });
+    });
     //获取公共图片
     app.get("/public_image/:imageId",function(req,res){
         var imageId=req.params.imageId;
