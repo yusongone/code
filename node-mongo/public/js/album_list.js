@@ -9,7 +9,7 @@ page.bindEvent=function(){
         page.initAddAlbumBox.open();  
     });
 };
-page.addAlbum=function(json){
+page.addAlbum=function(json,callback){
     $.ajax({
         type:"post",
         url:"/createAlbum",
@@ -17,6 +17,7 @@ page.addAlbum=function(json){
         dataType:"json",
         success:function(data){
             console.log(data); 
+            callback(data);
         }
     });
 }
@@ -38,14 +39,14 @@ page.ajax_getAlbumList=function(){
     });
 }
 
-page.ajax_removeAlbum=function(json){
+page.ajax_removeAlbum=function(json,callback){
     $.ajax({
         type:"post",
         url:"/removeAlbum",
         data:json,
         dataType:"json",
         success:function(data){
-            console.log(data); 
+            callback(data);
         }
     });
 }
@@ -71,18 +72,27 @@ page.album=(function(){
 
     function album(json){
         this.body=$("<li/>",{"class":"album"});
-        $(".albumList").append(this.body);
+        $(".albumList").prepend(this.body);
         this.initUI(json);
     }
+    album.prototype.addAnimate=function(json){
+        this.body.css({width:"0px"}).animate({"width":"140px"},500);
+    }
     album.prototype.initUI=function(json){
+        var that=this;
+        var imgStr;
+        if(json.img!="none"){
+            imgStr="<img src='/album_photo/"+json._id+"/"+json.img+"?type=fill'>";
+        }else{
+            imgStr="<i class='fa fa-picture-o fa-6'></i>";
+        }
         var htmlStr="<a href='/album/"+json._id+"'>"+
-            "<div class='imgBox'>"+
-                "<img src='/album_photo/"+json._id+"/"+json.img+"?type=fill'>"+
+            "<div class='imgBox'>"+imgStr+
             "</div>"+
             "<div class='name textOver'>"+(json.name||"--")+"</div>"+
-            "<div class='count'>"+(json.count||"0")+"</div>"+
+            "<div class='count'>"+(json.count||"")+"</div>"+
             "<div class='date'>"+(json.createDate||"--")+"</div>"+
-            "<div class='remove fa fa-remove'></div>";
+            "<div class='remove fa fa-trash-o'></div>";
             "</a>"
         this.body.append(htmlStr);
 
@@ -90,7 +100,11 @@ page.album=(function(){
             var jsonReq={};
                 jsonReq.albumId=json._id;
                 if(confirm("确定要删除相册内所有照片？")){
-                    page.ajax_removeAlbum(jsonReq);
+                    page.ajax_removeAlbum(jsonReq,function(data){
+                        that.body.hide("slow",function(){
+                            that.body.remove();
+                        });
+                    });
                 }
             return false;
         
@@ -109,9 +123,21 @@ page.initAddAlbumBox=(function(){
         div.append(htmlStr);
 
         div.find(".add").click(function(){
+            var tage=$(this);
+            if(tage.data("status")){
+                return false;
+            }
+            tage.data("status",1).addClass("disable").text("稍等...");
             var jsonReq={};
                 jsonReq.name=div.find("#name").val();
-            page.addAlbum(jsonReq);
+            page.addAlbum(jsonReq,function(data){
+                if(data.status=="ok"){
+                    tage.data("status",0).removeClass("disable").text("添加");
+                    div.dialog("close");
+                    var album=new page.album({name:jsonReq.name,_id:data.id,img:"none"});
+                        album.addAnimate();
+                }
+            });
         });
 
     return {

@@ -1,16 +1,20 @@
 .albumList{
 
 }
+.albumList .album:hover{
+    background:#dfeeff;
+    border-color:#c3d5e4;
+}
 .albumList .album{
     width:140px;
     height:200px;
     float:left;
-    border:1px solid #ddd;
+    border:1px solid #d8d8d8;
     margin:5px 8px;
     position:relative;
-    border-left:5px solid #eee;
-    border-top-left-radius:5px;
-    border-bottom-left-radius:5px;
+    border-right:5px solid #d8d8d8;
+    border-top-right-radius:10px;
+    border-bottom-right-radius:10px;
 }
 .album a{
     display: block;
@@ -29,26 +33,33 @@
 .album .imgBox{
     width:120px;
     height:120px;
-    background:#999;
     margin:10px;
+    text-align:center;
+}
+.album .imgBox .fa{
+    width: 100%;
+    height: 100%;
+    font-size: 100px;
+    margin-top: 8px;
+    color: #ddd;
 }
 .album .imgBox img{
     width:100%;
     height:100%;
+    border:1px solid #ccc;
+    border-radius:5px;
 }
 .album .count{
-    position:absolute;
-    top:0px;
-    left:18px;
-    width:0px;
-    line-height:24px;
-    text-align:center;
-    color:#333;
-    border-left: 12px solid #ddd;
-    border-bottom: 12px solid transparent;
-    border-right: 12px solid #ddd;
-    text-indent: -7px;
-    opacity: 0.9;
+    position: absolute;
+    top: 96px;
+    right: 6px;
+    text-align: center;
+    color: #fff;
+    text-indent: 5px;
+    font-size: 12px;
+    padding-right: 10px;
+    padding-left: 5px;
+    font-size: 28px;
 }
 .album .name{
     font-weight:bold;
@@ -60,14 +71,20 @@
 .album:hover .remove{
     display:block;
 }
+.album .remove:hover{
+    background:red;
+}
 .album .remove{
     width: 24px;
     height: 24px;
-    background:#efefef;
+    line-height: 24px;
+    background:#ff7994;
     border-radius: 15px;
     position: absolute;
     top: -12px;
-    right: -10px;
+    left: -10px;
+    text-align:center; 
+    color:#fff;
     display:none;
 }
 .toolbox{
