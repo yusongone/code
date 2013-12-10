@@ -17,7 +17,9 @@ page.ajax_getPhotosFromAlbum=function(){
                 var ary=data.data.photos||[];
                 var name=data.data.name;
                 var count=ary.length;
-                $(".page_title").text(name);
+                var a=$("<a/>",{href:"/album_list"});
+                    a.append("<i class='fa fa-arrow-left'></i>");
+                $(".page_title").html(a).append("",name);
                 $(".count label").text(count);
                 for(var i=0;i<count;i++){
                     var json=ary[i];

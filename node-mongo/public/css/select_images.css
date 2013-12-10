@@ -1,3 +1,4 @@
+.nav{position:fixed;}
 .topBox .search{
     float:right;
     margin:2px 0 0 50px;
@@ -14,12 +15,9 @@
 }
 
 
-.nav{display:none;}
-.right_area{width:980px;}
 .content{
     min-height:700px;
     padding-top:100px;
-    width:960px;
     background:#ddd;
 }
 .content .thu{
@@ -100,8 +98,9 @@
 }
 .productBox{
     background:rgba(50,50,50,0.8);
-    width:960px;
+    width:805px;
     overflow:hidden;
+    height:100px;
     position:absolute;
     top:0;
     z-index:999;

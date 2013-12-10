@@ -10,34 +10,37 @@
         <script src="/js/vendor/jquery.fileupload.js"></script>  
         <script src="/js/select_images.js"></script>
     </head>
-    <body class="page image_libs">
-        <input type="hidden" id="cusInfoId" value="<%=cusInfoId%>" />
-        <% include lib/user_toplink%>
-        <div class="right_area">
-            <div class="topBox">
-                <div class="logoBox">LOGO</div>
-                <div class="buttonBox">
-                    <div class="btnBlue" id="createList">生成列表</div>
+    <body>
+        <div class="page image_libs">
+            <input type="hidden" id="cusInfoId" value="<%=cusInfoId%>" />
+            <% include lib/user_toplink%>
+            <% include lib/user_nav %>
+            <div class="right_area">
+                <div class="topBox">
+                    <div class="logoBox">LOGO</div>
+                    <div class="buttonBox">
+                        <div class="btnBlue" id="createList">生成列表</div>
+                    </div>
                 </div>
-            </div>
-            <div class="toolBar">
-            </div>
-            <div class="bottom_line"></div>
-            <div class="content">
-                <div class="productBox">
+                <div class="toolBar">
                 </div>
-                <ul class="list imageList a">
-                    <li></li>
-                </ul>
-                <ul class="list imageList b">
-                    <li></li>
-                </ul>
-                <ul class="list imageList c">
-                    <li></li>
-                </ul>
-                <ul class="list imageList d">
-                    <li></li>
-                </ul>
+                <div class="bottom_line"></div>
+                <div class="content">
+                    <div class="productBox">
+                    </div>
+                    <ul class="list imageList a">
+                        <li></li>
+                    </ul>
+                    <ul class="list imageList b">
+                        <li></li>
+                    </ul>
+                    <ul class="list imageList c">
+                        <li></li>
+                    </ul>
+                    <ul class="list imageList d">
+                        <li></li>
+                    </ul>
+                </div>
             </div>
         </div>
         <% include lib/footer %>

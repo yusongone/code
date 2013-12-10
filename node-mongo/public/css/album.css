@@ -10,6 +10,14 @@
     border:1px solid #c3d5e4;
     background:#dfeeff;
 }
+.nav{
+    position:fixed;
+}
+.page_title i{
+        float: left;
+        line-height: 30px;
+        color: #09F;
+}
 .photo .imgBox{
     float:left;
     height:160px;

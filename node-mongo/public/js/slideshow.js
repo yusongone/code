@@ -62,9 +62,9 @@ var SlideShow=window.slideShow||(function(){
             var that=this;
             var close=$("<div/>",{"class":"fa fa-times-circle close"});
             this.content=$("<div/>",{"class":"slideCon"});
-                var left=$("<i/>",{"class":"fa fa-arrow-left"});
+                var left=$("<i/>",{"class":"fa fa-chevron-left"});
             var prev=$("<div/>",{"class":"prev"}).append(left);
-                var right=$("<i/>",{"class":"fa fa-arrow-right"});
+                var right=$("<i/>",{"class":"fa fa-chevron-right"});
             var next=$("<div/>",{"class":"next"}).append(right);;
             this.body.append(this.content,close,prev,next);
             
