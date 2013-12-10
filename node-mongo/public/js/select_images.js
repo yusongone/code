@@ -147,7 +147,9 @@ $(window).scroll(function(evt){
 var ProductThumbList=(function(){
     var charAry=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","O","R","S","T","U","V","W","X","Y","Z"];
     var thumList=[];
-    var productList=$("<div/>",{"class":"productList"});
+    var productList=$("<ul/>",{"class":"productList"});
+    var overFlowDiv=$("<div/>",{"class":"overFlowDiv"});
+        overFlowDiv.append(productList);
     var signList=$("<ul/>",{"class":"signList"})
     function Thum(json){
         this.id=json._id;
@@ -163,7 +165,7 @@ var ProductThumbList=(function(){
        var name=$("<div/>",{"class":"textOver name","text":this.name});
        var sign=$("<div/>",{"class":"sign","text":charAry[this.data.index]});
        this.count=$("<div/>",{"class":"count","text":0+"/"+this.data.imgCount});
-       var img=$("<img/>",{"class":"headImage","src":"/public_image/"+this.data.imgPath+"?size=100&type=fill"})
+       var img=$("<img/>",{"class":"headImage","src":"/public_image/"+this.data.imgPath+""})
        this.body.append(img,sign,this.count,name);
        productList.append(this.body);
    }
@@ -232,7 +234,11 @@ var ProductThumbList=(function(){
     }
    return {
         init:function(ary){
-            $(".productBox").append(productList);
+            var prev=$("<div/>",{"class":"prev"});
+                prev.append("<i class='fa fa-arrow-left'></i>");
+            var next=$("<div/>",{"class":"next"});
+                next.append("<i class='fa fa-arrow-right'></i>");
+            $(".productBox").append(prev,overFlowDiv,next);
             _createThumbList(ary);
         }
         ,getPThumb:function(thu){

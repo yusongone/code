@@ -16,10 +16,10 @@
 .imageList .photo{
     border:1px solid #ddd;
     margin:10px auto;
-    width:185px;
+    width:190px;
 }
 .imageList .imgBox{
-    width:170px;
+    width:180px;
     margin:10px auto;
 }
 .imageList .nameBox{
@@ -43,16 +43,60 @@
 .signList{
     float:right;
 }
-.productList li{
+.productBox{
+    background:rgba(230,230,230,0.8);
+    width:805px;
+    overflow:hidden;
+    position:absolute;
+    top:0;
+    z-index:999;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+    border:1px solid #ddd;
+    border-top:none;
+}
+.productBox .prev,
+.productBox .next{
+    float:left;
+    width:40px;
+    height:150px;
     position:relative;
-    display:inline-block;
-    width:155px;
-    margin:5px;
+}
+
+.productBox .prev i,
+.productBox .next i{
+    position:absolute;
+    top:50%;
+    left:50%;
+    font-size:32px;
+    margin-left:-16px;
+    margin-top:-16px;
+    width:32px;
+    height:32px;
+    text-align:center;
+}
+
+.productBox .overFlowDiv{
+    width:725px;
+    overflow:hidden;
+    float:left;
+}
+.productList{
+    width:1000px;
+    text-align: center;
+    padding:5px 0;
     overflow:hidden;
 }
+.productList li{
+    position:relative;
+    width:135px;
+    margin:0 5px;
+    overflow:hidden;
+    float:left;
+}
 .productLi .headImage{
-    width:120px;
-    height:120px;
+    width:100px;
+    max-height:130px;
     float:left;
     border:1px solid #ddd;
     border-radius:5px;
@@ -78,17 +122,17 @@
     font-size: 24px;
     float: left;
     margin-top: -31px;
-    width: 120px;
+    width: 100px;
     height: 30px;
     background: rgba(255,255,255,0.8);
     margin-left: 1px;
     line-height: 30px;
 }
 .productLi .name{
-    width:120px;
+    width:100px;
     height:24px;
     line-height:24px;
-    font-size:16px;
+    font-size:14px;
     color: #666;
 }
 /*888888888888888888888888888*/
@@ -166,21 +210,4 @@
 }
 .content{
     position:relative;
-}
-.productBox{
-    background:rgba(230,230,230,0.8);
-    width:805px;
-    overflow:hidden;
-    position:absolute;
-    top:0;
-    z-index:999;
-    border-bottom-left-radius:10px;
-    border-bottom-right-radius:10px;
-    border:1px solid #ddd;
-    border-top:none;
-}
-.productList{
-    width:100%;
-    text-align: center;
-    padding:10px 0;
 }

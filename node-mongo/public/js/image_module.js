@@ -167,7 +167,7 @@ pageSpace.Product=(function(){
             });
 
 
-            var html="<div class='imgBox'><img src='/public_image/"+json.imgPath+"?type=fill' /> </div>"+
+            var html="<div class='imgBox'><img src='/public_image/"+json.imgPath+"' /> </div>"+
                         "<div class='rightBox'>"+
                             "<div class='name'><lable>名称:</lable><label class='show'> "+(json.name||"- -")+"</label></div>"+
                                 "<div class='size'><lable>尺寸: </lable><label class='show'> "+(json.size||"- -")+"</label></div>"+
