@@ -1,4 +1,5 @@
 var db=require("../../db");
+var Images=require("./images");
 var fs=require("fs");
 var Canvas=require("canvas");
     var Image=Canvas.Image;
@@ -96,10 +97,7 @@ var removeThumbnailByOriginId=function(jsonReq){
 
 //获取原始图片
 var _getOriginalImageAndCrop=function(jsonReq,callback){
-    poolMain.acquire(function(err,database){
-        jsonReq.database=database;
-        db.Images.getImage(jsonReq,function(err,buf){
-            poolMain.release(database);
+    Images.getOriginImage(jsonReq,function(err,buf){
             if(err){return callback(err)};
             jsonReq.buf=buf;
             _crop(jsonReq,function(err,cropBuf){
@@ -111,7 +109,6 @@ var _getOriginalImageAndCrop=function(jsonReq,callback){
                 });
             });
         });
-    });
 }
 //压缩图片
 function _crop(jsonReq,callback){

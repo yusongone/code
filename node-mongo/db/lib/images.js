@@ -2,6 +2,7 @@ var Common=require("./common");
 var mongodb=require("mongodb"),
     objectId=mongodb.ObjectID,
     gridStore=mongodb.GridStore;
+var fs = require('fs');
 
     var _createObjectId=Common.createObjectId;
 
@@ -71,6 +72,11 @@ function uploadImage(jsonReq,callback){
     var gs=new gridStore(database,new objectId(),"w",attr);
     gs.open(function(err,gs){
         gs.writeFile(file.path,function(err,doc){
+            //É¾³ýÁÙÊ±ÎÄ¼þ
+            fs.unlink(file.path, function (err) {
+                  if (err) throw err;
+                    console.log('successfully deleted /tmp/hello');
+            });
             if(err){return callback(err);}
             var fileId=doc.fileId; 
             gs.close(function(err,result){

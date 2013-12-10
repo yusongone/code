@@ -1,4 +1,5 @@
 var db=require("../../db");
+var Images=require("./images");
 var parse=require("./common").parse;
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
@@ -51,12 +52,13 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
                 jsonReq.attr={
                     "metadata":{ property:"private" }
                 }
-                db.Images.uploadImage(jsonReq,function(err,fileId){
+                Images.uploadImage(jsonReq,function(err,fileId){
                     if(err){
                         poolMain.release(database);
                         return callback(err);
                     }
                     jsonReq.fileId=fileId;
+                    jsonReq.database=database;
                     //把添加的图片Id添加到imagesLib中；
                     db.ImageLibs.addImageIdToLibs(jsonReq,function(err,result){
                         poolMain.release(database);

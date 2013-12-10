@@ -1,5 +1,6 @@
 var db=require("../../db");
 var parse=require("./common").parse;
+var Images=require("./images");
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
 var Thumbnail=require("./thumbnail");
@@ -45,7 +46,6 @@ var removeAlbum=function(jsonReq,callback){
         getPhotosFromAlbum(jsonReq,function(err,result){
             if(result&&result.photos&&result.photos.length>0){
                 jsonReq.photoIdAry=result.photos;
-                console.log(result.photos);
                 deletePhotosFromAlbum(jsonReq,function(err,failAry){
                     if(failAry.length>0){
                         console.log("delete Album error fail list",failAry);
@@ -88,12 +88,13 @@ var uploadPhotoToAlbum=function(jsonReq,callback){
         jsonReq.database=database;
         db.Album.checkAlbumAuth(jsonReq,function(err,result){
             if(result){
-                db.Images.uploadImage(jsonReq,function(err,fileId){
+                Images.uploadOriginImage(jsonReq,function(err,fileId){
                     if(err){
                         poolMain.release(database);
                         return callback(err);
                     }
                     jsonReq.fileId=fileId;
+                    jsonReq.database=database;
                     //把添加的图片Id添加到imagesLib中；
                     db.Album.addPhotoIdToAlbum(jsonReq,function(err,result){
                         poolMain.release(database);
@@ -164,6 +165,7 @@ var deleteOnePhotoFromAlbum=function(jsonReq,callback){
         db.Album.checkAlbumAuth(jsonReq,function(err,result){
             if(result){
                 db.Images.deleteImage(jsonReq,function(err,fileId){
+                    poolMain.release(database);
                     if(err){return callback(err)}
                     db.Album.deletePhotoIdFromAlbum(jsonReq,function(err,result){
                         callback(err,result);

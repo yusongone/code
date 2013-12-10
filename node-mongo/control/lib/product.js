@@ -1,4 +1,5 @@
 var db=require("../../db");
+var Images=require("./images");
 var parse=db.Common.parse;
 var Type=db.Common.Type;
 var getPool=db.Common.getPool;
@@ -48,10 +49,12 @@ function uploadProductHeadImage(jsonReq,callback){
                     property:"public"
                 }
             }
-            db.Images.uploadImage(jsonReq,function(err,_id){
+            Images.uploadOriginImage(jsonReq,function(err,_id){
+                jsonReq.database=database;
                 jsonReq.imgPath=_id;
                 db.Product.changeProduct(jsonReq,function(err,result){
                     callback(err,result);    
+                    poolMain.release(database);
                 });
             });
         }

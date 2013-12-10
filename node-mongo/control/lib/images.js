@@ -5,6 +5,7 @@ var Canvas=require("canvas");
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
 var poolThumbnail=getPool("thumbnail");
+var poolImage=getPool("image");
 
 var _getThumbnailImage=require("./thumbnail").getThumbnailImage;
 
@@ -18,7 +19,8 @@ var getAlbumImage=function(jsonReq,callback){
             if(err){ poolMain.release(database); return callback(err) };
             if(result){
                 if(jsonReq.size=="origin"){
-                        db.Images.getImage(jsonReq,function(err,buf){
+                        //db.Images.getImage(jsonReq,function(err,buf){
+                        getOriginImage(jsonReq,function(err,buf){
                             poolMain.release(database);
                             callback(err,buf);
                         });
@@ -37,17 +39,17 @@ var getAlbumImage=function(jsonReq,callback){
 }
 
 var getPublicImage=function(jsonReq,callback){
-    poolMain.acquire(function(err,database){
+    poolImage.acquire(function(err,database){
         if(!database){
             return callback("no err"); 
         }
         jsonReq.database=database;
         db.Images.getImageInfoById(jsonReq,function(err,result){
-            poolMain.release(database);
+            poolImage.release(database);
             if(result&&result.metadata&&result.metadata.property=="public"){
                 if(jsonReq.size=="origin"){
-                        db.Images.getImage(jsonReq,function(err,buf){
-                            poolMain.release(database);
+                        //db.Images.getImage(jsonReq,function(err,buf){
+                        getOriginImage(jsonReq,function(err,buf){
                             callback(err,buf);
                         });
                     return;
@@ -87,8 +89,8 @@ var _getImage=function(jsonReq,callback){
                     };
                     if(jsonReq.size=="origin"){
                         if("creator"==UserTitle){
-                            db.Images.getImage(jsonReq,function(err,buf){
-                                poolMain.release(database);
+                           // db.Images.getImage(jsonReq,function(err,buf){
+                            getOriginImage(jsonReq,function(err,buf){
                                 callback(err,buf);
                             });
                         }else{
@@ -110,7 +112,39 @@ var _getImage=function(jsonReq,callback){
     });
 };
 
+var deleteOriginImage=function(jsonReq,callback){
+    poolImage.acquire(function(err,database){
+        jsonReq.database=database;
+            db.Images.deleteImage(jsonReq,function(err,fileId){
+                poolImage.release(database);
+                callback(err,fileId);
+            });
+    });
+}
+
+var uploadOriginImage=function(jsonReq,callback){
+    poolImage.acquire(function(err,database){
+        jsonReq.database=database;
+            db.Images.uploadImage(jsonReq,function(err,fileId){
+                poolImage.release(database);
+                callback(err,fileId);
+            });
+    });
+}
+
+var getOriginImage=function(jsonReq,callback){
+    poolImage.acquire(function(err,database){
+        jsonReq.database=database;
+            db.Images.getImage(jsonReq,function(err,fileId){
+                poolImage.release(database);
+                callback(err,fileId);
+            });
+    });
+}
 
 exports.getImage=_getImage;
 exports.getPublicImage=getPublicImage;
 exports.getAlbumImage=getAlbumImage;
+exports.uploadOriginImage=uploadOriginImage;
+exports.getOriginImage=getOriginImage;
+exports.deleteOriginImage=deleteOriginImage;

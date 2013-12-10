@@ -24,10 +24,14 @@ function setApp(app){
             jsonReq.userId=req.session.userId;
             jsonReq.reserverMessage=reserverMessage;
             if(reqVcode!=req.session.vcode){
-                return res.send({"stuats":"sorry","message":"vcode error"});
+                res.send({"stuats":"sorry","message":"vcode error"});
+                return
             }
             ctrl.Customer.bindUser(jsonReq,function(err,json){
-                if(err){return res.send({"status":"sorry","message":err})}
+                if(err){
+                    res.send({"status":"sorry","message":err});
+                    return
+                }
                 if(json>0){
                     res.send({"status":"ok"});
                 }else{
@@ -51,7 +55,10 @@ function setApp(app){
                 }
                 if(result.status=="ok"){
                     ctrl.Product.addProduct(jsonReq,function(err,json){
-                        if(err){return res.send({"status":"error","message":err})}
+                        if(err){
+                            res.send({"status":"error","message":err});
+                            return
+                        }
                         res.send({"status":"ok","id":json});
                     });
                 }
@@ -71,7 +78,10 @@ function setApp(app){
                 }
                 if(result.status=="ok"){
                     ctrl.Product.getProductsByUserId(jsonReq,function(err,json){
-                        if(err){return res.send({"status":"error","message":err})}
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return
+                        }
                         res.send({"status":"ok","data":json});
                     });
                 }
@@ -138,6 +148,7 @@ function setApp(app){
     //查找用户 user
     app.post('/ajax_searchUser', function(req, res){
         if(checkLogind(req,res)){
+            return false;
             ctrl.Users.searchUser({keyword:req.body.keyword},function(json){
                 if(err){return res.send({"status":"sorry","message":err})}
                 res.send(json);
@@ -149,7 +160,10 @@ function setApp(app){
     app.post('/ajax_searchCustomer', function(req, res){
         if(checkLogind(req,res)){
             ctrl.Customer.searchCustomer({keyword:req.body.keyword},function(json){
-                if(err){return res.send({"status":"error","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 res.send(json);
             });
         };
@@ -162,7 +176,10 @@ function setApp(app){
                 jsonReq.objStr=req.body.objStr;
                 jsonReq.userId=req.session.userId; 
             ctrl.Customer.uploadSelectPhotoList(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})};
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 res.send({"status":"ok"});
             });
         };
@@ -175,12 +192,16 @@ function setApp(app){
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
                 if(result.status=="ok"){
                     ctrl.Customer.getSelects(jsonReq,function(err,result){
-                        if(err){return res.send({"status":"error","message":err})};
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return;
+                        }
                         res.send({"status":"ok","data":result});
                     });
+                }else{
+                        res.send({"status":"sorry","message":err})
                 }
             });
         };
@@ -205,11 +226,16 @@ function setApp(app){
 
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result.status=="ok"){
                     ctrl.Customer.addCustomer(jsonReq,function(err,json){
                         res.send(json);
                     });
+                }else{
+                        res.send({"status":"sorry"});
                 }
             });
         };
@@ -224,12 +250,16 @@ function setApp(app){
             jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
                 if(result.status=="ok"){
                     ctrl.Customer.addProductToCustomer(jsonReq,function(err,result){
-                        if(err){return res.send({"status":"error","message":err})}
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return;
+                        }
                         res.send({"status":"ok"});
                     });
+                }else{
+                        res.send({"status":"sorry"});
                 }
             });
         }
@@ -244,12 +274,16 @@ function setApp(app){
             jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
                 if(result.status=="ok"){
                     ctrl.Customer.removeProductFromCustomer(jsonReq,function(err,result){
-                        if(err){return res.send({"status":"error","message":err})}
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return;
+                        }
                         res.send({"status":"ok"});
                     });
+                }else{
+                        res.send({"status":"sorry"});
                 }
             });
         }
@@ -265,12 +299,16 @@ function setApp(app){
             jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
                 if(result.status=="ok"){
                     ctrl.Customer.subProductFromCustomer(jsonReq,function(err,result){
-                        if(err){return res.send({"status":"error","message":err})}
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return;
+                        }
                         res.send({"status":"ok"});
                     });
+                }else{
+                        res.send({"status":"sorry"});
                 }
             });
         }
@@ -283,9 +321,14 @@ function setApp(app){
             jsonReq.userId=userId;
             jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
-            ctrl.Customer.getProductsFromCustomer(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
-                res.send({"status":"ok","data":result});
+            checkStudio(req,res,"post",function(err,result){
+                 ctrl.Customer.getProductsFromCustomer(jsonReq,function(err,result){
+                    if(err){
+                        res.send({"status":"error","message":err})
+                        return;
+                    }
+                    res.send({"status":"ok","data":result});
+                 });
             });
         }
     });
@@ -298,9 +341,12 @@ function setApp(app){
             jsonReq.studioId=req.session.studioId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
                 if(result.status=="ok"){
                     ctrl.Customer.getCustomerList(jsonReq,function(err,json){
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return;
+                        }
                         res.send(json);
                     });
                 }
@@ -313,14 +359,16 @@ function setApp(app){
         var fileId=req.body.fileId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
                 if(result.status=="ok"){
                     ctrl.ImageLibs.deletePhoto({
                         cusInfoId:cusInfoId,
                         fileId:fileId,
                         userId:req.session.userId
                     },function(err,result){
-                        if(err){return res.send({"status":"error","message":err})}
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return;
+                        }
                         res.send({"status":"ok","cusInfoId":cusInfoId}); 
                     });
                 }
@@ -335,11 +383,15 @@ function setApp(app){
                 jsonReq.userId=req.session.userId;
                 var ImageSize=jsonReq.files[0].size;
                 if(parseInt(ImageSize)>upload_max_size){
-                    return res.send({"stuats":"sorry","message":"Image too large"});
+                    res.send({"stuats":"sorry","message":"Image too large"});
+                    return 
                 }
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result.status=="ok"){
                     ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(err,json){
                         res.send(json);
@@ -355,7 +407,10 @@ function setApp(app){
                 jsonReq.cusInfoId=req.body.cusInfoId;
                 jsonReq.userId=req.session.userId;
             ctrl.ImageLibs.getCustomerImages(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result&&result.status=="ok"){
                     res.send({"status":"ok","data":result.data});
                 }else{
@@ -374,7 +429,10 @@ function setApp(app){
             };
             jsonReq.userId=req.session.userId;
             ctrl.Customer.applyStudio(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result.status=="ok"){
                     req.session.studioId=result.studioId;
                     res.send({"status":"ok"});
@@ -390,8 +448,9 @@ function setApp(app){
             jsonReq.openId=req.session.thirdparty.openId;
         ctrl.Users.newThirdparty(jsonReq,function(err,result){
             if(err){
-                return res.send({"status":"error","message":err});
-            } 
+                res.send({"status":"error","message":err})
+                return;
+            }
             if(result.status=="ok"){
                 console.log(result.userId);
                 req.session.userId=result.userId;
@@ -422,30 +481,33 @@ function setApp(app){
     app.post('/ajax_checkUsername', function(req, res){
         var username=req.body.username;
         if(!username){
-            return res.send({"status":"sorry","message":"参数不完整!"});
+            res.send({"status":"sorry","message":"参数不完整!"});
+            return 
         }
         var jsonReq={};
             jsonReq.username=username;
         ctrl.Users.checkUsername(jsonReq,function(err,result){
             if(err){
-                return res.send({"status":"error","message":err});
+                res.send({"status":"error","message":err});
+                return ;
             } 
             if(result){
                 res.send({"status":"sorry","message":"用户名已经存在"});
             }else{
                 res.send({"status":"ok","message":"可以使用"});
             }
-
         }); 
     });
     //注册
     app.post('/ajax_register', function(req, res){
         if(!(req.body.username&&req.body.pass&&req.body.vcode)){
-            return res.send({"status":"sorry","message":"参数不完整!"});
+            res.send({"status":"sorry","message":"参数不完整!"});
+            return;
         }
         var reqVcode=req.body.vcode;
         if(reqVcode!=req.session.vcode){
-            return res.send({"status":"sorry","message":"验证码错误!"});
+            res.send({"status":"sorry","message":"验证码错误!"});
+            return;
         }
 
         var jsonReq={};
@@ -453,10 +515,12 @@ function setApp(app){
             jsonReq.pass=req.body.pass
         ctrl.Users.checkUsername(jsonReq,function(err,result){
             if(err){
-                return res.send({"status":"error","message":err});
+                res.send({"status":"error","message":err});
+                return
             } 
             if(result){
-                return res.send({"status":"sorry","message":"用户名已经存在"});
+                res.send({"status":"sorry","message":"用户名已经存在"});
+                return 
             }else{
                 ctrl.Users.insertUserName(jsonReq,function(err,json){
                     res.send(json); 
@@ -472,14 +536,18 @@ function setApp(app){
     app.post('/createAlbum', function(req, res){
         var name=req.body.name;
         if(!name){
-            return res.send({"status":"sorry","message":"参数不完整!"});
+            res.send({"status":"sorry","message":"参数不完整!"});
+            return ;
         }
         if(checkLogind(req,res)){
             var jsonReq={};
                 jsonReq.name=name;
                 jsonReq.userId=req.session.userId;
             ctrl.Album.createAlbum(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result){
                     res.send({"status":"ok","id":result._id});
                 }else{
@@ -495,7 +563,10 @@ function setApp(app){
             var jsonReq={};
                 jsonReq.userId=req.session.userId;
             ctrl.Album.getAlbumList(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result){
                     res.send({"status":"ok","data":result});
                 }else{
@@ -512,7 +583,10 @@ function setApp(app){
             jsonReq.userId=req.session.userId;
         if(checkLogind(req,res)){
             ctrl.Album.removeAlbum(jsonReq,function(err,result){
-                if(err){return res.send({"status":"error","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result){
                     res.send({"status":"ok","data":result});
                 }else{
@@ -530,7 +604,10 @@ function setApp(app){
             jsonReq.name=req.body.name;
         if(checkLogind(req,res)){
             ctrl.Album.changeAlbum(jsonReq,function(err,result){
-                if(err){return res.send({"status":"sorry","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result){
                     res.send({"status":"ok","data":result});
                 }else{
@@ -547,9 +624,12 @@ function setApp(app){
         jsonReq.userId=req.session.userId;
         if(checkLogind(req,res)){
             ctrl.Album.uploadPhotoToAlbum(jsonReq,function(err,result){
-                if(err){return res.send({"status":"sorry","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result){
-                    res.send({"status":"ok"});      
+                    res.send({"status":"ok","fileId":result.fileId});      
                 }else{
                     res.send({"status":"sorry"});      
                 }
@@ -564,7 +644,10 @@ function setApp(app){
         jsonReq.fileId=req.body.fileId;
         if(checkLogind(req,res)){
             ctrl.Album.deleteOnePhotoFromAlbum(jsonReq,function(err,result){
-                if(err){return res.send({"status":"sorry","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result){
                     res.send({"status":"ok"});      
                 }else{
@@ -581,8 +664,10 @@ function setApp(app){
         jsonReq.userId=req.session.userId;
         if(checkLogind(req,res)){
             ctrl.Album.getPhotosFromAlbum(jsonReq,function(err,result){
-                console.log("abcerror");
-                if(err){return res.send({"status":"sorry","message":err})}
+                if(err){
+                    res.send({"status":"error","message":err})
+                    return;
+                }
                 if(result){
                     res.send({"status":"ok","data":result});      
                 }else{

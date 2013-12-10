@@ -84,7 +84,11 @@ var mongodb=require("mongodb"),
             if(!(uid&&albumId)){return callback("err")};
         var col=database.collection("album");
             col.update({"_id":albumId,"userId":uid},{"$addToSet":{"photos":{"id":fileId}}},function(err,doc){
-                callback(err,doc);
+                if(doc){
+                    callback(err,{"fileId":fileId});
+                }else{
+                    callback(err,null);
+                }
             });
          
     }

@@ -4,8 +4,10 @@ var mongodb=require("mongodb"),
     objectId=mongodb.ObjectID;
 var db_conf=require("../../config.json").db;
 var thu_conf=require("../../config.json").thumbnail;
+var img_conf=require("../../config.json").image;
 var poolModule=require("generic-pool");
 
+//表结构数据库连接
 var poolMain = poolModule.Pool({
         name     : 'main',
         create   : function(callback) {
@@ -24,8 +26,8 @@ var poolMain = poolModule.Pool({
 //      log : true
         log : false
     });
-var z=0;
-var t=0;
+
+//缩略图数据库连接
 var poolThumbnail = poolModule.Pool({
         name     : 'thumbnail',
         create   : function(callback) {
@@ -45,6 +47,25 @@ var poolThumbnail = poolModule.Pool({
         log : false
     });
 
+//文件数据库连接
+var poolImage= poolModule.Pool({
+        name     : 'image',
+        create   : function(callback) {
+            mongodb.MongoClient.connect("mongodb://"+img_conf.ip+"/"+img_conf.dbname,{server:{poolSize:1}},function(err,database){
+                    if(err){return callback(err);}
+                    database.authenticate(img_conf.user,img_conf.pass,function(err,ddb){
+                        callback(err,database);
+                    });
+            });
+        },
+        destroy  : function(database) { 
+            database.close();
+         }, //当超时则释放连接
+        max      : 10,   //最大连接数
+        idleTimeoutMillis : 30000,  //超时时间
+        //log : true  
+        log : false
+    });
 
 function _getAuthenticationDatabase(callback){
          console.log("*****************************************");
@@ -75,9 +96,11 @@ exports.getPool=function(type){
     switch(type){
         case "main":pool=poolMain;break;
         case "thumbnail":pool=poolThumbnail;break;
+        case "image":pool=poolImage;break;
     };
     return pool;
 }
+
 exports.createObjectId=function(str){
     try{
         str=str.toString();

@@ -1,5 +1,6 @@
 var page={};
 $(document).ready(function(){
+        page.albumId=$("#albumId").val();
         UP.init();
         bindFileUpload();
         page.ajax_getPhotosFromAlbum();
@@ -9,7 +10,7 @@ page.ajax_getPhotosFromAlbum=function(){
     $.ajax({
         "type":"post",
         "url":"/getPhotosFromAlbum",
-        "data":{"albumId":$("#albumId").val()},
+        "data":{"albumId":page.albumId},
         "dataType":"json",
         "success":function(data){
             if(data.status=="ok"){
@@ -20,9 +21,7 @@ page.ajax_getPhotosFromAlbum=function(){
                 $(".count label").text(count);
                 for(var i=0;i<count;i++){
                     var json=ary[i];
-                        json.albumId=$("#albumId").val();
-                    var imgObj=new imageObj(ary[i]);
-                        $(".photoList").append(imgObj.initUI(ary[i]));
+                    var imgObj=new imageObj(json);
                 }
             }
         }
@@ -36,10 +35,8 @@ function bindFileUpload(){
         url:"/uploadPhotoToAlbum",//上传地址
         acceptFileTypes: /(\.|\/)(gif|jpeg|png)$/i,
         dataType: 'json',
-        formData:{"albumId":$("#albumId").val()},
+        formData:{"albumId":page.albumId},
         done: function (e, data) {//设置文件上传完毕事件的回调函数
-            var upl=data.context.data("object");
-                upl.done();
         },
         fail:function(e,data){
             var upl=data.context.data("object");
@@ -47,8 +44,14 @@ function bindFileUpload(){
         },
         add:function(e,data){
             data.context=UP.createAupload({name:data.files[0].name,"data":data});
-            UP.open();
+            UP.open(data);
             data.submit();
+            data.jqXHR.done(function(reqData){
+                if(reqData.status=="ok"){
+                    var upl=data.context.data("object");
+                        upl.done(reqData);
+                }
+            });
         },
         progress: function (e, data) {//设置上传进度事件的回调函数
             var upl=data.context.data("object");
@@ -71,8 +74,8 @@ var UP=(function(){
             resizable: true,
             modal: true,
             buttons: {
-                "Delete all items": function() {
-                    $('#addCustomer').fileupload('clear');
+                "清空": function() {
+                    $('#upload').fileupload("clear");
                 }
             },
             "close":function(){
@@ -91,29 +94,36 @@ var UP=(function(){
     uploadLi.prototype.createUI=function(json){
         var p=this.body;
         var that=this;
+        that.data=json.data;
         var name=$("<div/>",{"class":"proName","text":json.name});
         this.progress=$("<div/>",{});
-        var submit=$("<div/>",{"text":"取消","class":"cancel"});
-        p.append(this.progress.append(name,submit));
-        this.progress.progressbar({value:10});
+        this.btnCancel=$("<div/>",{"text":"取消","class":"cancel"});
+        this.resubmit=$("<div/>",{"text":"重试","class":"resubmit"});
+        p.append(this.progress.append(name,this.btnCancel,this.resubmit));
+        this.progress.progressbar({value:3});
         this.progress.addClass("progress");
         div.append(p);
-        submit.click(function(){
+        this.btnCancel.click(function(){
             json.data.abort();
             that.cancel();
         });
+        this.resubmit.click(function(){
+            $(this).hide();
+            that.data.submit();
+        });
     }
     uploadLi.prototype.fail=function(callback){
-        this.progress.find("div").eq(-1).css("background","red");
+        this.progress.addClass("fail");
+        this.resubmit.show();
     }
     uploadLi.prototype.cancel=function(val){
-        this.progress.find("div").eq(-1).css("background","yellow");
+        this.progress.addClass("cancel");
     }
-    uploadLi.prototype.done=function(callback){
-        this.progress.find("div").eq(-1).css("background","green");
-        this.progress.find("div").eq(-1).click(function(){
-            callback();
-        });
+    uploadLi.prototype.done=function(data){
+        this.progress.addClass("done");
+        this.btnCancel.hide();
+        var imgObj=new imageObj({id:data.fileId});
+            imgObj.insertAnimate();
     }
     uploadLi.prototype.setValue=function(val){
         this.progress.progressbar({value:val});
@@ -121,7 +131,7 @@ var UP=(function(){
 
    return {
         init:_init,
-        open:function(){
+        open:function(data){
             div.dialog("open");
         },
         createAupload:function(json){
@@ -135,34 +145,34 @@ var UP=(function(){
 
 
 var imageObj=(function(){
-    function image(){
-    
+    function image(json){
+        this.body=$("<li/>",{"class":"photo"});
+        this.initUI(json); 
     }
+    image.prototype.insertAnimate=function(){
+        this.body.css({"width":"0px"}).animate({"width":"160px"},1500);
+    };
     image.prototype.initUI=function(json){
-        var albumId=this.albumId=json.albumId;
+        var albumId=this.albumId=page.albumId;
         var id=this.fileId=json.id;
-        var thu=$("<li/>",{"class":"photo"});
         var imgBox=$("<div/>",{"class":"imgBox"});
             var img=$("<img/>",{"src":"/album_photo/"+albumId+"/"+id+"?type=fill"});
             var del=$("<div/>",{"class":"delete fa fa-trash-o"})
             var name=$("<div/>",{"class":"nameBox"});
                 name.append(del);
             imgBox.append(img);
-        thu.append(imgBox,name);
-        this.thu=thu;
+        this.body.append(imgBox,name);
         this.bindEvent({"del":del});
-        return thu;
+        $(".photoList").prepend(this.body);
     }
     image.prototype.bindEvent=function(json){
         var that=this;
         json.del.click(function(){
             ajax_deleteImage(that.albumId,that.fileId,function(){
-                that.thu.remove();
+                that.body.remove();
             });
         });
     }
-
-
     return image;
 })();
 
