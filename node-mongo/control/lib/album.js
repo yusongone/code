@@ -143,7 +143,7 @@ var deletePhotosFromAlbum=function(jsonReq,callback){
         function remove(jsonReq,callback){
             db.Album.checkAlbumAuth(jsonReq,function(err,result){
                 if(result){
-                    db.Images.deleteImage(jsonReq,function(err,fileId){
+                    Images.deleteOriginImage(jsonReq,function(err,fileId){
                         if(err){return callback(err)}
                         db.Album.deletePhotoIdFromAlbum(jsonReq,function(err,result){
                             callback(err,result);
@@ -164,7 +164,7 @@ var deleteOnePhotoFromAlbum=function(jsonReq,callback){
         jsonReq.database=database;
         db.Album.checkAlbumAuth(jsonReq,function(err,result){
             if(result){
-                db.Images.deleteImage(jsonReq,function(err,fileId){
+                Images.deleteOriginImage(jsonReq,function(err,fileId){
                     poolMain.release(database);
                     if(err){return callback(err)}
                     db.Album.deletePhotoIdFromAlbum(jsonReq,function(err,result){

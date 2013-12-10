@@ -16,7 +16,7 @@ var _deletePhoto=function(jsonReq,callback){
                 db.ImageLibs.checkImageInCustomer(jsonReq,function(err,result){
                     if(err){ poolMain.release(database); return callback(err); }
                     if(null!=result){
-                        db.Images.deleteImage(jsonReq,function(err,result){
+                        Images.deleteOriginImage(jsonReq,function(err,result){
                             if(err){ poolMain.release(database); return callback(err); }
                             db.ImageLibs.removeImageFromImagelibs(jsonReq,function(err,result){
                                 if(err){ poolMain.release(database); return callback(err); }
@@ -52,7 +52,7 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
                 jsonReq.attr={
                     "metadata":{ property:"private" }
                 }
-                Images.uploadImage(jsonReq,function(err,fileId){
+                Images.uploadOriginImage(jsonReq,function(err,fileId){
                     if(err){
                         poolMain.release(database);
                         return callback(err);

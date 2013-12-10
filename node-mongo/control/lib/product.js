@@ -35,7 +35,7 @@ function uploadProductHeadImage(jsonReq,callback){
             if(err){return callback(err)};
             if(productObj&&productObj.imgPath){
                 jsonReq.fileId=productObj.imgPath;
-                db.Images.deleteImage(jsonReq,function(err,result){
+                Images.deleteOriginImage(jsonReq,function(err,result){
                     if(err){return callback(err)} 
                     uploadImg(jsonReq,callback);
                 })

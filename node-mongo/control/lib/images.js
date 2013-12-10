@@ -113,30 +113,36 @@ var _getImage=function(jsonReq,callback){
 };
 
 var deleteOriginImage=function(jsonReq,callback){
+    var tempDatabase=jsonReq.database;
     poolImage.acquire(function(err,database){
         jsonReq.database=database;
             db.Images.deleteImage(jsonReq,function(err,fileId){
                 poolImage.release(database);
+                jsonReq.database=tempDatabase;
                 callback(err,fileId);
             });
     });
 }
 
 var uploadOriginImage=function(jsonReq,callback){
+    var tempDatabase=jsonReq.database;
     poolImage.acquire(function(err,database){
         jsonReq.database=database;
             db.Images.uploadImage(jsonReq,function(err,fileId){
                 poolImage.release(database);
+                jsonReq.database=tempDatabase;
                 callback(err,fileId);
             });
     });
 }
 
 var getOriginImage=function(jsonReq,callback){
+    var tempDatabase=jsonReq.database;
     poolImage.acquire(function(err,database){
         jsonReq.database=database;
             db.Images.getImage(jsonReq,function(err,fileId){
                 poolImage.release(database);
+                jsonReq.database=tempDatabase;
                 callback(err,fileId);
             });
     });

@@ -79,7 +79,7 @@ var removeThumbnailByOriginId=function(jsonReq){
             var z=0;
             for(var i=0;i<l;i++){
                 jsonReq.fileId=imageInfo[i]["_id"];
-                db.Images.deleteImage(jsonReq,function(err,result){
+                Images.deleteOriginImage(jsonReq,function(err,result){
                     z++;
                     console.log("remove a thumbnail");
                     if(z==l){
