@@ -185,7 +185,7 @@ function setApp(app){
         var albumId=req.params.albumId;
         var imageId=req.params.imageId;
         var userId=req.session.userId;
-        var sizeR={"origin":"origin","300":300,"180":180,"100":100};
+        var sizeR={"origin":"origin","600":600,"300":300,"180":180,"100":100};
         var typeR={"fill":"fill"}
         var size=sizeR[req.query.size]||180;
         var type=typeR[req.query.type]||"normal";

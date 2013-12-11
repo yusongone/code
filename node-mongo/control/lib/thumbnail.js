@@ -178,6 +178,11 @@ function save2(canvas){
 }
 
 
-
+exports.getImagesSize=function(file){
+    var img=new Image;
+        img.src=file.path;
+        var size={"width":img.width,"height":img.height};
+        return size;
+}
 exports.getThumbnailImage=_getThumbnailImage;
 exports.removeThumbnailByOriginId=removeThumbnailByOriginId;

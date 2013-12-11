@@ -88,6 +88,7 @@ var uploadPhotoToAlbum=function(jsonReq,callback){
         jsonReq.database=database;
         db.Album.checkAlbumAuth(jsonReq,function(err,result){
             if(result){
+                jsonReq.img=Thumbnail.getImagesSize(jsonReq.files[0]);
                 Images.uploadOriginImage(jsonReq,function(err,fileId){
                     if(err){
                         poolMain.release(database);

@@ -21,7 +21,7 @@ var poolMain = poolModule.Pool({
         destroy  : function(database) { 
             database.close();
          }, //当超时则释放连接
-        max      : 10,   //最大连接数
+        max      : 50,   //最大连接数
         idleTimeoutMillis : 30000,  //超时时间
 //      log : true
         log : false
@@ -41,7 +41,7 @@ var poolThumbnail = poolModule.Pool({
         destroy  : function(database) { 
             database.close();
          }, //当超时则释放连接
-        max      : 10,   //最大连接数
+        max      : 50,   //最大连接数
         idleTimeoutMillis : 30000,  //超时时间
         //log : true  
         log : false
@@ -61,7 +61,7 @@ var poolImage= poolModule.Pool({
         destroy  : function(database) { 
             database.close();
          }, //当超时则释放连接
-        max      : 10,   //最大连接数
+        max      : 50,   //最大连接数
         idleTimeoutMillis : 30000,  //超时时间
         //log : true  
         log : false

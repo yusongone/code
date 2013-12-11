@@ -79,11 +79,13 @@ var mongodb=require("mongodb"),
         var database=jsonReq.database; 
         var name=jsonReq.name;
         var fileId=jsonReq.fileId;
+        var width=jsonReq.img.width;
+        var height=jsonReq.img.height;
         var uid= _createObjectId(jsonReq.userId);
         var albumId= _createObjectId(jsonReq.albumId);
             if(!(uid&&albumId)){return callback("err")};
         var col=database.collection("album");
-            col.update({"_id":albumId,"userId":uid},{"$addToSet":{"photos":{"id":fileId}}},function(err,doc){
+            col.update({"_id":albumId,"userId":uid},{"$addToSet":{"photos":{"id":fileId,width:width,height:height}}},function(err,doc){
                 if(doc){
                     callback(err,{"fileId":fileId});
                 }else{

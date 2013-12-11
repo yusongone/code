@@ -23,10 +23,30 @@ page.ajax_getPhotosFromAlbum=function(){
                     var json=ary[i];
                     var imgObj=new imageObj(json);
                 }
+                var ssData=_createSlideshowData(ary);
+                page.ss=SlideShow.getPageSS({
+                    images:ssData
+                });
             }
         }
     });
 };
+
+function _createSlideshowData(ary){
+    var tempAry=[];
+    for(var i=0;i<ary.length;i++){
+        var tempJson={};
+        var tempObj=ary[i];
+        var src="/album_photo/"+page.albumId+"/"+tempObj.id+"?size=600";
+        tempJson.src=src;
+        tempJson.max=600;
+        tempJson.id=tempObj.id;
+        tempJson.width=tempObj.width;
+        tempJson.height=tempObj.height;
+        tempAry.push(tempJson);
+    }
+    return tempAry;
+}
 
 function bindFileUpload(){
 //测试
@@ -145,7 +165,9 @@ var UP=(function(){
 
 
 var imageObj=(function(){
+    var imgList=[];
     function image(json){
+        this.index=imgList.push(this)-1;
         this.body=$("<li/>",{"class":"photo"});
         this.initUI(json); 
     }
@@ -171,6 +193,10 @@ var imageObj=(function(){
             ajax_deleteImage(that.albumId,that.fileId,function(){
                 that.body.remove();
             });
+        });
+
+        this.body.click(function(){
+            page.ss.show().to(that.index);
         });
     }
     return image;
