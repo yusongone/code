@@ -80,6 +80,7 @@ function changeProduct(jsonReq,callback){
         jsonReq.database=database;
         db.Product.changeProduct(jsonReq,function(err,result){
             callback(err,result);  
+            poolMain.release(database);
         });
     });
 };

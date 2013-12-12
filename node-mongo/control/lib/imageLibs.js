@@ -19,9 +19,10 @@ var _deletePhoto=function(jsonReq,callback){
                         Images.deleteOriginImage(jsonReq,function(err,result){
                             if(err){ poolMain.release(database); return callback(err); }
                             db.ImageLibs.removeImageFromImagelibs(jsonReq,function(err,result){
-                                if(err){ poolMain.release(database); return callback(err); }
-                                    callback(err,result); 
-                                    Thumbnail.removeThumbnailByOriginId(jsonReq);
+                                poolMain.release(database); 
+                                if(err){ return callback(err); }
+                                callback(err,result); 
+                                Thumbnail.removeThumbnailByOriginId(jsonReq);
                             });
                         }); 
                     }else{
@@ -30,6 +31,7 @@ var _deletePhoto=function(jsonReq,callback){
                     }
                 });
             }else{
+                poolMain.release(database);
                 callback("no permission");
             }
 

@@ -214,7 +214,8 @@ function getProductsFromCustomer(jsonReq,callback){
             if("creator"==result||"binder"==result){
                 jsonReq.userId=resJson.userId;
                 db.Customer.getProductsFromCustomer(jsonReq,function(err,res){
-                    if(err){ poolMain.release(database);return callback(err);};
+                    poolMain.release(database);
+                    if(err){return callback(err);};
                     callback(err,res);
                 });
             }else{
@@ -231,10 +232,12 @@ function getSelects(jsonReq,callback){
         jsonReq.database=database;
         db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result,resJson){
             if("creator"!=result){
+                poolMain.release(database);
                 return callback("no auth");
             }
             db.Customer.getProductsFromCustomer(jsonReq,function(err,result){
-                    if(err){ poolMain.release(database);return callback(err);};
+                    poolMain.release(database);
+                    if(err){return callback(err);};
                     callback(err,result);
             });
         });

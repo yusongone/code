@@ -160,9 +160,9 @@ var imageFactory=(function(){
     function _addSlideshowData(json){
             var tempObj=json;
             var tempJson={};
-            var src="/album_photo/"+page.albumId+"/"+tempObj.id+"?size=600";
+            var src="/album_photo/"+page.albumId+"/"+tempObj.id+"?size=800";
             tempJson.src=src;
-            tempJson.max=600;
+            tempJson.max=800;
             tempJson.id=tempObj.id;
             tempJson.width=tempObj.width;
             tempJson.height=tempObj.height;

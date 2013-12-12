@@ -1,52 +1,131 @@
+var page={};
 var pTop;
 $(document).ready(function(){
-    showSelectList.init();
-   ajax_get($("#cusInfoId").val()); 
-    ajax_getCusProducts($("#cusInfoId").val());
     pTop=$(".content").position().top;
+    page.cusInfoId=$("#cusInfoId").val();
+    showSelectList.init();
+    ajax_get(); 
+    ajax_getCusProducts();
+
     $("#createList").click(function(){
         ProductThumbList.createSelectPhoto();
-//    showSelectList.
     });
 });
-var ajax_get=function(cusInfoId){
-    console.log(cusInfoId);
+var ajax_get=function(){
     $.ajax({
         "type":"post",
         "url":"/getCustomerImages",
         "datatype":"json",
-        "data":{"cusInfoId":cusInfoId},
+        "data":{"cusInfoId":page.cusInfoId},
         "success":function(json){
             if("sorry"==json.status){alert(json.message);return false;};
             var data=json.data;
-            var c=["a","b","c","d"];
-            var pThumList=ProductThumbList.signList;
             for(var i=0,l=data.length;i<l;i++){
+                    var json=data[i];
+                    var imgObj=imageFactory.createImg(json);
+                /*
                 var id=data[i].fileId; 
                 var img=$("<img/>",{"src":"/photo/"+cusInfoId+"/"+id+"?size=300"});
                 var thu=$("<li/>",{"class":"thu"});
                 var overBox=$("<div/>",{"class":"overBox"});
-                $("."+c[i%4]).append(thu.append(img,overBox));
                 thu.data("id",id);
                 thu.data("filename",data[i].filename);
-                thu.hover(function(){
-                    var pThumb=ProductThumbList.getPThumb($(this)); 
-                    $(this).append(pThumb);
-                },function(){
-                    //z.remove();
-                });
+                */
             };
         }
     });
 };
-var ajax_getCusProducts=function(cusInfoId){
-    console.log("efef");
+
+
+var imageFactory=(function(){
+    var imgList=[];
+    var slideshowData=[];
+
+                page.ss=SlideShow.getPageSS({
+                    images:slideshowData
+                });
+
+    function _addSlideshowData(json){
+            var tempObj=json;
+            var tempJson={};
+            var src="/album_photo/"+page.albumId+"/"+tempObj.id+"?size=800";
+            tempJson.src=src;
+            tempJson.max=800;
+            tempJson.id=tempObj.id;
+            tempJson.width=tempObj.width;
+            tempJson.height=tempObj.height;
+            slideshowData.push(tempJson);
+    }
+    
+    function _removeMe(){
+        var that=this;
+        var index=_getMeIndex.call(that);
+        imgList.splice(index,1);
+        slideshowData.splice(index,1);
+    }
+    function _getMeIndex(){
+        var that=this;
+        for(var i=0;i<imgList.length;i++){
+            if(imgList[i]==that){
+                return i;
+            }
+        }
+    }
+
+    function image(json){
+        this.body=$("<li/>",{"class":"photo"});
+        _addSlideshowData(json);
+        this.id=json.fileId;
+        this.initUI(json); 
+    }
+    image.prototype.insertAnimate=function(){
+        this.body.css({"width":"0px"}).animate({"width":"160px"},1500);
+    };
+    image.prototype.initUI=function(json){
+        var that=this;
+        var imgBox=$("<div/>",{"class":"imgBox"});
+            var img=$("<img/>",{"src":"/photo/"+page.cusInfoId+"/"+that.id+"?size=300"});
+            var name=$("<div/>",{"class":"nameBox"});
+                name.append();
+            imgBox.append(img);
+        this.body.append(imgBox,name);
+        this.bindEvent({"imgBox":imgBox});
+    }
+    image.prototype.bindEvent=function(json){
+        var that=this;
+        json.imgBox.click(function(){
+            var index=_getMeIndex.call(that);
+            console.log("myIndex",index);
+            page.ss.show().to(index);
+        });
+                this.body.hover(function(){
+                    var pThumb=ProductThumbList.getPThumb($(this)); 
+                    $(this).find(".nameBox").append(pThumb);
+                },function(){
+                    //z.remove();
+                });
+    }
+    return {
+        createImg:function(json){
+            var imgObj=new image(json);
+                imgList.push(imgObj);
+                var c=["a","b","c","d"];
+                var index=imgList.length%4;
+                    console.log(index);
+                $("."+c[index]).append(imgObj.body);
+                return imgObj;
+        }
+    }
+})();
+
+
+var ajax_getCusProducts=function(){
     $.ajax({
         "type":"post",
         "url":"/ajax_getProductsFromCustomer",
         "dataType":"json",
         "data":{
-            "cusInfoId":cusInfoId
+            "cusInfoId":page.cusInfoId
         },
         "success":function(data){
             if(data.status=="ok"&&data.data){
@@ -85,14 +164,13 @@ var ProductThumbList=(function(){
        var sign=$("<div/>",{"class":"sign","text":charAry[this.data.index]});
        this.count=$("<div/>",{"class":"count","text":0+"/"+this.data.imgCount});
        var img=$("<img/>",{"class":"headImage","src":"/public_image/"+this.data.imgPath+"?size=100&type=fill"})
-       this.body.append(img,name,this.count,sign);
+       this.body.append(img,sign,this.count,name);
        productList.append(this.body);
    }
    Thum.prototype.subThu=function(thu){
        var list=this.list;
        var length=list.length;
        for(var i=0;i<length;i++){
-           console.log(list[i],thu.data("id"));
            if(list[i]==thu.data("id")){
                 list.splice(i,1);
            } 
@@ -117,7 +195,7 @@ var ProductThumbList=(function(){
    Thum.prototype.createSign=function(){
        var that=this;
        var text=charAry[this.data.index];
-        this.sign=$("<li/>",{"class":"sign","text":text});
+        this.sign=$("<li/>",{"class":"btnBlue sign","text":text});
         this.sign.data("text",text);
         signList.append(this.sign);
         this.sign.click(function(){
@@ -144,11 +222,11 @@ var ProductThumbList=(function(){
                 var text=$(this).data("text");
                 console.log(thu.find("."+text).length);
                 if(thu.find("."+text).length>0){
-                    $(this).css({background:"red"});
+                    $(this).addClass("disable");
                     $(this).data("enable",1);
                 }else{
                     $(this).data("enable",0);
-                    $(this).css({background:"blue"});
+                    $(this).removeClass("disable");
                 };
             });
     }
