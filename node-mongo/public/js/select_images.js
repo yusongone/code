@@ -74,6 +74,7 @@ var ajax_getCusProducts=function(){
 
 
 var imageFactory=(function(){
+    var ActiveImage=null;
     var imgList=[];
     var slideshowData=[];
 
@@ -134,6 +135,7 @@ var imageFactory=(function(){
             var pro=$(this).data("pro");
             pro.subThu(that); 
             overSign.remove();
+            return false;
         });
     };
     image.prototype.insertAnimate=function(){
@@ -169,8 +171,19 @@ var imageFactory=(function(){
         },function(){
             //z.remove();
         });
+
+        json.imgBox.on({
+            dragstart:function(e){
+                ActiveImage=that;
+                //e.preventDefault();
+            }
+        });
     }
+
     return {
+        getActiveImage:function(){
+            return ActiveImage;
+        },
         createImg:function(json){
             var imgObj=new image(json);
                 var index=imgList.length%4;
@@ -204,7 +217,6 @@ var ThumbBar=(function(){
     selectBtn.prototype.bindEvent=function(){
         var that=this;
         this.body.click(function(){
-            alert("bcd");
             if($(this).data("enable")){return false;};
             that.fatherThumb.addThu(hoverImage);
         });
@@ -261,7 +273,21 @@ var ProductThumbList=(function(){
         this.body=$("<li/>",{"class":"productLi","title":this.data.name});
         this.text=charAry[this.data.index];
         this.initUI();
+        this.bindEvent();
     } 
+   Thum.prototype.bindEvent=function(){
+       var that=this;
+       this.body.on({
+            drop:function(e){
+                var obj=imageFactory.getActiveImage();
+                    console.log(obj);
+                that.addThu(obj);
+            },
+            dragover:function(e){
+                e.preventDefault();
+            }
+       });
+   }
    Thum.prototype.initUI=function(){
        var name=$("<div/>",{"class":"textOver name","text":this.name});
        var sign=$("<div/>",{"class":"sign","text":this.text});
