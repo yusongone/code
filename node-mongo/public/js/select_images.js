@@ -86,6 +86,13 @@ var imageFactory=(function(){
                     var that=imgList[activeIndex];
                     var pThumb=ThumbBar.getThumbTool(that); 
                         $(".productBox").append(pThumb);
+                        this.body.find(".imgBox").append(that.slideshowBox);
+                        ActiveImage=that;
+                        this.body.find(".imgBox").on({
+                            dragstart:function(){
+                                ActiveImage=that;
+                            }
+                        });
                 });
 
     function _addSlideshowData(json){
@@ -120,16 +127,32 @@ var imageFactory=(function(){
     function image(json){
         this.body=$("<li/>",{"class":"photo"});
         this.body.data("id",json.fileId);
+        this.slideshowBox=$("<div/>",{});
         _addSlideshowData(json);
         this.id=json.fileId;
         this.initUI(json); 
-    }
+    };
+    image.prototype.addSlideshowOverDiv=function(pro){
+        var that=this;
+        var overSign=$("<div/>",{"class":"over "+pro.text,"text":pro.text})
+        var close=$("<div/>",{"class":"close fa fa-times"})
+            close.data("pro",pro);
+        this.slideshowBox.append(overSign.append(close));
+
+        close.click(function(){
+            var pro=$(this).data("pro");
+            pro.subThu(that); 
+            overSign.remove();
+            return false;
+        });
+    };
     image.prototype.addOverDiv=function(pro){
         var that=this;
         var overSign=$("<div/>",{"class":"over "+pro.text,"text":pro.text})
         var close=$("<div/>",{"class":"close fa fa-times"})
             close.data("pro",pro);
         this.overBox.append(overSign.append(close));
+        this.addSlideshowOverDiv(pro);
 
         close.click(function(){
             var pro=$(this).data("pro");
@@ -158,6 +181,7 @@ var imageFactory=(function(){
         json.imgBox.click(function(){
             var index=_getMeIndex.call(that);
             page.ss.show().to(index);
+
             var po=$(".productBox").css("position")||"absolute";
             $(".productBox").css({"position":"fixed"});
             page.ss.bind("close",function(){
@@ -178,11 +202,14 @@ var imageFactory=(function(){
                 //e.preventDefault();
             }
         });
+
     }
 
     return {
         getActiveImage:function(){
-            return ActiveImage;
+            var temp=ActiveImage;
+                ActiveImage=null;
+            return temp;
         },
         createImg:function(json){
             var imgObj=new image(json);
@@ -280,7 +307,6 @@ var ProductThumbList=(function(){
        this.body.on({
             drop:function(e){
                 var obj=imageFactory.getActiveImage();
-                    console.log(obj);
                 that.addThu(obj);
             },
             dragover:function(e){
