@@ -56,6 +56,7 @@ var SlideShow=window.slideShow||(function(){
             this.activeImgDOM=null;
             this.body=$("<div/>",{"class":"pageSS"});
             this.initUI(); 
+            this.fun={};
         }
         _extend(slideshow,basic);
         slideshow.prototype.initUI=function(){
@@ -71,20 +72,51 @@ var SlideShow=window.slideShow||(function(){
             close.click(function(){
                 that.hide();
                 that.content.html("");
+                if(that.fun.close){
+                    that.fun.close.call(that,that.activeIndex); 
+                }
             });
 
             prev.click(function(){
-                that.to(++that.activeIndex); 
+                that.change("prev");
             });
 
             next.click(function(){
-                that.to(--that.activeIndex); 
+                that.change("next");
             });
             this.prev=prev;
             this.next=next;
         }
+        slideshow.prototype.change=function(direction){
+            var that=this;
+            if(this.sort){
+                if(direction=="next"){
+                    that.to(++that.activeIndex); 
+                }else{
+                    that.to(--that.activeIndex); 
+                }    
+            }else{
+                if(direction=="next"){
+                    that.to(--that.activeIndex); 
+                }else{
+                    that.to(++that.activeIndex); 
+                }    
+            }
+        }
         slideshow.prototype.checkBtn=function(){
             var that=this;
+            if(this.sort){
+                if(that.activeIndex>that.images.length-2){
+                    that.next.hide();
+                }else{
+                    that.next.show();
+                }
+                if(that.activeIndex<1){
+                    that.prev.hide();
+                }else{
+                    that.prev.show();
+                }
+            }else{
                 if(that.activeIndex>that.images.length-2){
                     that.prev.hide();
                 }else{
@@ -95,6 +127,7 @@ var SlideShow=window.slideShow||(function(){
                 }else{
                     that.next.show();
                 }
+            }
          }
         slideshow.prototype.to=function(index){
             var that=this;
@@ -103,9 +136,15 @@ var SlideShow=window.slideShow||(function(){
             if(this.activeImgDOM){
             this.activeImgDOM.animate({"opacity":0},200,function(){
                 that.content.html("").append(imagesDOM); 
+                if(that.fun.change){
+                    that.fun.change.call(that,that.activeIndex); 
+                }
             });
             }else{
                 that.content.html("").append(imagesDOM); 
+                if(that.fun.change){
+                    that.fun.change.call(that,that.activeIndex); 
+                }
             }
             this.activeImgDOM=imagesDOM
             that.checkBtn();
@@ -125,6 +164,9 @@ var SlideShow=window.slideShow||(function(){
             $("body").addClass("slideBody").append(this.body); 
             return this;
         }
+        slideshow.prototype.bind=function(name,fun){
+            this.fun[name]=fun;
+        }
         return slideshow;
     })();
 
@@ -137,6 +179,7 @@ var SlideShow=window.slideShow||(function(){
         getPageSS:function(json){
             var ss=new pageSS();
                 ss.images=json.images;
+                ss.sort=json.sort;
                 return ss;
         }
     }

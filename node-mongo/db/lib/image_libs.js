@@ -15,7 +15,7 @@ var mongodb=require("mongodb"),
         var filename=jsonReq.files[0].name;
     //    var col=database.collection("image_libs");
         var col=database.collection("customerInfo");
-            col.update({"_id":cusInfoId},{$addToSet:{images:{$each:[{"fileId":fileId,"filename":filename}]}}},{w:1},function(err){
+            col.update({"_id":cusInfoId},{$addToSet:{images:{$each:[{"fileId":fileId,"filename":filename,"width":jsonReq.img.width,"height":jsonReq.img.height}]}}},{w:1},function(err){
                     callback(err,{"status":"ok"});
                 });
     };

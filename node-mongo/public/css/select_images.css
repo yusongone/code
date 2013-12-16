@@ -21,10 +21,16 @@
 .imageList .imgBox{
     width:180px;
     margin:10px auto;
+    position:relative;
 }
 .imageList .nameBox{
     height:30px;
     padding:0 7px;
+}
+.imageList .overBox{
+    position:absolute;
+    top:0;
+    left:0px;
 }
 .photo img{
     width:100%;
@@ -46,7 +52,6 @@
 .productBox{
     background:rgba(230,230,230,0.8);
     width:805px;
-    overflow:hidden;
     position:absolute;
     top:0;
     z-index:999;
@@ -54,6 +59,14 @@
     border-bottom-right-radius:10px;
     border:1px solid #ddd;
     border-top:none;
+}
+.pageSS .next,.pageSS .prev{
+    width:80px;
+}
+.productBox .signList{
+    position:absolute;
+    bottom:-30px;
+    right:0px;
 }
 .productBox .prev,
 .productBox .next{

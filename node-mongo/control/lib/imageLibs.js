@@ -54,6 +54,7 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
                 jsonReq.attr={
                     "metadata":{ property:"private" }
                 }
+                jsonReq.img=Thumbnail.getImagesSize(jsonReq.files[0]);
                 Images.uploadOriginImage(jsonReq,function(err,fileId){
                     if(err){
                         poolMain.release(database);

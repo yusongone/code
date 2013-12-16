@@ -28,7 +28,7 @@ var ajax_get=function(){
         "success":function(json){
             if("sorry"==json.status){alert(json.message);return false;};
             var data=json.data;
-            for(var i=0,l=data.length;i<l;i++){
+            for(var l=-1,i=data.length-1;i>l;i--){
                     var json=data[i];
                     var imgObj=imageFactory.createImg(json);
                 /*
@@ -79,15 +79,22 @@ var imageFactory=(function(){
 
                 page.ss=SlideShow.getPageSS({
                     images:slideshowData
+                    ,sort:true
+                });
+                page.ss.bind("change",function(activeIndex){
+                    var that=imgList[activeIndex];
+                    var pThumb=ThumbBar.getThumbTool(that); 
+                        $(".productBox").append(pThumb);
                 });
 
     function _addSlideshowData(json){
             var tempObj=json;
             var tempJson={};
-            var src="/album_photo/"+page.albumId+"/"+tempObj.id+"?size=800";
+            var src="/photo/"+page.cusInfoId+"/"+tempObj.fileId+"?size=600";
+            console.log(src);
             tempJson.src=src;
-            tempJson.max=800;
-            tempJson.id=tempObj.id;
+            tempJson.max=600;
+            tempJson.id=tempObj.fileId;
             tempJson.width=tempObj.width;
             tempJson.height=tempObj.height;
             slideshowData.push(tempJson);
@@ -99,6 +106,7 @@ var imageFactory=(function(){
         imgList.splice(index,1);
         slideshowData.splice(index,1);
     }
+
     function _getMeIndex(){
         var that=this;
         for(var i=0;i<imgList.length;i++){
@@ -113,19 +121,19 @@ var imageFactory=(function(){
         this.body.data("id",json.fileId);
         _addSlideshowData(json);
         this.id=json.fileId;
-        this.productList={};
         this.initUI(json); 
     }
-    image.prototype.addOverDiv=function(text){
-        var overSign=$("<div/>",{"class":"over "+text,"text":text})
+    image.prototype.addOverDiv=function(pro){
+        var that=this;
+        var overSign=$("<div/>",{"class":"over "+pro.text,"text":pro.text})
         var close=$("<div/>",{"class":"close fa fa-times"})
-        this.body.append(overSign.append(close));
-        //this.productList[obj.text]=overSign;
+            close.data("pro",pro);
+        this.overBox.append(overSign.append(close));
 
         close.click(function(){
-           that.subThu(thu); 
-           overSign.remove();
-            check(thu);
+            var pro=$(this).data("pro");
+            pro.subThu(that); 
+            overSign.remove();
         });
     };
     image.prototype.insertAnimate=function(){
@@ -137,8 +145,10 @@ var imageFactory=(function(){
             var img=$("<img/>",{"src":"/photo/"+page.cusInfoId+"/"+that.id+"?size=300"});
             var name=$("<div/>",{"class":"nameBox"});
                 name.append();
-            imgBox.append(img);
+            var overBox=$("<div/>",{"class":"overBox"});
+            imgBox.append(img,overBox);
         this.body.append(imgBox,name);
+        this.overBox=overBox;
         this.bindEvent({"imgBox":imgBox});
     }
     image.prototype.bindEvent=function(json){
@@ -146,6 +156,11 @@ var imageFactory=(function(){
         json.imgBox.click(function(){
             var index=_getMeIndex.call(that);
             page.ss.show().to(index);
+            var po=$(".productBox").css("position")||"absolute";
+            $(".productBox").css({"position":"fixed"});
+            page.ss.bind("close",function(){
+                $(".productBox").css({"position":po});
+            });
         });
 
         this.body.hover(function(){
@@ -158,9 +173,10 @@ var imageFactory=(function(){
     return {
         createImg:function(json){
             var imgObj=new image(json);
+                var index=imgList.length%4;
                 imgList.push(imgObj);
                 var c=["a","b","c","d"];
-                var index=imgList.length%4;
+                console.log(index);
                 $("."+c[index]).append(imgObj.body);
                 return imgObj;
         }
@@ -175,48 +191,56 @@ var imageFactory=(function(){
 
 
 var ThumbBar=(function(){
+    var signAry=[];
     var signList=$("<ul/>",{"class":"signList"})
     var hoverImage;
 
     function selectBtn(thum){
         this.body=$("<li/>",{"class":"btnBlue sign","text":thum.text});
-        this.ThumbShow=thum;
+        this.fatherThumb=thum;
         signList.append(this.body);
         this.bindEvent();
     }
     selectBtn.prototype.bindEvent=function(){
         var that=this;
         this.body.click(function(){
-            console.log($(this).data("enable"),"fefe");
+            alert("bcd");
             if($(this).data("enable")){return false;};
-            that.ThumbShow.addThu(hoverImage);
-           // hoverImage.addProduct(that.ThumbShow);
-            check(hoverImage);
+            that.fatherThumb.addThu(hoverImage);
         });
     }
 
-    function check(thu){
-            signList.find(".sign").each(function(){
-                var text=thu.text;
-                console.log(thu.body.find(".A").length);
-                if(thu.body.find("."+text).length>0){
-                    $(this).addClass("disable");
-                    $(this).data("enable",1);
-                }else{
-                    $(this).data("enable",0);
-                    $(this).removeClass("disable");
-                };
-            });
+    selectBtn.prototype.stats=function(stats){
+        var btn=this.body;
+        if(stats){
+            btn.addClass("disable");
+            btn.data("enable",1);
+        }else{
+            btn.data("enable",0);
+            btn.removeClass("disable");
+        }
+    };
+
+    function _btnStatus(imgObj){
+        for(var i=0;i<signAry.length;i++){
+            var index=signAry[i].fatherThumb.getChildIndex(imgObj);
+            if(index>-1){
+                signAry[i].stats(1);
+            }else{
+                signAry[i].stats(0);
+            }
+        }
     }
 
     return {
        createSign:function(thum){
            var that=this;
-           new selectBtn(thum);
+           signAry.push(new selectBtn(thum));
        }
-        ,getThumbTool:function(thu){
-            //check(thu);
-            hoverImage=thu;
+        ,btnStatus:_btnStatus
+        ,getThumbTool:function(imgObj){
+            this.btnStatus(imgObj);
+            hoverImage=imgObj;
             return signList;
         }
     }
@@ -246,23 +270,37 @@ var ProductThumbList=(function(){
        this.body.append(img,sign,this.count,name);
        productList.append(this.body);
    }
-   Thum.prototype.subThu=function(thu){
+   Thum.prototype.subThu=function(imgObj){
        var list=this.list;
-       var length=list.length;
-       for(var i=0;i<length;i++){
-           if(list[i]==thu.data("id")){
-                list.splice(i,1);
-           } 
-       }
-        this.count.text(this.list.length+"/"+this.data.imgCount)
+       var index=this.getChildIndex(imgObj);
+       console.log(index);
+        list.splice(index,1);
+        this.count.text(this.list.length+"/"+this.data.imgCount);
+        ThumbBar.btnStatus(imgObj);
    }
    Thum.prototype.addThu=function(imgObj){
+       var index=this.getChildIndex(imgObj);
+       if(index>-1){
+           return false;
+       }
        var that=this;
        this.list.push(imgObj.id);
         this.count.text(this.list.length+"/"+this.data.imgCount)
         var text=charAry[this.data.index];
-        imgObj.addOverDiv(this.text);
+        imgObj.addOverDiv(this);
+        ThumbBar.btnStatus(imgObj);
    }
+   Thum.prototype.getChildIndex=function(imgObj){
+       var list=this.list;
+       var length=list.length;
+        for(var i=0;i<length;i++){
+            if(list[i]==imgObj.id){
+                return i;
+            }
+        }; 
+        return -1;
+   }
+
     
    function _createThumbList(ary){
         for(var i=0;i<ary.length;i++){
