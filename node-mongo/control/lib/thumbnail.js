@@ -143,7 +143,8 @@ function _crop(jsonReq,callback){
             var ctx=canvas.getContext("2d");
             ctx.drawImage(img,0,0,smallW,smallH);
         }
-        canvas.toBuffer(callback);
+        //canvas.toBuffer(callback);
+        save1(canvas,callback);
 }
 
 
@@ -155,16 +156,27 @@ function testFs(buf){
         ctx.drawImage(img,0,0,50,50);
 }
 function save1(canvas,callback){
-    var fs = require('fs')
-        , out = fs.createWriteStream(__dirname + '/text.png')
-        , stream = canvas.pngStream();
-
+    var stream = canvas.createJPEGStream({
+              bufsize : 204800,
+              quality :90 
+        });
+    var length=0;
+    var chunkAry=[];
     stream.on('data', function(chunk){
-          out.write(chunk);
+        length+=chunk.length;
+        chunkAry.push(chunk);
     });
 
     stream.on('end', function(){
-        callback("saved png");
+        var buf=new Buffer(length);
+        for(var i=0;i<chunkAry.length;i++){
+            if(i==0){
+                chunkAry[i].copy(buf,0);
+            }else{
+                chunkAry[i].copy(buf,chunkAry[i-1].length);
+            }
+        }
+        callback(null,buf);
     });
 }
 
