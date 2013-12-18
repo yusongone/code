@@ -1,3 +1,15 @@
+.overDiv{
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(250,250,250,1);
+    z-index:9999;
+    position:absolute;
+}
+.top{
+    z-index:9999999;
+}
 .nav{position:fixed;}
 .topBox .search{
     float:right;
@@ -37,7 +49,7 @@
 }
 .nameBox .sign{
     margin:0 2px;
-    width:16px;
+    width:22px;
     height:16px;
     line-height:16px;
     padding:2px;
@@ -48,6 +60,9 @@
 }
 .signList{
     float:right;
+}
+.signList .sign.fa{
+    background:green;
 }
 .productBox{
     background:rgba(230,230,230,0.8);
@@ -65,8 +80,15 @@
 }
 .productBox .signList{
     position:absolute;
-    bottom:-30px;
+    bottom:-45px;
     right:0px;
+}
+.productBox .signList .sign{
+    width: 50px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 32px;
+    margin:0 3px;
 }
 .productBox .prev,
 .productBox .next{
@@ -93,6 +115,18 @@
     width:725px;
     overflow:hidden;
     float:left;
+}
+.productBox.slide{
+    border:1px solid #333;
+    background:rgba(50,50,50,0.8);
+}
+.productBox.slide .headImage,
+.productBox.slide .sign{
+    border-color:#666;
+}
+.productBox.slide .count{
+    background:rgba(50,50,50,0.8);
+    color:#aaa;
 }
 .productList{
     width:1000px;
@@ -128,6 +162,7 @@
     border-top-right-radius:5px;
     border-bottom-right-radius:5px;
     margin-left:-1px;
+    border-left:none;
     background:#09f;
 }
 .productLi .count{
@@ -140,6 +175,8 @@
     background: rgba(255,255,255,0.8);
     margin-left: 1px;
     line-height: 30px;
+    border-bottom-left-radius:4px;
+    border-bottom-right-radius:4px;
 }
 .productLi .name{
     width:100px;
@@ -224,3 +261,4 @@
 .content{
     position:relative;
 }
+
