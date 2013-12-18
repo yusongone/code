@@ -116,10 +116,10 @@ page.album=(function(){
 page.initAddAlbumBox=(function(){
     var div=$("<div/>",{});
     var htmlStr="<div class='toolbox'>"+
-                "<p class='alt'></p>"+
                 "<label>名称</label>"+
                 "<input class='text' id='name'/>"+
                 "<div class='btnBlue add'>添加</div>"+
+                "<p class='alt'></p>"+
                 "</div>";
         div.append(htmlStr);
 
@@ -127,6 +127,7 @@ page.initAddAlbumBox=(function(){
             var tage=$(this);
             if(!($("#name").val().trim())){
                 $(".alt").text("不能为空!");
+                return false;
             }
             if(tage.data("status")){
                 return false;
@@ -151,7 +152,7 @@ page.initAddAlbumBox=(function(){
                 width:350,
                 autoOpen:false,
                 close:function(){
-                   $(".alt").text();  
+                   $(".alt").text("");  
                    $("#name").val();
                 }
             });
