@@ -38,14 +38,16 @@ var SlideShow=window.slideShow||(function(){
                 img.load(function(){
                     load.remove();
                     imgBox.append(img);
+                    w=img[0].width||w;
+                    h=img[0].height||h;
+                    imgBox.css({
+                        "width":w+"px",
+                        "height":h+"px",
+                        "margin-left":(-w/2)+"px",
+                        "margin-top":(-h/2)+"px"
+                    });
                 });
 
-            imgBox.css({
-                "width":w+"px",
-                "height":h+"px",
-                "margin-left":(-w/2)+"px",
-                "margin-top":(-h/2)+"px"
-            });
             return imgBox;
         }
 

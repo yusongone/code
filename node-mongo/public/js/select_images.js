@@ -31,14 +31,6 @@ var ajax_get=function(){
             for(var l=-1,i=data.length-1;i>l;i--){
                     var json=data[i];
                     var imgObj=imageFactory.createImg(json);
-                /*
-                var id=data[i].fileId; 
-                var img=$("<img/>",{"src":"/photo/"+cusInfoId+"/"+id+"?size=300"});
-                var thu=$("<li/>",{"class":"thu"});
-                var overBox=$("<div/>",{"class":"overBox"});
-                thu.data("id",id);
-                thu.data("filename",data[i].filename);
-                */
             };
         }
     });
@@ -86,7 +78,6 @@ var imageFactory=(function(){
                     var that=imgList[activeIndex];
                     var pThumb=ThumbBar.getThumbTool(that); 
                         $(".productBox").append(pThumb);
-                        this.body.find(".imgBox").append(that.slideshowBox);
                         ActiveImage=that;
                         this.body.find(".imgBox").on({
                             dragstart:function(){
@@ -99,7 +90,6 @@ var imageFactory=(function(){
             var tempObj=json;
             var tempJson={};
             var src="/photo/"+page.cusInfoId+"/"+tempObj.fileId+"?size=600";
-            console.log(src);
             tempJson.src=src;
             tempJson.max=600;
             tempJson.id=tempObj.fileId;
@@ -127,32 +117,21 @@ var imageFactory=(function(){
     function image(json){
         this.body=$("<li/>",{"class":"photo"});
         this.body.data("id",json.fileId);
-        this.slideshowBox=$("<div/>",{});
         _addSlideshowData(json);
         this.id=json.fileId;
         this.initUI(json); 
     };
-    image.prototype.addSlideshowOverDiv=function(pro){
-        var that=this;
-        var overSign=$("<div/>",{"class":"over "+pro.text,"text":pro.text})
-        var close=$("<div/>",{"class":"close fa fa-times"})
-            close.data("pro",pro);
-        this.slideshowBox.append(overSign.append(close));
-
-        close.click(function(){
-            var pro=$(this).data("pro");
-            pro.subThu(that); 
-            overSign.remove();
-            return false;
-        });
-    };
+    image.prototype.subOverDiv=function(pro){
+        this.body.find(".over."+pro.text).remove();
+        this.imgBox.removeClass("type"+pro.text);
+    }
     image.prototype.addOverDiv=function(pro){
+        this.imgBox.addClass("type"+pro.text);
         var that=this;
         var overSign=$("<div/>",{"class":"over "+pro.text,"text":pro.text})
         var close=$("<div/>",{"class":"close fa fa-times"})
             close.data("pro",pro);
         this.overBox.append(overSign.append(close));
-        this.addSlideshowOverDiv(pro);
 
         close.click(function(){
             var pro=$(this).data("pro");
@@ -174,6 +153,7 @@ var imageFactory=(function(){
             imgBox.append(img,overBox);
         this.body.append(imgBox,name);
         this.overBox=overBox;
+        this.imgBox=imgBox;
         this.bindEvent({"imgBox":imgBox});
     }
     image.prototype.bindEvent=function(json){
@@ -181,12 +161,16 @@ var imageFactory=(function(){
         json.imgBox.click(function(){
             var index=_getMeIndex.call(that);
             page.ss.show().to(index);
-
-            var po=$(".productBox").css("position")||"absolute";
-            $(".productBox").css({"position":"fixed"});
+            
+            var proBox=$(".productBox");
+            var po=proBox.css("position")||"absolute";
+            proBox.css({"position":"fixed"});
             page.ss.bind("close",function(){
-                $(".productBox").css({"position":po});
+                proBox.css({"position":po});
+                proBox.removeClass("slide");
             });
+            imageFactory.cancelShowImages();
+            proBox.addClass("slide");
         });
 
         this.body.hover(function(){
@@ -204,7 +188,7 @@ var imageFactory=(function(){
         });
 
     }
-
+    var over=$("<div/>",{"class":"overDiv"});
     return {
         getActiveImage:function(){
             var temp=ActiveImage;
@@ -216,9 +200,24 @@ var imageFactory=(function(){
                 var index=imgList.length%4;
                 imgList.push(imgObj);
                 var c=["a","b","c","d"];
-                console.log(index);
                 $("."+c[index]).append(imgObj.body);
                 return imgObj;
+        },
+        cancelShowImages:function(text){
+            $(".top").removeClass("top");
+            $(".over").show("slow");
+            over.remove();
+        },
+        showImages:function(text){
+            var that=this;
+            $("body").append(over);
+            over.css({"height":$(document).height()})
+            $(".over").hide("slow");
+            $(".imgBox.type"+text).addClass("top");
+
+            over.click(function(){
+                that.cancelShowImages();
+            });
         }
     }
 })();
@@ -244,19 +243,22 @@ var ThumbBar=(function(){
     selectBtn.prototype.bindEvent=function(){
         var that=this;
         this.body.click(function(){
-            if($(this).data("enable")){return false;};
-            that.fatherThumb.addThu(hoverImage);
+            if($(this).data("enable")){
+                that.fatherThumb.subThu(hoverImage);
+            }else{
+                that.fatherThumb.addThu(hoverImage);
+            };
         });
     }
 
     selectBtn.prototype.stats=function(stats){
         var btn=this.body;
         if(stats){
-            btn.addClass("disable");
+            btn.addClass("fa fa-check");
             btn.data("enable",1);
         }else{
             btn.data("enable",0);
-            btn.removeClass("disable");
+            btn.removeClass("fa fa-check");
         }
     };
 
@@ -304,6 +306,9 @@ var ProductThumbList=(function(){
     } 
    Thum.prototype.bindEvent=function(){
        var that=this;
+       this.body.click(function(){
+           imageFactory.showImages(that.text);
+       });
        this.body.on({
             drop:function(e){
                 var obj=imageFactory.getActiveImage();
@@ -325,10 +330,10 @@ var ProductThumbList=(function(){
    Thum.prototype.subThu=function(imgObj){
        var list=this.list;
        var index=this.getChildIndex(imgObj);
-       console.log(index);
         list.splice(index,1);
         this.count.text(this.list.length+"/"+this.data.imgCount);
         ThumbBar.btnStatus(imgObj);
+        imgObj.subOverDiv(this);
    }
    Thum.prototype.addThu=function(imgObj){
        var index=this.getChildIndex(imgObj);
