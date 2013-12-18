@@ -168,7 +168,7 @@ function _addCustomerInfo(jsonReq,callback){
         var imagesLibId=new objectId();
         if(!userId){return callback("create ObjectId error")};
         col.insert({"_id":id,"studioId":studioId,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
-            callback(err,{"cusInfoId":id,"imageLibId":imagesLibId});
+            callback(err,item);
         });
 }
 //通过Id 获取一项客户具体信息

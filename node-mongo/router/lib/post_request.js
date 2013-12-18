@@ -232,7 +232,7 @@ function setApp(app){
                 }
                 if(result.status=="ok"){
                     ctrl.Customer.addCustomer(jsonReq,function(err,json){
-                        res.send(json);
+                        res.send({"status":"ok","data":json});
                     });
                 }else{
                         res.send({"status":"sorry"});

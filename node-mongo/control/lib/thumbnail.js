@@ -144,6 +144,10 @@ function _crop(jsonReq,callback){
             ctx.drawImage(img,0,0,smallW,smallH);
         }
         //canvas.toBuffer(callback);
+        ctx.fillStyle = "#fff";
+        ctx.font ='bold 20px Arial';
+        ctx.fillText("PICONLINE",canvas.width-100,canvas.height-50);
+
         save1(canvas,callback);
 }
 
