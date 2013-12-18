@@ -184,11 +184,14 @@ function setApp(app){
     app.get("/album_photo/:albumId/:imageId",function(req,res){
         var albumId=req.params.albumId;
         var imageId=req.params.imageId;
+            imageId=imageId.split(".")[0];
         var userId=req.session.userId;
         var sizeR={"origin":"origin","800":800,"300":300,"180":180,"100":100};
         var typeR={"fill":"fill"}
         var size=sizeR[req.query.size]||180;
         var type=typeR[req.query.type]||"normal";
+        var d=(new Date()).getTime();
+            console.log((new Date()).getTime()+"---------------------------------------");
             ctrl.Images.getAlbumImage({
                 "albumId":albumId,
                 "fileId":imageId,
@@ -198,6 +201,8 @@ function setApp(app){
             },function(err,data){
                 res.writeHead(200, {'Content-Type': 'image/png' });
                 res.end(data, 'binary');
+                var now=(new Date()).getTime();
+                console.log((now-d)+"=================================");
             });
     });
     //
