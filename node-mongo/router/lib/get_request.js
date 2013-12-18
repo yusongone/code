@@ -199,7 +199,7 @@ function setApp(app){
                 "imageType":type,
                 "size":size
             },function(err,data){
-                res.writeHead(200, {'Content-Type': 'image/png' });
+                res.writeHead(200, {"Cache-Control":"max-age=86400",'Content-Type': 'image/png' });
                 res.end(data, 'binary');
                 var now=(new Date()).getTime();
                 console.log((now-d)+"=================================");
@@ -237,7 +237,7 @@ function setApp(app){
                 "imageType":type,
                 "size":size
             },function(err,data){
-                res.writeHead(200, {'Content-Type': 'image/png' });
+                res.writeHead(200, {"Cache-Control":"max-age=86400",'Content-Type': 'image/png' });
                 res.end(data, 'binary');
             });
     });
@@ -263,7 +263,7 @@ function setApp(app){
                     if(err){
                         res.redirect("/404");
                     }else{
-                        res.writeHead(200, {'Content-Type': 'image/png' });
+                        res.writeHead(200, {"Cache-Control":"max-age=86400",'Content-Type': 'image/png' });
                         res.end(data, 'binary');
                     }
                 });
