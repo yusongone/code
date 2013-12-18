@@ -116,6 +116,7 @@ page.album=(function(){
 page.initAddAlbumBox=(function(){
     var div=$("<div/>",{});
     var htmlStr="<div class='toolbox'>"+
+                "<p class='alt'></p>"+
                 "<label>名称</label>"+
                 "<input class='text' id='name'/>"+
                 "<div class='btnBlue add'>添加</div>"+
@@ -124,6 +125,9 @@ page.initAddAlbumBox=(function(){
 
         div.find(".add").click(function(){
             var tage=$(this);
+            if(!($("#name").val().trim())){
+                $(".alt").text("不能为空!");
+            }
             if(tage.data("status")){
                 return false;
             }
@@ -145,7 +149,11 @@ page.initAddAlbumBox=(function(){
             div.dialog({
                 modal: true,
                 width:350,
-                autoOpen:false
+                autoOpen:false,
+                close:function(){
+                   $(".alt").text();  
+                   $("#name").val();
+                }
             });
         }
         ,open:function(){
