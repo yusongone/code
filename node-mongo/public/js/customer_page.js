@@ -79,14 +79,13 @@ page.Lib=(function(){
     lib.prototype.initUI=function(json){
         var li=$("<li/>",{}); 
             var name=$("<div/>",{"class":"td name"});
-                this.boy.name?name.append("<a class='boy bname'>"+this.boy.name+"</a>"):"";
-                this.girl.name?name.append("<a class='girl gname'>"+this.girl.name+"</a>"):"";
-            var cus=$("<div/>",{"class":"td qq","text":json.qq||"--"});
+                name.append("<a class='boy bname'>"+(this.boy.name||"--")+"</a>");
+                name.append("<a class='girl gname'>"+(this.girl.name||"--")+"</a>");
             var tel=$("<div/>",{"class":"td tel"});
-                this.boy.phone?tel.append("<a class='boy gphone'>"+this.boy.phone+"</a>"):"";
-                this.girl.phone?tel.append("<a class='girl gphone'>"+this.girl.phone+"</a>"):"";
+                tel.append("<a class='boy phone'>"+(this.boy.phone||"--")+"</a>");
+                tel.append("<a class='girl phone'>"+(this.girl.phone||"--")+"</a>");
             var play=$("<div/>",{"class":"td play"});
-            li.append(name,cus,tel,play);
+            li.append(name,tel,play);
         this.body=li;
         this.playBox=play;
     }
@@ -100,6 +99,7 @@ page.LibBar=(function(){
     function bar(tage,libJson){
         this.cusId=libJson._id;
         this.bindUserId=libJson.bindUser;
+        this.jsonData=libJson;
         this.initUI(tage,libJson);
     };
     bar.prototype.initUI=function(tage,libJson){
@@ -118,14 +118,29 @@ page.LibBar=(function(){
     };
     bar.prototype.bindEvent=function(json){
         var that=this;
+        console.log(that.jsonData);
             json.share.click(function(){
                 if($(this).data("bd")){return false;};
-                var box=$("<box/>",{});
+                var box=$("<box/>",{"class":"bindPathBox"});
                 var src="http://chart.apis.google.com/chart?chs=200x200&cht=qr&chld=|1&chl="+location.host+"/bindlink/"+that.cusId;
+                var imgBox=$("<div/>",{"class":"imgBox"});
                 var img=$("<img/>",{"src":src});
-                var input=$("<input/>",{"value":"http://"+location.host+"/bindlink/"+that.cusId});
-                box.append(img,input);
+                var load=$("<i/>",{"src":src,"class":"fa fa-spinner fa-spin load"});
+                var loadInfo=$("<p/>",{"class":"loadInfo","text":"加载二维码..."});
+                imgBox.append(load,loadInfo);
+                    img.load(function(){
+                        load.remove();
+                        loadInfo.remove();
+                        imgBox.append(img); 
+                    });
+
+                var htmlStr="<h3>使用指南</h3>"
+                            +"<p>请用手机扫描此二维码获取绑定地址，或者复制输入框中的地址发给用户。用户通过预留信息来绑定到客户信息，从而获取对应功能。</p>"
+                            +"<p class='resMes'>用户预留信息: "+that.jsonData.reserverMessage+"</p>"
+                var input=$("<input/>",{"class":"text pathInput","value":"http://"+location.host+"/bindlink/"+that.cusId});
+                box.append(imgBox,htmlStr,input);
                 box.dialog({
+                    width:450,
                     resizable:false,
                     modal: true,
                     close:function(){
@@ -217,84 +232,6 @@ page.customer=(function(){
     }
 })();
 
-//删除掉
-page.customer_des=(function(){
-    var addCustomerBox;
-    var _createSearchList=function(data,tag){
-        for(var i=0;i<data.length;i++){
-            var li=$("<li/>",{"text":data[i].name});
-            tag.append(li);
-        }
-    }
-
-
-    var _initCustomerAddDialog=function(){
-        var box=$("<div/>",{"class":"addCustomerBox"});
-        var inputBox=$("<div/>",{"class":"inputBox"});
-        var input=$("<input/>",{"class":"text searchCusInput","placeholder":"用户名/邮箱/第三方账号"});
-        var typeTab=$("<div/>",{"class":"typeTab"}); 
-        var add=$("<div/>",{"class":"btnBlue add","text":"添加"});
-            inputBox.append(input,typeTab);
-        var barBox=$("<div/>",{});
-        var progressBar=$("<div/>",{class:"progress"});
-        var ul=$("<div/>",{class:"searchList"});
-        box.append(barBox.append(inputBox,add),progressBar,ul);
-        box.dialog({
-             autoOpen:false,
-             resizable:false,
-            height:500,
-             modal: true
-        });
-        var interval=null;
-        var username;
-        
-        //input bind event
-        var json={"email":"邮件","qq":"QQ帐号","mobile":"手机","err":"用户名"};
-        input.bind("keyup",function(){
-            var val=input.val();
-            var type=Common.Type.getType(val);
-            typeTab.html(json[type]);
-            interval?clearTimeout(interval):"";
-            interval=setTimeout(function(){
-                clearTimeout(interval);
-                page.ajax_searchUser(val,function(data){
-                    var l=data.length; 
-                    ul.html("");
-                    if(l>0){
-                        username=data[0].name;
-                        _createSearchList(data,ul);
-                        Common.Btn.buttonOpreta(add,1);
-                    }else{
-                        username=null;
-                        if("err"==type){
-                            Common.Btn.buttonOpreta(add,0);
-                        }else{
-                            Common.Btn.buttonOpreta(add,1);
-                        }
-                    }
-                });
-            },500);
-        });
-
-        //add bind event
-        add.click(function(){
-            if(!$(this).data("status")){return;}
-            var value=username||input.val();
-            page.ajax_addCustomer(value);
-            username=null;
-        });
-        addCustomerBox=box;
-    }
-    
-    return {
-        init:function(){
-            _initCustomerAddDialog();
-        },
-        openAddBox:function(){
-            addCustomerBox.dialog("open");
-        }
-    }
-})();
 
 var ProductBox=(function(){
     var cusInfoId=null;

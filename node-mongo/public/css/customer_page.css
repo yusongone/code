@@ -59,33 +59,40 @@
 .content .boy{
     color:#09f;
 }
-.content .bname,
-.content .gname{
-    padding:0 10px;
-}
-.toolBar .td,
-.content .td{
+.toolBar .td{
     float:left;
-    height:30px;
     line-height:30px;
 }
 .content .td{
+    float:left;
     width:120px;
-    height:35px;
-    line-height:35px;
+    padding:5px 0;
+    font-size:14px;
 }
 .toolBar .name{
     margin-left:10px;
 }
 .toolBar .name,
 .content .name{
-    width:100px;
+    width:130px;
     padding-left:20px;
 }
-.toolBar .qq,
-.content .qq{
-    width:120px;
+
+.content .bname,
+.content .gname{
+    float:left;
+    height:20px;
+    line-height:20px;
+    width:100%;
 }
+
+.content .phone{
+    float: left;
+    height: 20px;
+    line-height: 20px;
+    width: 100%;
+}
+
 .toolBar .tel,
 .content .tel{
     width:150px;
@@ -94,9 +101,13 @@
 .content .email{
     width:150px;
 }
-.toolBar .play,
+.toolBar .play{
+    text-align:center;
+    width:500px;
+}
 .content .play{
-    width:300px;
+    width:500px;
+    text-align:right;
 }
 .content .play a.active{
     color:#666;
@@ -109,7 +120,7 @@
     display:block;
     width:50px;
     text-align:center;
-    float:left;
+    display:inline;
 }
 .content .play a:hover{
     color:#333;
@@ -217,4 +228,40 @@
     border:1px solid #ddd;
     border-radius:3px;
 }
-
+.bindPathBox{
+    float:left;
+}
+.bindPathBox .imgBox{
+    float:left;
+    border:1px solid #ddd;
+    border-radius:10px;
+    margin-right:15px;
+    margin-bottom:15px;
+    overflow:hidden;
+    width:200px;
+    height:200px;
+}
+.bindPathBox .load{
+    margin:85px 0 10px 50px;
+    font-size:32px;
+    float:left;
+}
+.bindPathBox .loadInfo{
+    float: left;
+    width: 100px;
+    text-align: center;
+    margin-top: 93px;
+}
+.bindPathBox h3{
+    margin:10px 0;
+}
+.bindPathBox p{
+    font-size:14px;
+}
+.bindPathBox .pathInput{
+    width:410px;
+}
+.bindPathBox .resMes{
+    margin-top:20px;
+    color:#999;
+}
