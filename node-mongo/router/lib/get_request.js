@@ -83,6 +83,11 @@ function setApp(app){
             "title":"第一次登录",
         });
     });
+    app.get('/logout', function(req,res){
+        req.session.destroy();
+        res.redirect("/login");
+    });
+
     app.get('/login', function(req,res){
         var path=req.query.path;
         if(path){path=path.toString()};
@@ -401,7 +406,7 @@ function setApp(app){
     });
     app.get('/b/manage_image/:cusInfoId', function(req, res){
         if(!req.params.cusInfoId){ res.redirect("/404"); };
-        if(checkLogind(req,res,"get","/b/manage_image"+req.params.id)){
+        if(checkLogind(req,res,"get","/b/manage_image/"+req.params.id)){
             checkStudio(req,res,"get",function(err,result){
                 if(err){
                     return showError({

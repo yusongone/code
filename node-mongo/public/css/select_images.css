@@ -10,7 +10,6 @@
 .top{
     z-index:9999999;
 }
-.nav{position:fixed;}
 .topBox .search{
     float:right;
     margin:2px 0 0 50px;

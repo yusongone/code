@@ -6,33 +6,9 @@ $(document).ready(function(){
         page.ajax_getPhotosFromAlbum();
 });
 
-page.ajax_getPhotosFromAlbum=function(){
-    $.ajax({
-        "type":"post",
-        "url":"/getPhotosFromAlbum",
-        "data":{"albumId":page.albumId},
-        "dataType":"json",
-        "success":function(data){
-            if(data.status=="ok"){
-                var ary=data.data.photos||[];
-                var name=data.data.name;
-                var count=ary.length;
-                var a=$("<a/>",{href:"/album_list"});
-                    a.append("<i class='fa fa-arrow-left'></i>");
-                $(".page_title").html(a).append("",name);
-                $(".count label").text(count);
-                for(var i=0;i<count;i++){
-                    var json=ary[i];
-                    var imgObj=imageFactory.createImg(json);
-                }
-            }
-        }
-    });
-};
 
 
 function bindFileUpload(){
-//测试
     $('#upload').fileupload({
         autoUpload: true,//是否自动上传
         url:"/uploadPhotoToAlbum",//上传地址
@@ -42,22 +18,18 @@ function bindFileUpload(){
         done: function (e, data) {//设置文件上传完毕事件的回调函数
         },
         fail:function(e,data){
-            var upl=data.context.data("object");
+            var upl=data.uploader;
                 upl.fail(data);
         },
         add:function(e,data){
-            data.context=UP.createAupload({name:data.files[0].name,"data":data});
+            console.log(data);
+            var uploader=UP.createAupload({"data":data});
             UP.open(data);
-            data.submit();
-            data.jqXHR.done(function(reqData){
-                if(reqData.status=="ok"){
-                    var upl=data.context.data("object");
-                        upl.done(reqData.data);
-                }
-            });
+            data.uploader=uploader;
+            uploader.submit();
         },
         progress: function (e, data) {//设置上传进度事件的回调函数
-            var upl=data.context.data("object");
+            var upl=data.uploader;
             var val=parseInt(data.loaded/data.total*100,10);
             upl.setValue(val);
         },
@@ -66,7 +38,6 @@ function bindFileUpload(){
         }
     });
 }
-
 
 var UP=(function(){
         var div;
@@ -90,29 +61,33 @@ var UP=(function(){
         });
     }
 
-    var uploadLi=function(){
+    var uploadLi=function(json){
         this.body=$("<p/>");
-        this.body.data("object",this);
+        this.data=json.data;
+        this.initUI(json);
     }
-    uploadLi.prototype.createUI=function(json){
+    uploadLi.prototype.submit=function(json){
+        var that=this;
+            that.progress.removeClass("fail");
+            that.progress.progressbar({value:0});
+            that.data.submit();
+            that.data.jqXHR.done(function(reqData){
+                that.done(reqData.data);
+            });
+    }
+    uploadLi.prototype.initUI=function(json){
         var p=this.body;
         var that=this;
-        that.data=json.data;
-        var name=$("<div/>",{"class":"proName","text":json.name});
+        var name=$("<div/>",{"class":"proName","text":that.data.files[0].name});
         this.progress=$("<div/>",{});
-        this.btnCancel=$("<div/>",{"text":"取消","class":"cancel"});
         this.resubmit=$("<div/>",{"text":"重试","class":"resubmit"});
-        p.append(this.progress.append(name,this.btnCancel,this.resubmit));
-        this.progress.progressbar({value:3});
+        p.append(this.progress.append(name,this.resubmit));
+        this.progress.progressbar({value:0});
         this.progress.addClass("progress");
         div.append(p);
-        this.btnCancel.click(function(){
-            json.data.abort();
-            that.cancel();
-        });
         this.resubmit.click(function(){
             $(this).hide();
-            that.data.submit();
+            that.submit();
         });
     }
     uploadLi.prototype.fail=function(callback){
@@ -124,7 +99,7 @@ var UP=(function(){
     }
     uploadLi.prototype.done=function(data){
         this.progress.addClass("done");
-        this.btnCancel.hide();
+        this.resubmit.hide();
         var imgObj=imageFactory.createImg({id:data.fileId,width:data.img.width,height:data.img.height});
             imgObj.insertAnimate();
     }
@@ -138,9 +113,8 @@ var UP=(function(){
             div.dialog("open");
         },
         createAupload:function(json){
-            var ul=new uploadLi();
-                ul.createUI(json);
-                return ul.body;
+            var ul=new uploadLi(json);
+                return ul;
         }
     } 
 })();
@@ -248,6 +222,29 @@ var ajax_deleteImage=function(albumId,fileId,callback){
    }); 
 }
 
+page.ajax_getPhotosFromAlbum=function(){
+    $.ajax({
+        "type":"post",
+        "url":"/getPhotosFromAlbum",
+        "data":{"albumId":page.albumId},
+        "dataType":"json",
+        "success":function(data){
+            if(data.status=="ok"){
+                var ary=data.data.photos||[];
+                var name=data.data.name;
+                var count=ary.length;
+                var a=$("<a/>",{href:"/album_list"});
+                    a.append("<i class='fa fa-arrow-left'></i>");
+                $(".page_title").html(a).append("",name);
+                $(".count label").text(count);
+                for(var i=0;i<count;i++){
+                    var json=ary[i];
+                    var imgObj=imageFactory.createImg(json);
+                }
+            }
+        }
+    });
+};
 
 
 

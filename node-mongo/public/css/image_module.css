@@ -31,15 +31,21 @@
 .content .inputBox .btnBlue{
     margin-left:5px;
 }
-.moduleList li{
+.moduleList .module:hover{
+    background:#dde5f0;
+}
+.moduleList .module{
+    border-radius:10px;
     position:relative;
     float:left;
     padding:20px 0;
     float:left;
-    border-bottom:1px solid #ddd;
     width:100%;
 }
 .module .editInput{
+}
+.module.editBox{
+    background:#dde5f0;
 }
 .imgBox{
     float:left;
@@ -49,6 +55,9 @@
     text-align:center;
     cursor:pointer;
     position:relative;
+    border:1px solid #ddd;
+    border-radius:5px;
+    margin-left:15px;
 }
 .imgBox img{
     max-width:100%;
@@ -70,16 +79,24 @@
     float:left;
     width:70px;
 }
+.rightBox textarea{
+    width:600px;
+    height:70px;
+}
 .rightBox{
     float:left;
     width:600px;
-    margin-left:10px;
+    margin-left:20px;
 }
 .rightBox .name{
     margin-top: 0;
     font-size: 16px;
     font-weight: bold;
     width:100%;
+}
+.rightBox .imgCount{
+    margin-top:5px;
+    float:left;
 }
 .rightBox .size{
     margin-top:5px;
@@ -94,9 +111,11 @@
 }
 .btnBar{
     position:absolute;
-    right:0;
+    right:20px;
 }
 .btnBar .edit,
+.btnBar .cancel,
+.btnBar .save,
 .btnBar .delete{
     margin-left:5px;
 }

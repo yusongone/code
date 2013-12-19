@@ -83,18 +83,6 @@ function getUserAndCustomerRelation(jsonReq,callback){
         });
 }
 
-/*
-//在 客户关系表中增加一项 客户具体信息 的索引
-function _addCustomerToList(jsonReq,callback){
-    var database=jsonReq.database;
-    var cusId=jsonReq.cusInfoId;
-    var userId=jsonReq.userId;
-    var col=database.collection("studio");
-        col.update({"userId":userId},{$addToSet:{customerList:{$each:[{"cusId":cusId}]}}},{w:1},function(err,doc){
-            callback(err,{"status":"ok"});
-        });
-};
-*/
 //检测customerInfo 相信信息是否绑定用户;
 function _checkBind(jsonReq,callback){
     var database=jsonReq.database;
@@ -109,20 +97,6 @@ function _checkBind(jsonReq,callback){
                 callback(err,false);
             }
         });
-/*
-        col.find({"bindUser":buser}).toArray(function(err,item){
-            if(err){return callback(err)}
-            if(item.length>0){
-                if(null==item[0].bindUser){
-                    callback(err,false);
-                }else{
-                    callback(err,true);
-                }
-            }else{
-                callback(err,false);
-            }
-        });
-        */
 };
 //绑定用户Id到customerInfo表中；
 function _bindUser(jsonReq,callback){
@@ -332,18 +306,6 @@ function getProductsFromCustomer(jsonReq,callback){
         });
 }
 
-/*
-function _searchCustomer(jsonReq,callback){
-    var database=jsonReq.database;
-    var keyword=json.keyword;
-    var col=database.collection("customer");
-        col.find({$or:[{"name":keyword},{"qqId":keyword},{"email":keyword}]},{"name":1,"_id":0}).toArray(function(err,item){
-            callback(err,item);
-        })
-}
-
-exports.searchCustomer=_searchCustomer;
-*/
 
 exports.bindUser=_bindUser;
 exports.checkBind=_checkBind;
