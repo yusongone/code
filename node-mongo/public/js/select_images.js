@@ -391,18 +391,24 @@ var ProductThumbList=(function(){
                 obj[productId]=list;
             };
             showSelectList.parseData(obj);
-            var c=JSON.stringify(obj)
-            ajax_upload({"objStr":c});
         }
    }
 })();
 
 var showSelectList=(function(){
     var d;
+    var obj;
     function initDialog(){
         d=$("<div/>",{});
             d.dialog({
                 autoOpen:false
+                ,model:true
+                ,buttons:{
+                    s:function(){
+                        var c=JSON.stringify(obj)
+                        ajax_upload({"objStr":c});
+                    }
+                }
             });
     }
 
@@ -411,6 +417,8 @@ var showSelectList=(function(){
             var z=$("<div/>");
             var headline=$("<div/>",{"text":i})
             var ul=$("<ul/>",{});
+                var li=$("<li/>",{"text":data[i].name});
+                ul.append(li);
             for(var j=0;j<data[i].length;j++){
                 var li=$("<li/>",{"text":data[i][j]});
                 ul.append(li);
@@ -424,6 +432,7 @@ var showSelectList=(function(){
             initDialog();
         },
         parseData:function(data){
+            obj=data;
             createUI(data);
             d.dialog("open");
         }
