@@ -19,6 +19,10 @@ $(window).scroll(function(evt){
     };
 });
 
+window.onbeforeunload=function(){
+        return confirm("保存？");
+}
+
 var ajax_get=function(){
     $.ajax({
         "type":"post",

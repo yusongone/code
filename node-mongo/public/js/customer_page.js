@@ -23,7 +23,7 @@ page.ajax_addCustomer=function(data,fun){
         "data":data,
         "success":function(result){
             if("ok"==result.status){
-                fun();
+                fun(result.data[0]);
             }else{
             }
         },
@@ -171,9 +171,12 @@ page.customer=(function(){
                 "提交":function(){
                     var value=getValue(); 
                     if(value){
-                        page.ajax_addCustomer(value,function(){
+                        page.ajax_addCustomer(value,function(dataReq){
                             addCustomerBox.dialog("close");
-                        })
+                            var Lib=page.Lib
+                            var lib=new Lib(dataReq);
+                            $(".list").append(lib.body);
+                        });
                     }
                 }
             }
@@ -322,7 +325,6 @@ var ProductBox=(function(){
     }
 
     function _getCusProducts(cusInfoId){
-        console.log(cusInfoId);
         $.ajax({
             "type":"post",
             "url":"/ajax_getProductsFromCustomer",
@@ -392,7 +394,6 @@ var Product=(function(){
             str="<div class='countBox'><div class='subOne'>-</div><input id='count' value='"+(json.count||"NAN")+"'><div class='addOne'>+</div></div>"
             str+="<div class='btnRed remove'>移除</div>";
         }
-        console.log(json);
         var html="<li class='productLi'>"+str+
                     "<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
                     "<div class='name'>"+json.name+"</div>"+
@@ -428,7 +429,6 @@ var Product=(function(){
                 "productId":pid
             },
             "success":function(data){
-                console.log(data);
             }
         });
     }
@@ -442,7 +442,6 @@ var Product=(function(){
                 "productId":pid
             },
             "success":function(data){
-                console.log(data);
             }
         });
     }
@@ -456,7 +455,6 @@ var Product=(function(){
                 "productId":pid
             },
             "success":function(data){
-                console.log(data);
             }
         });
     }

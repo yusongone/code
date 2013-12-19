@@ -210,14 +210,15 @@ var imageFactory=(function(){
     image.prototype.bindEvent=function(json){
         var that=this;
         json.del.click(function(){
-            ajax_deleteImage(page.albumId,that.id,function(){
-                that.body.remove();
-                _removeMe.call(that); 
-            });
+            if(confirm("确定要删除此照片？")){
+                ajax_deleteImage(page.albumId,that.id,function(){
+                    that.body.remove();
+                    _removeMe.call(that); 
+                });
+            }
         });
         json.imgBox.click(function(){
             var index=_getMeIndex.call(that);
-            console.log("myIndex",index);
             page.ss.show().to(index);
         });
         json.download.click(function(){
