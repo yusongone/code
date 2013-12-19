@@ -49,6 +49,7 @@ var removeAlbum=function(jsonReq,callback){
                 deletePhotosFromAlbum(jsonReq,function(err,failAry){
                     if(failAry.length>0){
                         console.log("delete Album error fail list",failAry);
+                        poolMain.release(database);
                         callback("delete image error",failAry); 
                     }else{
                         _removeAlbum(jsonReq,callback);     
@@ -61,8 +62,8 @@ var removeAlbum=function(jsonReq,callback){
         });
         function _removeAlbum(jsonReq,callback){
             db.Album.removeAlbum(jsonReq,function(err,result){
-                if(err){ poolMain.release(database); return callback(err) };
                 poolMain.release(database);
+                if(err){ poolMain.release(database); return callback(err) };
                 callback(err,result);
             });
         }
@@ -146,7 +147,7 @@ var deletePhotosFromAlbum=function(jsonReq,callback){
             db.Album.checkAlbumAuth(jsonReq,function(err,result){
                 if(result){
                     Images.deleteOriginImage(jsonReq,function(err,fileId){
-                        if(err){return callback(err)}
+                        if(err){ poolMain.release(database); return callback(err)}
                         db.Album.deletePhotoIdFromAlbum(jsonReq,function(err,result){
                             callback(err,result);
                             Thumbnail.removeThumbnailByOriginId(jsonReq);
@@ -167,9 +168,9 @@ var deleteOnePhotoFromAlbum=function(jsonReq,callback){
         db.Album.checkAlbumAuth(jsonReq,function(err,result){
             if(result){
                 Images.deleteOriginImage(jsonReq,function(err,fileId){
-                    poolMain.release(database);
-                    if(err){return callback(err)}
+                    if(err){ poolMain.release(database); return callback(err)}
                     db.Album.deletePhotoIdFromAlbum(jsonReq,function(err,result){
+                        poolMain.release(database);
                         callback(err,result);
                         Thumbnail.removeThumbnailByOriginId(jsonReq);
                     });

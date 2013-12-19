@@ -7,7 +7,7 @@ var thu_conf=require("../../config.json").thumbnail;
 var img_conf=require("../../config.json").image;
 var poolModule=require("generic-pool");
 var log=true,
-    maxTime=5000,
+    maxTime=30000,
     maxCon=50;
 
 //表结构数据库连接

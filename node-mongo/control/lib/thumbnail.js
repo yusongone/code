@@ -69,12 +69,12 @@ var _insertThumbnailToDB=function(jsonReq,callback){
 //
 var removeThumbnailByOriginId=function(jsonReq){
     poolThumbnail.acquire(function(err,database){
-        jsonReq.database=null;
         jsonReq.database=database;
         jsonReq.queryObj={
             "metadata.originalImageId":jsonReq.fileId
         }
         db.Images.getImageInfo(jsonReq,function(err,imageInfo){
+            poolThumbnail.release(database);
             var l=imageInfo.length;
             var z=0;
             for(var i=0;i<l;i++){
@@ -83,7 +83,6 @@ var removeThumbnailByOriginId=function(jsonReq){
                     z++;
                     console.log("remove a thumbnail");
                     if(z==l){
-                        poolThumbnail.release(database);
                         console.log("remove all thumb");
                     }
                 });
