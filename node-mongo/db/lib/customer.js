@@ -140,8 +140,9 @@ function _addCustomerInfo(jsonReq,callback){
         var id=new objectId();
         var userId=_createObjectId(userId);
         var imagesLibId=new objectId();
+        var isoData=(new Date()).toISOString();
         if(!userId){return callback("create ObjectId error")};
-        col.insert({"_id":id,"studioId":studioId,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
+        col.insert({"_id":id,"createDate":isoData,"studioId":studioId,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
             callback(err,item);
         });
 }

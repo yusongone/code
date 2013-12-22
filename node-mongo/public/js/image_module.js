@@ -176,7 +176,6 @@ pageSpace.Product=(function(){
                    var description=body.find(".description");
                    description.append(descriptionInput.val(description.find(".show").text()));
                 });
-
             var imageEdit=$("<input/>",{"class":"imageEdit","type":"file"});
             that.bindUploadEvent(imageEdit);
 
@@ -195,7 +194,7 @@ pageSpace.Product=(function(){
                             "<div class='btnBar'></div>"+
                             "</div>";
         this.body.append($(html));
-        this.body.find(".imgBox").append(imageEdit);
+        this.body.find(".imgBox").append("<i class='fa fa-pencil editIcon'></i>",imageEdit);
         this.body.find(".btnBar").append(save,cancel,edit,btnDelete);
     }
     return product;
