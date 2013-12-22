@@ -456,8 +456,8 @@ var ProductFactory=(function(){
             jsonReq.cid=that.cusInfoId;
         page.ajax_bindProduct(jsonReq,function(){
             if(!that.count){
-                json.type="pList"
-                json.count=1;
+                that.json.type="pList"
+                that.json.count=1;
                 ProductFactory.createProduct(that.json);
             }else{
                 that.count++;
