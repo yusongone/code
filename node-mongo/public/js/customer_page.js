@@ -332,7 +332,8 @@ var Product=(function(){
             str+="<div class='btnRed remove'>移除</div>";
         }
         var html="<li class='productLi'>"+str+
-                    "<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
+                 //   "<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
+                    "<div class='thu'><img src='data:image/gif;base64,"+json.base64Img+"' /> </div>"+
                     "<div class='name'>"+json.name+"</div>"+
                     "<div class='size'>"+json.size+"</div>"+
                     "<div class='imgCount'>"+(json.imgCount||"1")+"</div>"+

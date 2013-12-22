@@ -35,23 +35,17 @@ function addProductToList(jsonReq,callback){
         });
 }
 
-
-
-//增加产品到列表
-/*
-function addProductToList(jsonReq,callback){
+function removeProductFromList(jsonReq,callback){
     var database=jsonReq.database;
-    var cusId=jsonReq.cusInfoId;
-    var productId=jsonReq.productId;
-    var cid=_createObjectId(cusId);
-    var pid=_createObjectId(productId);
-    if(!(cid&&pid)){return callback("creat object error at addProductToList function")}
+    var name=jsonReq.name;
+    var studioId=jsonReq.studioId;
     var col=database.collection("productList");
-        col.update({"cusInfoId":cid},{$addToSet:{products:{$each:[{"productId":pId}]}}},{w:1},function(err,doc){
-            callback(err,{"status":"ok"});
+    var pid=_createObjectId(jsonReq.productId);
+        col.update({"studioId":studioId},{$pull:{products:{"_id":pid}}},function(err,result){
+            callback(err,result);
         });
 }
-*/
+
 
 function getProductById(jsonReq,callback){
     var database=jsonReq.database,
@@ -94,6 +88,7 @@ function changeProduct(jsonReq,callback){
     var studioId=jsonReq.studioId;
     var name=jsonReq.name,
         userId=jsonReq.userId,
+        base64Img=jsonReq.base64Img||null,
         imgPath=jsonReq.imgPath||null,
         size=jsonReq.size,
         price=jsonReq.price,
@@ -105,14 +100,15 @@ function changeProduct(jsonReq,callback){
         if(!(uid&&pid)){return callback("create objectId err db/lib/products changeParoduct")}
     var col=database.collection("productList");
     var setObject={};
+        base64Img?setObject["products.$.base64Img"]=base64Img:"";
         imgCount?setObject["products.$.imgCount"]=imgCount:"";
         name?setObject["products.$.name"]=name:"";
         imgPath?setObject["products.$.imgPath"]=imgPath:"";
         size?setObject["products.$.size"]=size:"";
         price?setObject["products.$.price"]=price:"";
         description?setObject["products.$.description"]=description:"";
-        col.update( {"studioId":studioId,"products._id":pid},{ "$set":setObject },function(err,item){
-                    callback(err,item);
+        col.update({"studioId":studioId,"products._id":pid},{ "$set":setObject },function(err,item){
+            callback(err,item);
         });
 }
 
@@ -123,3 +119,4 @@ exports.checkProductDocExist=checkProductDocExist;
 exports.AddRowToProductList=AddRowToProductList;
 exports.changeProduct=changeProduct;
 exports.getProductById=getProductById;
+exports.removeProductFromList=removeProductFromList;

@@ -46,6 +46,21 @@ pageSpace.ajax_getProductList=function(){
     });
 }
 
+pageSpace.ajax_removeProduct=function(productId,callback){
+    $.ajax({
+        type:"post",
+        url:"/removeProduct",
+        dataType:"json",
+        data:{productId:productId},
+        success:function(data){
+            if(data.status=="ok"){
+                callback();
+            }else{
+                alert("sorry"+data.message);
+            }
+        }
+    });
+}
 pageSpace.ajax_addProduct=function(name,callback){
     $.ajax({
         type:"post",
@@ -180,11 +195,15 @@ pageSpace.Product=(function(){
             that.bindUploadEvent(imageEdit);
 
             var btnDelete=$("<div/>",{"class":"btnRed delete","text":"删除"}).click(function(){
+                pageSpace.ajax_removeProduct(json._id,function(){
                 alert("asddf"); 
+                
+                });
             });
 
 
-            var html="<div class='imgBox'><img src='/public_image/"+json.imgPath+"' /> </div>"+
+            //var html="<div class='imgBox'><img src='/public_image/"+json.imgPath+"' /> </div>"+
+            var html="<div class='imgBox'><img src='data:image/gif;base64,"+json.imgPath+"' /> </div>"+
                         "<div class='rightBox'>"+
                             "<div class='name'><lable>名称:</lable><label class='show'> "+(json.name||"- -")+"</label></div>"+
                                 "<div class='size'><lable>尺寸: </lable><label class='show'> "+(json.size||"- -")+"</label></div>"+

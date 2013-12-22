@@ -7,6 +7,7 @@ var parse=db.Common.parse;
 var Type=db.Common.Type;
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
+var Thumbnail=require("./thumbnail");
 
 function _getCustomerInfoIdByBindUserId(jsonReq,callback){
     poolMain.acquire(function(err,database){

@@ -1,7 +1,8 @@
 var Common=require("./common");
+var ctrl=require("../../control");
 var mongodb=require("mongodb"),
     Product=require("./product");
-    objectId=mongodb.ObjectID;
+var objectId=mongodb.ObjectID;
 
     var _createObjectId=Common.createObjectId;
 
@@ -223,11 +224,42 @@ function addProductToCustomer(jsonReq,callback){
                 Product.getProductById(jsonReq,function(err,doc){
                     var productObj=doc;
                         productObj.count=1;
-                    col.update({"_id":cid},{$addToSet:{products:{$each:[productObj]}}},function(err,result){
-                        callback(err,result);
-                    });
+                        col.update({"_id":cid},{$addToSet:{products:{$each:[productObj]}}},function(err,result){
+                            callback(err,result);
+                        });
                 });
             }
+        });
+}
+function subProductFromCustomer(jsonReq,callback){
+    var database=jsonReq.database;
+    var cid=_createObjectId(jsonReq.cusInfoId);
+    var pid=_createObjectId(jsonReq.productId);
+    if(!(cid&&pid)){return callback("create object Id error");}
+    var col=database.collection("customerInfo");
+        getProductFromCustomerById(jsonReq,function(err,doc){
+            if(!doc){return callback("no product")};
+           if(doc.count&&doc.count>1){
+                col.update({"_id":cid,"products._id":pid},{ "$inc":{"products.$.count":-1}},function(err,item){
+                    callback(err,item);
+                });
+           }else if(doc.count&&doc.count==1){
+               removeProductFromCustomer(jsonReq,function(err,result){
+                   callback(err,result);
+               });
+           }
+        });
+}
+
+//删除用户绑定的product
+function removeProductFromCustomer(jsonReq,callback){
+    var database=jsonReq.database;
+    var cid=_createObjectId(jsonReq.cusInfoId);
+    var pid=_createObjectId(jsonReq.productId);
+    if(!(cid&&pid)){return callback("create object Id error");}
+    var col=database.collection("customerInfo");
+        col.update({"_id":cid},{$pull:{products:{"_id":pid}}},function(err,result){
+            callback(err,result);
         });
 }
 //上传选片列表数据
@@ -261,39 +293,7 @@ function getProductFromCustomerById(jsonReq,callback){
 
 }
 
-function subProductFromCustomer(jsonReq,callback){
-    var database=jsonReq.database;
-    var cid=_createObjectId(jsonReq.cusInfoId);
-    var pid=_createObjectId(jsonReq.productId);
-    if(!(cid&&pid)){return callback("create object Id error");}
-    var col=database.collection("customerInfo");
-        getProductFromCustomerById(jsonReq,function(err,doc){
-            if(!doc){return callback("no product")};
-           if(doc.count&&doc.count>1){
-                col.update({"_id":cid,"products._id":pid},{ "$inc":{"products.$.count":-1}},function(err,item){
-                    callback(err,item);
-                });
-           }else if(doc.count&&doc.count==1){
-               removeProductFromCustomer(jsonReq,function(err,result){
-                   callback(err,result);
-               });
-           }
-        });
-}
 
-//删除用户绑定的product
-function removeProductFromCustomer(jsonReq,callback){
-    var database=jsonReq.database;
-    var cid=_createObjectId(jsonReq.cusInfoId);
-    var pid=_createObjectId(jsonReq.productId);
-    if(!(cid&&pid)){return callback("create object Id error");}
-    var col=database.collection("customerInfo");
-        col.update({"_id":cid},{$pull:{products:{"_id":pid}}},function(err,result){
-            callback(err,result);
-        });
-}
-
-//删除用户绑定的product
 function getProductsFromCustomer(jsonReq,callback){
     var database=jsonReq.database;
     var cid=_createObjectId(jsonReq.cusInfoId);

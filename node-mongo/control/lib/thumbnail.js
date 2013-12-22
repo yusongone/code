@@ -192,6 +192,9 @@ function save2(canvas){
         stream.pipe(out);
 }
 
+function _cropImage(){
+}
+
 
 exports.getImagesSize=function(file){
     var img=new Image;
