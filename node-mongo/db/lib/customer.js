@@ -282,13 +282,16 @@ function getProductFromCustomerById(jsonReq,callback){
     var pid=_createObjectId(jsonReq.productId);
     var col=database.collection("customerInfo");
         col.findOne({"_id":cid,"products._id":pid},function(err,doc){
+            if(!doc){
+               return callback(err,null);
+            }
             var ary=doc.products;
             for(var i=0,l=ary.length;i<l;i++){
                 if(ary[i]["_id"]==pid.toString()){
                     return callback(err,ary[i]);
                 }
             }
-            callback(err,null);
+                callback(err,null);
         });
 
 }
