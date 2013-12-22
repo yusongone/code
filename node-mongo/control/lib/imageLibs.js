@@ -68,7 +68,7 @@ var _uploadImageToImagesLib=function(jsonReq,callback){
                         if(err){
                             return callback(err);
                         }
-                        callback(err,result);
+                        callback(err,{"fileId":jsonReq.fileId, "img":jsonReq.img});
                     });
                 });       
             }

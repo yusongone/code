@@ -119,45 +119,63 @@ pageSpace.Product=(function(){
             var nameInput=$("<input/>",{"class":"text editInput"});
             var sizeInput=$("<input/>",{"class":"text editInput"});
             var imgCountInput=$("<input/>",{"class":"text editInput"});
-            var descriptionInput=$("<textarea/>",{"class":"text editInput",width:"650",height:"70"});
+            var descriptionInput=$("<textarea/>",{"class":"text editInput"});
 
 
-            var save=$("<div/>",{"class":"btnBlue save hide","text":"保存"}).click(function(){
-                $(this).hide(); 
-                edit.show();
-                var jsonReq={
-                    productId:that.id,
-                    productName:nameInput.val(),
-                    imgCount:imgCountInput.val(),
-                    size:sizeInput.val(),
-                    description:descriptionInput.val()
-                };
-                    
-                pageSpace.ajax_saveChange(jsonReq,function(data){
-                    var body=that.body;
-                    that.body.find(".show").show();
-                    that.body.find(".editInput").remove();
-                    body.find(".name .show").text(jsonReq.productName);
-                    body.find(".size .show").text(jsonReq.size);
-                    body.find(".description .show").text(jsonReq.description);
-                    body.find(".imgCount .show").text(jsonReq.imgCount);
+            var save=$("<div/>",{"class":"btnBlue save hide","text":"保存"});
+                save.click(function(){
+                    $(this).hide(); 
+                    edit.show();
+                    cancel.hide();
+                    btnDelete.show();
+                    var jsonReq={
+                        productId:that.id,
+                        productName:nameInput.val(),
+                        imgCount:imgCountInput.val(),
+                        size:sizeInput.val(),
+                        description:descriptionInput.val()
+                    };
+                        
+                    pageSpace.ajax_saveChange(jsonReq,function(data){
+                        var body=that.body;
+                        body.find(".show").show();
+                        body.find(".editInput").remove();
+                        body.find(".name .show").text(jsonReq.productName);
+                        body.find(".size .show").text(jsonReq.size);
+                        body.find(".description .show").text(jsonReq.description);
+                        body.find(".imgCount .show").text(jsonReq.imgCount);
+                    });
+            });
+
+            var cancel=$("<div/>",{"class":"btnBlue cancel hide","text":"取消"});
+                cancel.click(function(){
+                        $(this).hide();
+                        that.body.find(".editInput").remove();
+                        edit.show();
+                        btnDelete.show();
+                        that.body.find(".show").show();
+                        save.hide();
                 });
-            });
 
-            var edit=$("<div/>",{"class":"btnBlue edit","text":"编辑"}).click(function(){
-                that.body.find(".show").hide();
-                $(this).hide();
-                save.show();
-               var body=that.body;
-               var name=body.find(".name");
-               name.append(nameInput.val(name.find(".show").text()));
-               var size=body.find(".size");
-               size.append(sizeInput.val(size.find(".show").text()));
-               var imgCount=body.find(".imgCount");
-               imgCount.append(imgCountInput.val(imgCount.find(".show").text()));
-               var description=body.find(".description");
-               description.append(descriptionInput.val(description.find(".show").text()));
-            });
+            var edit=$("<div/>",{"class":"btnBlue edit","text":"编辑"});
+
+                edit.click(function(){
+                    $("body").append("<div class='overDiv'></div>");
+                    that.body.addClass("editBox").find(".show").hide();
+                    $(this).hide();
+                    save.show();
+                    btnDelete.hide();
+                    cancel.show();
+                   var body=that.body;
+                   var name=body.find(".name");
+                   name.append(nameInput.val(name.find(".show").text()));
+                   var size=body.find(".size");
+                   size.append(sizeInput.val(size.find(".show").text()));
+                   var imgCount=body.find(".imgCount");
+                   imgCount.append(imgCountInput.val(imgCount.find(".show").text()));
+                   var description=body.find(".description");
+                   description.append(descriptionInput.val(description.find(".show").text()));
+                });
 
             var imageEdit=$("<input/>",{"class":"imageEdit","type":"file"});
             that.bindUploadEvent(imageEdit);
@@ -178,7 +196,7 @@ pageSpace.Product=(function(){
                             "</div>";
         this.body.append($(html));
         this.body.find(".imgBox").append(imageEdit);
-        this.body.find(".btnBar").append(save,edit,btnDelete);
+        this.body.find(".btnBar").append(save,cancel,edit,btnDelete);
     }
     return product;
 })();

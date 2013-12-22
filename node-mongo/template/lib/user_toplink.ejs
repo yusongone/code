@@ -2,7 +2,8 @@
     <ul class="links">
         <li><a href="/b/customer">工作室操作</a></li>
         <%if(locals.user){%>
-            <li><a><%=user.name%></a></li>
+            <li> <a href="/userset"><%=user.name%></a> </li>
+            <li> <a href="/logout">退出</a> </li>
         <%}%>
     </ul>
 </div>

@@ -23,7 +23,7 @@ function setApp(app){
             jsonReq.cusId=cusId;
             jsonReq.userId=req.session.userId;
             jsonReq.reserverMessage=reserverMessage;
-            if(reqVcode!=req.session.vcode){
+            if(reqVcode.toLowerCase()!=req.session.vcode){
                 res.send({"stuats":"sorry","message":"vcode error"});
                 return
             }
@@ -377,26 +377,24 @@ function setApp(app){
     });
     //上传图片
     app.post('/uploadImageToImagesLib', function(req, res){
-            var jsonReq={};
-                jsonReq.files=req.files.files;
-                jsonReq.cusInfoId=req.body.cusInfoId;
-                jsonReq.userId=req.session.userId;
-                var ImageSize=jsonReq.files[0].size;
-                if(parseInt(ImageSize)>upload_max_size){
-                    res.send({"stuats":"sorry","message":"Image too large"});
-                    return 
-                }
+        var jsonReq={};
+            jsonReq.files=req.files.files;
+            jsonReq.cusInfoId=req.body.cusInfoId;
+            jsonReq.userId=req.session.userId;
+            var ImageSize=jsonReq.files[0].size;
+            if(parseInt(ImageSize)>upload_max_size){
+                res.send({"stuats":"sorry","message":"Image too large"});
+                return 
+            }
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
                 if(err){
                     res.send({"status":"error","message":err})
                     return;
                 }
-                if(result.status=="ok"){
-                    ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(err,json){
-                        res.send(json);
-                    });
-                }
+                ctrl.ImageLibs.uploadImageToImagesLib(jsonReq,function(err,json){
+                    res.send({"status":"ok","data":json})
+                });
             });
         };
     });
@@ -505,7 +503,7 @@ function setApp(app){
             return;
         }
         var reqVcode=req.body.vcode;
-        if(reqVcode!=req.session.vcode){
+        if(reqVcode.toLowerCase()!=req.session.vcode){
             res.send({"status":"sorry","message":"验证码错误!"});
             return;
         }
