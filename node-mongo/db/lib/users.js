@@ -11,6 +11,7 @@ var mongodb=require("mongodb"),
         var type=jsonReq.idType;//QQ weibo ..
         var insertObj={};
             insertObj[type]=jsonReq.openId;
+            inSertObj["createDate"]=new Date().toISOString();
             
         var col=database.collection("users");
         col.insert(insertObj,function(err,res){
@@ -43,7 +44,8 @@ var mongodb=require("mongodb"),
                 }else{
                     var md5=crypto.createHash("md5");
                     var md5Pass=md5.update(pass).digest("base64");
-                    col.insert({"name":username,"pass":md5Pass},function(err,res){
+                    var date=new Date().toISOString();
+                    col.insert({"name":username,"pass":md5Pass,createDate:date},function(err,res){
                         if(err){return callback(err)};
                         callback(err,{"status":"ok"});
                     });
