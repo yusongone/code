@@ -1,4 +1,8 @@
 var HttpGet=require("./httpget");
+        //var client_id="100550929";
+var qqClient_id="100586908";
+var qqRedirect_uri="http://mutuke.com/qq_callback";
+var qqClient_secret="9cfe91826773a1be9295a6343e3fcf59";
 var _qq={
     // getPath 根据 申请的appId等 获取Authorization Code，返回给 callBack页面，
     // callBack 页面得到 返回的 Authorization Code，给getTokenByAcode 方法，https请求回Token 数据包
@@ -7,8 +11,10 @@ var _qq={
     getPath:function(){
         var path="https://graph.qq.com/oauth2.0/authorize";
         var response_type="code";
-        var client_id="100550929";
-        var redirect_uri="http://makejs.com/qq_callback";
+        //var client_id="100550929";
+        //var redirect_uri="http://makejs.com/qq_callback";
+        var client_id=qqClient_id;
+        var redirect_uri=qqRedirect_uri;
             redirect_uri=encodeURIComponent(redirect_uri);
         var state="1";
         var url=path+"?response_type="+response_type+"&client_id="+client_id+"&redirect_uri="+redirect_uri+"&state="+state;
@@ -18,10 +24,11 @@ var _qq={
         var that=this;
         var path="https://graph.qq.com/oauth2.0/token";
         var grant_type="authorization_code";
-        var client_id="100550929";
-        var client_secret="88641a170b4d51d2b47bc33ddaf0dcdd";
+        var client_secret=qqClient_secret;//"88641a170b4d51d2b47bc33ddaf0dcdd";
         var code=Acode;
-        var redirect_uri="http://makejs.com/qq_callback";
+        //var redirect_uri="http://makejs.com/qq_callback";
+        var redirect_uri=qqRedirect_uri;
+        var client_id=qqClient_id;
         var url=path+"?grant_type="+grant_type+"&client_id="+client_id+"&client_secret="+client_secret+"&code="+code+"&redirect_uri="+redirect_uri;
         //res.redirect(url);
         return url;
