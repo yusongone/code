@@ -84,11 +84,12 @@ function uploadProductHeadImage(jsonReq,callback){
                 jsonReq.imgPath=_id;
                 jsonReq.fileId=_id;
                 //a thumbnail image base64 str insert to customer products
+                jsonReq.size=180;
                 Images.getPublicImage(jsonReq,function(err,buf){
                     jsonReq.base64Img= new Buffer(buf, 'binary').toString('base64');
                     jsonReq.database=database;
                     db.Product.changeProduct(jsonReq,function(err,result){
-                        callback(err,result);    
+                        callback(err,_id);    
                         poolMain.release(database);
                     });
                 });

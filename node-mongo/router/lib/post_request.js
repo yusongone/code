@@ -157,7 +157,7 @@ function setApp(app){
                 if(result.status=="ok"){
                     ctrl.Product.uploadProductHeadImage(jsonReq,function(err,result){
                         if(result){
-                            res.send({"status":"ok"});      
+                            res.send({"status":"ok","data":result});      
                         }
                     });
                 }

@@ -158,7 +158,7 @@
     float:left;
 }
 .product .allProduct .pList{
-    overflow-y: scroll;
+    overflow-y:auto;
     height: 480px;
 }
 .product .pList .thu img{
