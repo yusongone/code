@@ -1,7 +1,8 @@
 var Common=require("./common");
+var ctrl=require("../../control");
 var mongodb=require("mongodb"),
     Product=require("./product");
-    objectId=mongodb.ObjectID;
+var objectId=mongodb.ObjectID;
 
     var _createObjectId=Common.createObjectId;
 
@@ -140,8 +141,9 @@ function _addCustomerInfo(jsonReq,callback){
         var id=new objectId();
         var userId=_createObjectId(userId);
         var imagesLibId=new objectId();
+        var isoData=(new Date()).toISOString();
         if(!userId){return callback("create ObjectId error")};
-        col.insert({"_id":id,"studioId":studioId,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
+        col.insert({"_id":id,"createDate":isoData,"studioId":studioId,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
             callback(err,item);
         });
 }
@@ -222,44 +224,13 @@ function addProductToCustomer(jsonReq,callback){
                 Product.getProductById(jsonReq,function(err,doc){
                     var productObj=doc;
                         productObj.count=1;
-                    col.update({"_id":cid},{$addToSet:{products:{$each:[productObj]}}},function(err,result){
-                        callback(err,result);
-                    });
+                        col.update({"_id":cid},{$addToSet:{products:{$each:[productObj]}}},function(err,result){
+                            callback(err,result);
+                        });
                 });
             }
         });
 }
-//上传选片列表数据
-function uploadSelectPhotoList(jsonReq,callback){
-    var database=jsonReq.database;
-    var uid=_createObjectId(jsonReq.userId);
-    var pid=_createObjectId(jsonReq.productId);
-    var ary=jsonReq.photoAry;
-
-    if(!(uid&&pid)){return callback("create object Id error");}
-    var col=database.collection("customerInfo");
-        col.update({"bindUser":uid,"products._id":pid},{"$set":{"products.$.selectPhotos":ary}},function(err,doc){
-            callback(err,doc);
-        });
-}
-
-function getProductFromCustomerById(jsonReq,callback){
-    var database=jsonReq.database;
-    var cid=_createObjectId(jsonReq.cusInfoId);
-    var pid=_createObjectId(jsonReq.productId);
-    var col=database.collection("customerInfo");
-        col.findOne({"_id":cid,"products._id":pid},function(err,doc){
-            var ary=doc.products;
-            for(var i=0,l=ary.length;i<l;i++){
-                if(ary[i]["_id"]==pid.toString()){
-                    return callback(err,ary[i]);
-                }
-            }
-            callback(err,null);
-        });
-
-}
-
 function subProductFromCustomer(jsonReq,callback){
     var database=jsonReq.database;
     var cid=_createObjectId(jsonReq.cusInfoId);
@@ -291,8 +262,41 @@ function removeProductFromCustomer(jsonReq,callback){
             callback(err,result);
         });
 }
+//上传选片列表数据
+function uploadSelectPhotoList(jsonReq,callback){
+    var database=jsonReq.database;
+    var uid=_createObjectId(jsonReq.userId);
+    var pid=_createObjectId(jsonReq.productId);
+    var ary=jsonReq.photoAry;
 
-//删除用户绑定的product
+    if(!(uid&&pid)){return callback("create object Id error");}
+    var col=database.collection("customerInfo");
+        col.update({"bindUser":uid,"products._id":pid},{"$set":{"products.$.selectPhotos":ary}},function(err,doc){
+            callback(err,doc);
+        });
+}
+
+function getProductFromCustomerById(jsonReq,callback){
+    var database=jsonReq.database;
+    var cid=_createObjectId(jsonReq.cusInfoId);
+    var pid=_createObjectId(jsonReq.productId);
+    var col=database.collection("customerInfo");
+        col.findOne({"_id":cid,"products._id":pid},function(err,doc){
+            if(!doc){
+               return callback(err,null);
+            }
+            var ary=doc.products;
+            for(var i=0,l=ary.length;i<l;i++){
+                if(ary[i]["_id"]==pid.toString()){
+                    return callback(err,ary[i]);
+                }
+            }
+                callback(err,null);
+        });
+
+}
+
+
 function getProductsFromCustomer(jsonReq,callback){
     var database=jsonReq.database;
     var cid=_createObjectId(jsonReq.cusInfoId);

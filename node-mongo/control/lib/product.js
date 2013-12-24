@@ -4,6 +4,7 @@ var parse=db.Common.parse;
 var Type=db.Common.Type;
 var getPool=db.Common.getPool;
 var poolMain=getPool("main");
+var fs = require('fs');
 
 //添加一个Product
 function addProduct(jsonReq,_callback){
@@ -28,6 +29,35 @@ function addProduct(jsonReq,_callback){
         }
    });
 }
+
+function removeProduct(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        //查看产品列表 productList 中是否存在 此userId的doc；如果有，直接插入，如没有，创建后插入；
+       db.Product.removeProductFromList(jsonReq,function(err,id){
+            poolMain.release(database);
+            callback(err,id); 
+       });
+   });
+}
+/*
+function uploadProductHeadImage(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+            var file=jsonReq.files[0];
+            fs.readFile(file.path, 'binary', function(err, original_data){
+                var base64Image = new Buffer(original_data, 'binary').toString('base64');
+                var decodedImage = new Buffer(base64Image, 'base64');//.toString('binary');
+                //console.log(decodedImage);
+                jsonReq.imgPath=base64Image;
+                db.Product.changeProduct(jsonReq,function(err,result){
+                    callback(err,result);    
+                    poolMain.release(database);
+                });
+            });
+    });
+}
+*/
 function uploadProductHeadImage(jsonReq,callback){
     poolMain.acquire(function(err,database){
         jsonReq.database=database;
@@ -52,9 +82,16 @@ function uploadProductHeadImage(jsonReq,callback){
             Images.uploadOriginImage(jsonReq,function(err,_id){
                 jsonReq.database=database;
                 jsonReq.imgPath=_id;
-                db.Product.changeProduct(jsonReq,function(err,result){
-                    callback(err,result);    
-                    poolMain.release(database);
+                jsonReq.fileId=_id;
+                //a thumbnail image base64 str insert to customer products
+                jsonReq.size=180;
+                Images.getPublicImage(jsonReq,function(err,buf){
+                    jsonReq.base64Img= new Buffer(buf, 'binary').toString('base64');
+                    jsonReq.database=database;
+                    db.Product.changeProduct(jsonReq,function(err,result){
+                        callback(err,_id);    
+                        poolMain.release(database);
+                    });
                 });
             });
         }
@@ -89,3 +126,4 @@ exports.addProduct=addProduct;
 exports.getProductsByUserId=getProductsByUserId;
 exports.changeProduct=changeProduct;
 exports.uploadProductHeadImage=uploadProductHeadImage;
+exports.removeProduct=removeProduct;

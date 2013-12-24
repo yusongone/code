@@ -20,11 +20,18 @@ pageSpace.createAddBox=function(addBox){
 
         ok.click(function(){
             pageSpace.ajax_addProduct(moduleName.val(),function(){
-                addBox.slideUp("slow",function(){
-                    div.remove(); 
-                });
+                _close();
             });
         });
+        cancel.click(function(){
+            _close();
+        });
+
+        function _close(){
+            addBox.slideUp("slow",function(){
+                div.remove(); 
+            });
+        }
 }
 
 pageSpace.ajax_getProductList=function(){
@@ -46,6 +53,21 @@ pageSpace.ajax_getProductList=function(){
     });
 }
 
+pageSpace.ajax_removeProduct=function(productId,callback){
+    $.ajax({
+        type:"post",
+        url:"/removeProduct",
+        dataType:"json",
+        data:{productId:productId},
+        success:function(data){
+            if(data.status=="ok"){
+                callback();
+            }else{
+                alert("sorry"+data.message);
+            }
+        }
+    });
+}
 pageSpace.ajax_addProduct=function(name,callback){
     $.ajax({
         type:"post",
@@ -56,7 +78,7 @@ pageSpace.ajax_addProduct=function(name,callback){
             if(data.status=="ok"){
                 var product=pageSpace.Product;
                 var d=new product({"_id":data.id,"name":name});
-                $(".moduleList .module").eq(0).before(d.body);
+                $(".moduleList").prepend(d.body);
                 callback();
             }else{
                 alert("sorry"+data.message);
@@ -95,7 +117,6 @@ pageSpace.Product=(function(){
             dataType: 'json',
             formData:{"productId":that.id,"filename":"na"},
             done: function (e, data) {//设置文件上传完毕事件的回调函数
-                alert("ok");
             },
             fail:function(e,data){
                 var upl=data.context.data("object");
@@ -103,9 +124,12 @@ pageSpace.Product=(function(){
                     upl.fail();
             },
             add:function(e,data){
-                //data.context=UP.createAupload({name:data.files[0].name,"data":data});
-                //UP.open();
                 data.submit();
+                data.jqXHR.done(function(reqData){
+                    if(reqData.status=="ok"){
+                        that.body.find(".imgBox img").attr("src","/public_image/"+reqData.data);        
+                    }
+                });
             },
             progress: function (e, data) {//设置上传进度事件的回调函数
             },
@@ -176,16 +200,23 @@ pageSpace.Product=(function(){
                    var description=body.find(".description");
                    description.append(descriptionInput.val(description.find(".show").text()));
                 });
-
             var imageEdit=$("<input/>",{"class":"imageEdit","type":"file"});
             that.bindUploadEvent(imageEdit);
 
-            var btnDelete=$("<div/>",{"class":"btnRed delete","text":"删除"}).click(function(){
-                alert("asddf"); 
-            });
+            var btnDelete=$("<div/>",{"class":"btnRed delete","text":"删除"});
+                btnDelete.click(function(){
+                    if(confirm("确定删除此模板？`")){
+                        pageSpace.ajax_removeProduct(json._id,function(){
+                            that.body.slideUp(200,function(){
+                                that.body.remove();
+                            });         
+                        });
+                    }
+                });
 
 
             var html="<div class='imgBox'><img src='/public_image/"+json.imgPath+"' /> </div>"+
+            //var html="<div class='imgBox'><img src='data:image/gif;base64,"+json.base64Img+"' /> </div>"+
                         "<div class='rightBox'>"+
                             "<div class='name'><lable>名称:</lable><label class='show'> "+(json.name||"- -")+"</label></div>"+
                                 "<div class='size'><lable>尺寸: </lable><label class='show'> "+(json.size||"- -")+"</label></div>"+
@@ -195,7 +226,7 @@ pageSpace.Product=(function(){
                             "<div class='btnBar'></div>"+
                             "</div>";
         this.body.append($(html));
-        this.body.find(".imgBox").append(imageEdit);
+        this.body.find(".imgBox").append("<i class='fa fa-pencil editIcon'></i>",imageEdit);
         this.body.find(".btnBar").append(save,cancel,edit,btnDelete);
     }
     return product;

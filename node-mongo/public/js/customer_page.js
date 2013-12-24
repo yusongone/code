@@ -15,6 +15,67 @@ page.bindEvent=function(){
     ProductBox.init();
 };
 
+page.ajax_removeProduct=function(json,callback){
+    var pid=json.pid,
+        cid=json.cid;
+        $.ajax({
+            "type":"post",
+            "url":"/ajax_removeProductFromCustomer",
+            "dataType":"json",
+            "data":{
+                "cusInfoId":cid,
+                "productId":pid
+            },
+            "success":function(data){
+                if(data.status=="ok"){
+                    callback();
+                }else{
+                    alert(data.message);
+                }
+            }
+        });
+    }
+page.ajax_subProduct=function(json,callback){
+    var pid=json.pid,
+        cid=json.cid;
+        $.ajax({
+            "type":"post",
+            "url":"/ajax_subProductFromCustomer",
+            "dataType":"json",
+            "data":{
+                "cusInfoId":cid,
+                "productId":pid
+            },
+            "success":function(data){
+                if(data.status=="ok"){
+                    callback();
+                }else{
+                    alert(data.message);
+                }
+            }
+        });
+    }
+page.ajax_bindProduct=function(json,callback){
+    var pid=json.pid,
+        cid=json.cid;
+        $.ajax({
+            "type":"post",
+            "url":"/ajax_bindProductToCustomer",
+            "dataType":"json",
+            "data":{
+                "cusInfoId":cid,
+                "productId":pid
+            },
+            "success":function(data){
+                if(data.status=="ok"){
+                    callback();
+                }else{
+                    alert(data.message);
+                }
+            }
+        });
+    }
+
 page.ajax_addCustomer=function(data,fun){
     $.ajax({
         "type":"post",
@@ -47,6 +108,36 @@ page.ajax_searchUser=function(username,callback){
         }
     });
 }
+
+page.ajax_getCusProducts=function(cusInfoId,callback){
+    $.ajax({
+        "type":"post",
+        "url":"/ajax_getProductsFromCustomer",
+        "dataType":"json",
+        "data":{
+            "cusInfoId":cusInfoId
+        },
+        "success":function(data){
+            if(data.status=="ok"){
+                callback(data.data);
+            }
+        }
+    });
+}
+
+page.ajax_getAllProducts=function(json,callback){
+    $.ajax({
+        type:"post",
+        url:"/getAllProduct",
+        dataType:"json",
+        success:function(data){
+            if(data.status=="ok"){
+                callback(data.data);
+            }
+        }
+    });
+}
+
 page.ajax_getCusList=function(cusId){
     $.ajax({
         "type":"post",
@@ -118,7 +209,6 @@ page.LibBar=(function(){
     };
     bar.prototype.bindEvent=function(json){
         var that=this;
-        console.log(that.jsonData);
             json.share.click(function(){
                 if($(this).data("bd")){return false;};
                 var box=$("<box/>",{"class":"bindPathBox"});
@@ -236,6 +326,7 @@ page.customer=(function(){
 var ProductBox=(function(){
     var cusInfoId=null;
     var html="<div class='product'>"+
+                "<div class='overDiv'><i class='fa fa-spinner fa-spin'></i><p>初始化...</p></div>"+
                 "<div class='allProduct'>"+
                     "<ul class='pList'></ul>"+
                 "</div>"+
@@ -243,11 +334,11 @@ var ProductBox=(function(){
                     "<ul class='pList'></ul>"+
                 "</div>"+
             "</div>";
-    var z=$(html);
-    var aList=z.find(".allProduct .pList");
-    var pList=z.find(".cusProduct .pList");
+    var body=$(html);
+    var pList=body.find(".cusProduct .pList");
+    var aList=body.find(".allProduct .pList");
     function _init(){
-        z.dialog({
+        body.dialog({
             autoOpen:false,
             resizable: true,
             width:800,
@@ -260,142 +351,205 @@ var ProductBox=(function(){
             }
         });
     }
-
-    function _getCusProducts(cusInfoId){
-        $.ajax({
-            "type":"post",
-            "url":"/ajax_getProductsFromCustomer",
-            "dataType":"json",
-            "data":{
-                "cusInfoId":cusInfoId
-            },
-            "success":function(data){
-                if(data.status=="ok"){
-                var ary=data.data;
-                    for(var i=0,l=ary.length;i<l;i++){
-                        var json=ary[i];
-                        json.cusInfoId=cusInfoId;
-                       var p=new Product(json);
-                            pList.append(p.body);
-                    };
-                }
-            }
-        });
+    body.find(".cusProduct").on({
+        drop:function(e){
+            var obj=ProductFactory.getActiveProduct();
+                obj.add();
+        },
+        dragover:function(e){
+            e.preventDefault();
+        }
+    });
+    
+    function _createCusProduct(data){
+        var ary=data;
+            for(var i=0,l=ary.length;i<l;i++){
+                var json=ary[i];
+                json.cusInfoId=cusInfoId;
+                    json.type="pList";
+                    json.tage=pList;
+                    ProductFactory.createProduct(json);
+            };
+        $(body).find(".overDiv").hide();
     }
 
-    function _getAllProducts(){
-        $.ajax({
-            type:"post",
-            url:"/getAllProduct",
-            dataType:"json",
-            success:function(data){
-                if(data.status=="ok"){
-                var ary=data.data;
-                    for(var i=0,l=ary.length;i<l;i++){
-                        var json=ary[i];
-                            json.cusInfoId=cusInfoId;
-                            json.type="aList";
-                       var p=new Product(json);
-                            aList.append(p.body);
-                    };
-                }
-            }
-        });
+    function _createAllProduct(data){
+        var ary=data;
+            for(var i=0,l=ary.length;i<l;i++){
+                var json=ary[i];
+                    json.cusInfoId=cusInfoId;
+                    json.type="aList";
+                    json.tage=aList;
+                    ProductFactory.createProduct(json);
+            };
+            page.ajax_getCusProducts(cusInfoId,_createCusProduct);
+        }
 
-    }
     return {
         init:function(){
             _init();
         },
         open:function(cusId){
             cusInfoId=cusId;
-            _getCusProducts(cusInfoId);
-            _getAllProducts(cusInfoId);
-            z.dialog("open");
-        }
+            page.ajax_getAllProducts({},_createAllProduct);
+            body.dialog("open");
+        },
+        cList:pList,
+        aList:aList
     } 
 })();
 
-var Product=(function(){
-    function product(json){
+var ProductFactory=(function(){
+    var originList={};
+    var cusList={};
+
+    var ActiveProduct;
+    function OriginProduct(json){
         this.id=json["_id"];
+        originList[this.id]=this;
+        this.json=json;
         this.cusInfoId=json.cusInfoId;
         this.initUI(json);
     }
-    product.prototype.initUI=function(json){
-        var that=this;
-        var str="";
-        if(json.type=="aList"){
-            str="<div class='btnBlue add'>添加</div>";
+    OriginProduct.prototype.setCount=function(count){
+        this.count=count||0;
+        if(this.count==0){
+            this.body.find(".countBox").hide();
         }else{
-            str="<div class='countBox'><div class='subOne'>-</div><input id='count' value='"+(json.count||"NAN")+"'><div class='addOne'>+</div></div>"
-            str+="<div class='btnRed remove'>移除</div>";
+            this.body.find(".countBox").show().find(".setCount").text(count);
         }
-        var html="<li class='productLi'>"+str+
-                    "<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
+    };
+    OriginProduct.prototype.initUI=function(json){
+        var that=this;
+            var img=$("<img>",{src:"/public_image/"+json.imgPath+"?type=fill"});
+                img.load(function(){
+                    that.body.find(".thu").html("").append(img);
+                });
+        var html="<li class='productLi' draggable=true>"+
+                    "<div class='countBox'><i class='fa fa-check check'></i><div class='setCount'></div></div>"+
+                    "<div class='btnBlue add'><i class='fa fa-angle-double-right'></i>添加</div>"+
+                    "<div class='thu'><i class='fa fa-picture-o'></i></div>"+
+                    //"<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
+                   // "<div class='thu'><img src='data:image/gif;base64,"+json.base64Img+"' /> </div>"+
                     "<div class='name'>"+json.name+"</div>"+
                     "<div class='size'>"+json.size+"</div>"+
                     "<div class='imgCount'>"+(json.imgCount||"1")+"</div>"+
                     "<div class='description'>"+json.description+"</div>"+
                 "</li>";
            this.body=$(html); 
+           this.body.on({
+            dragstart:function(e){
+                ActiveProduct=that;
+                //e.preventDefault();
+            }
+           });
            var add=this.body.find(".add");
+           add.click(function(){
+               that.add();
+           });
+        ProductBox.aList.append(this.body);
+    }
+    OriginProduct.prototype.add=function(){
+        var that=this;
+       var jsonReq={};
+            jsonReq.pid=that.id;
+            jsonReq.cid=that.cusInfoId;
+        page.ajax_bindProduct(jsonReq,function(){
+            if(!that.count){
+                json.type="pList"
+                json.count=1;
+                ProductFactory.createProduct(that.json);
+            }else{
+                that.count++;
+                cusList[that.id].setCount(that.count); 
+            }
+        }); 
+    }
+    
+    function CusProduct(json){
+        this.id=json["_id"];
+        this.count=parseInt(json.count)||0;
+        this.cusInfoId=json.cusInfoId;
+        this.initUI(json);
+        cusList[this.id]=this;
+        originList[this.id]?originList[this.id].setCount(this.count):"";
+    }
+    CusProduct.prototype.setCount=function(count){
+        originList[this.id].setCount(count);
+        this.count=count||0;
+        this.body.find(".count").text(count);
+    };
+    CusProduct.prototype.initUI=function(json){
+        var that=this;
+        var img;
+        if(json.base64Img){
+            img="<div class='thu'><img src='data:image/gif;base64,"+json.base64Img+"' /> </div>";
+        }else{
+            img="<div class='thu'><i class='fa fa-picture-o'></i></div>";
+        }
+        var html="<li class='productLi'>"+
+                    "<div class='countBox'><i class='fa fa-minus-square subOne'></i><div class='count'>"+(that.count||"NAN")+"</div><i class='fa fa-plus-square addOne'></i></div>"+
+                    "<div class='btnRed remove'><i class='fa fa-trash-o'></i>移除</div>"+img+
+                    //"<div class='thu'><img src='/public_image/"+json.imgPath+"?type=fill' /></div>"+
+                    "<div class='name'>"+json.name+"</div>"+
+                    "<div class='size'>"+json.size+"</div>"+
+                    "<div class='imgCount'>"+(json.imgCount||"1")+"</div>"+
+                    "<div class='description'>"+json.description+"</div>"+
+                "</li>";
+           this.body=$(html); 
+            ProductBox.cList.append(this.body);
            var remove=this.body.find(".remove");
            var addOne=this.body.find(".addOne");
            var subOne=this.body.find(".subOne");
-           add.click(function(){
-                _bindProduct(that.id,that.cusInfoId); 
-           });
+           var countUI=this.body.find(".count");
+
+           var jsonReq={};
+                jsonReq.pid=that.id;
+                jsonReq.cid=that.cusInfoId;
+
            remove.click(function(){
-                _removeProduct(that.id,that.cusInfoId); 
+                page.ajax_removeProduct(jsonReq,function(){
+                    that.body.remove();
+                    _changeCount(0);
+                }); 
            });
            addOne.click(function(){
-                _bindProduct(that.id,that.cusInfoId); 
+                page.ajax_bindProduct(jsonReq,function(){
+                    that.count++;
+                    _changeCount(that.count);
+                }); 
            });
            subOne.click(function(){
-                _subProduct(that.id,that.cusInfoId); 
+                page.ajax_subProduct(jsonReq,function(){
+                    that.count--;
+                    if(that.count==0){
+                        that.body.remove();
+                    }
+                    _changeCount(that.count);
+                }); 
            });
+
+           function _changeCount(count){
+                countUI.text(count);
+                originList[that.id].setCount(count);
+           }
     }
-    function _removeProduct(pid,cid){
-        $.ajax({
-            "type":"post",
-            "url":"/ajax_removeProductFromCustomer",
-            "dataType":"json",
-            "data":{
-                "cusInfoId":cid,
-                "productId":pid
-            },
-            "success":function(data){
+
+   // return product;
+    return {
+        createProduct:function(json){
+            if(json.type=="aList"){
+               var p=new OriginProduct(json);
+            }else{
+               var p=new CusProduct(json);
             }
-        });
+        }
+        ,getActiveProduct:function(){
+            var temp=ActiveProduct;
+            ActiveProduct=null;
+            return temp;
+        }
     }
-    function _subProduct(pid,cid){
-        $.ajax({
-            "type":"post",
-            "url":"/ajax_subProductFromCustomer",
-            "dataType":"json",
-            "data":{
-                "cusInfoId":cid,
-                "productId":pid
-            },
-            "success":function(data){
-            }
-        });
-    }
-    function _bindProduct(pid,cid){
-        $.ajax({
-            "type":"post",
-            "url":"/ajax_bindProductToCustomer",
-            "dataType":"json",
-            "data":{
-                "cusInfoId":cid,
-                "productId":pid
-            },
-            "success":function(data){
-            }
-        });
-    }
-    return product;
 })();
 
 

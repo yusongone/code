@@ -42,6 +42,29 @@ function setApp(app){
     });
 
 //================================================  product ================//
+    app.post('/removeProduct', function(req, res){
+        var reqBody=req.body;
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+            jsonReq.studioId=req.session.studioId;
+            jsonReq.productId=req.body.productId;
+        if(checkLogind(req,res)){
+            checkStudio(req,res,"post",function(err,result){
+                if(err){
+                    res.send({"status":"error","message":err});
+                }
+                if(result.status=="ok"){
+                    ctrl.Product.removeProduct(jsonReq,function(err,json){
+                        if(err){
+                            res.send({"status":"error","message":err});
+                            return
+                        }
+                        res.send({"status":"ok","id":json});
+                    });
+                }
+            });
+        };
+    });
     app.post('/addProduct', function(req, res){
         var reqBody=req.body;
         var jsonReq={};
@@ -134,7 +157,7 @@ function setApp(app){
                 if(result.status=="ok"){
                     ctrl.Product.uploadProductHeadImage(jsonReq,function(err,result){
                         if(result){
-                            res.send({"status":"ok"});      
+                            res.send({"status":"ok","data":result});      
                         }
                     });
                 }
@@ -324,7 +347,7 @@ function setApp(app){
             checkStudio(req,res,"post",function(err,result){
                  ctrl.Customer.getProductsFromCustomer(jsonReq,function(err,result){
                     if(err){
-                        res.send({"status":"error","message":err})
+                        res.send({"status":"error","message":err});
                         return;
                     }
                     res.send({"status":"ok","data":result});
