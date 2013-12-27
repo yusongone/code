@@ -143,7 +143,8 @@ function _addCustomerInfo(jsonReq,callback){
         var imagesLibId=new objectId();
         var isoData=(new Date()).toISOString();
         if(!userId){return callback("create ObjectId error")};
-        col.insert({"_id":id,"createDate":isoData,"studioId":studioId,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
+        var date=new Date().toISOString();
+        col.insert({"_id":id,"createDate":isoData,createDate:date,"studioId":studioId,imagesLibId:imagesLibId,bindUser:null,userId:userId,address:address,reserverMessage:message,member:{"boy":boy,"girl":girl}},function(err,item){
             callback(err,item);
         });
 }
@@ -199,7 +200,8 @@ function addStudio(jsonReq,callback){
     var userId=jsonReq.userId;
     var name=jsonReq.name;
     var col=database.collection("studio");
-        col.insert({userId:userId,name:name},function(err,item){
+    var date=new Date().toISOString();
+        col.insert({userId:userId,createDate:date,name:name},function(err,item){
             var studioId=item[0]._id;
             callback(err,studioId); 
         });

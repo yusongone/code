@@ -15,7 +15,8 @@ var mongodb=require("mongodb"),
         var dateStr=date.getYear()+"-"+date.getMonth()+"-"+date.getDate();
             if(!uid){return callback("err")};
         var col=database.collection("album");
-            col.insert({"userId":uid,"name":name},function(err,docAry){
+        var date=new Date().toISOString();
+            col.insert({"userId":uid,"name":name,"createDate":date},function(err,docAry){
                 if(docAry){
                     callback(err,docAry[0]); 
                 }else{

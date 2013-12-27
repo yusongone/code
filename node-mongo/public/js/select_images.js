@@ -5,7 +5,6 @@ $(document).ready(function(){
     page.cusInfoId=$("#cusInfoId").val();
     showSelectList.init();
     ajax_get(); 
-    ajax_getCusProducts();
 
     $("#createList").click(function(){
         ProductThumbList.createSelectPhoto();
@@ -36,6 +35,7 @@ var ajax_get=function(){
                     var json=data[i];
                     var imgObj=imageFactory.createImg(json);
             };
+                        ajax_getCusProducts();
         }
     });
 };
@@ -222,6 +222,15 @@ var imageFactory=(function(){
             over.click(function(){
                 that.cancelShowImages();
             });
+        },
+        getImgObjById:function(id){
+            for(var i=0;i<imgList.length;i++){
+                var tempObj=imgList[i];
+                    if(tempObj.id==id){
+                        return tempObj;
+                    }
+            }
+            return null;
         }
     }
 })();
@@ -382,6 +391,19 @@ var ProductThumbList=(function(){
                 next.append("<i class='fa fa-arrow-right'></i>");
             $(".productBox").append(prev,overFlowDiv,next);
             _createThumbList(ary);
+
+            this.bind(ary);
+        }
+        ,bind:function(ary){
+            for(var i=0;i<ary.length;i++){
+                var tempJson=ary[i]; 
+                var tempThum=this.getThumById(tempJson._id);
+                    for(var z=0;z<tempJson.selectPhotos.length;z++){
+                        var imgObj=imageFactory.getImgObjById(tempJson.selectPhotos[z]);
+                        console.log(imgObj);
+                        tempThum.addThu(imgObj);
+                    }
+            }
         }
         ,createSelectPhoto:function(){
             var obj={};
@@ -391,6 +413,15 @@ var ProductThumbList=(function(){
                 obj[productId]=list;
             };
             showSelectList.parseData(obj);
+        }
+        ,getThumById:function(id){
+            for(var i=0;i<thumList.length;i++){
+                var tempThum=thumList[i];
+                if(tempThum.id==id){
+                    return tempThum;
+                }
+            } 
+            return null;
         }
    }
 })();
