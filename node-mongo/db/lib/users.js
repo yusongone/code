@@ -11,7 +11,7 @@ var mongodb=require("mongodb"),
         var type=jsonReq.idType;//QQ weibo ..
         var insertObj={};
             insertObj[type]=jsonReq.openId;
-            inSertObj["createDate"]=new Date().toISOString();
+            insertObj["createDate"]=new Date().toISOString();
             
         var col=database.collection("users");
         col.insert(insertObj,function(err,res){
