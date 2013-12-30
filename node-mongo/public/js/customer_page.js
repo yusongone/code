@@ -195,13 +195,14 @@ page.LibBar=(function(){
     };
     bar.prototype.initUI=function(tage,libJson){
         var that=this;
+        var order=$("<a/>",{"text":"订单管理","href":"/b/orderList/"+that.cusId});
         var share=$("<a/>",{"text":"绑定链接"});
         this.bindUserId?share.addClass("active")&&share.text("已绑定")&&share.data("bd",true):"";
         var remove=$("<a/>",{"text":"删除"});
         var setModle=$("<a/>",{"text":"添加模板"});
         var setImage=$("<a/>",{"href":"/b/manage_image/"+that.cusId,"text":"管理图片"});
         var selectsList=$("<a/>",{"target":"_blank","href":"/b/selects/"+that.cusId,"text":"查看选片"});
-            tage.append(share,remove,setModle,setImage,selectsList);
+            tage.append(share,order,remove,setModle,setImage,selectsList);
             this.bindEvent({
                 share:share,
                 setModle:setModle

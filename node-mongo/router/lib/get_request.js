@@ -332,6 +332,29 @@ function setApp(app){
             });
         }
     });
+    //订单页面
+    app.get("/b/orderList/:cusInfoId",function(req,res){
+        var cusInfoId=req.params.cusInfoId;
+        if(checkLogind(req,res,"get","/b/calendar")){
+            checkStudio(req,res,"get",function(err,result){
+                if(err){
+                    return showError({
+                        "message":err,
+                        "res":res
+                    });
+                }
+                if(result.status=="ok"){
+                    res.render("./studio/order",{
+                        "js_version":js_version,
+                        "css_version":css_version,
+                        "user":{"name":req.session.username},
+                        "orderId":cusInfoId,
+                        "title":"订单列表"
+                    });
+                }
+            });
+        }
+    });
     
     //事物管理
     app.get("/b/calendar",function(req,res){

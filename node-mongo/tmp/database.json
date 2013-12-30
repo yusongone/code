@@ -42,7 +42,6 @@
 //customerInfo
 {
     "_id":"object(234235235234234)",
-    imagesLibs:"Object(134922349595239)",
     productLists:"Object(12470245934812347)",
     studio:"Object(123123123123)",//studio id;
     reserverMessage:"abc",
@@ -59,6 +58,15 @@
             phone:"effccs"
         }
     }
+}
+
+//customerOrder
+{
+    "_id":"object(123952348323456)",
+    customerInfoId:"object(234235235234234)",
+    bindUser:userId,
+    imagesLibs:"Object(134922349595239)",
+    design:"Object(134922349595239)",
     products:[
         {"_id":"objectId('asdffefefef')","imgPath":"asdf","count":"0"},
         {"pid":"objectId('asdffefefef')"},
