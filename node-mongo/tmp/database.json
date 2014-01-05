@@ -60,7 +60,7 @@
     }
 }
 
-//customerOrder
+//Order
 {
     "_id":"object(123952348323456)",
     customerInfoId:"object(234235235234234)",

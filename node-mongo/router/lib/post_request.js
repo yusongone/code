@@ -263,6 +263,21 @@ function setApp(app){
             });
         };
     });
+    app.post("/ajax_addOrder",function(req,res){
+        var userId=req.session.userId;
+        if(checkLogind(req,res)){
+            checkStudio(req,res,"post",function(err,result){
+                if(result.status=="ok"){
+                    ctrl.Order.addOder(jsonReq,function(err,result){
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return;
+                        }
+                    });
+                }
+            })
+        }
+    });
     //给customerInfo 绑定 product
     app.post("/ajax_bindProductToCustomer",function(req,res){
         var userId=req.session.userId;
