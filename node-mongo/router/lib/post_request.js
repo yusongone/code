@@ -263,16 +263,38 @@ function setApp(app){
             });
         };
     });
-    app.post("/ajax_addOrder",function(req,res){
-        var userId=req.session.userId;
+    app.post("/ajax_getOrderList",function(req,res){
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+            jsonReq.cusInfoId=req.body.cusInfoId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
                 if(result.status=="ok"){
-                    ctrl.Order.addOder(jsonReq,function(err,result){
+                    ctrl.Order.getOrderList(jsonReq,function(err,result){
                         if(err){
                             res.send({"status":"error","message":err})
                             return;
                         }
+                        res.send({"status":"ok","data":result});
+                    });
+                }
+            })
+        }
+    });
+    app.post("/ajax_addOrder",function(req,res){
+        var jsonReq={};
+            jsonReq.userId=req.session.userId;
+            jsonReq.cusInfoId=req.body.cusInfoId;
+            jsonReq.studioId=req.session.studioId;
+        if(checkLogind(req,res)){
+            checkStudio(req,res,"post",function(err,result){
+                if(result.status=="ok"){
+                    ctrl.Order.addOrder(jsonReq,function(err,result){
+                        if(err){
+                            res.send({"status":"error","message":err})
+                            return;
+                        }
+                        res.send({"status":"ok","data":result});
                     });
                 }
             })

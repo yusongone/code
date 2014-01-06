@@ -8,6 +8,7 @@ var oauth=require("./lib/oauth");
 var verifyCode=require("./lib/verifycode");
 var product=require("./lib/product");
 var album=require("./lib/album");
+var order=require("./lib/order");
 
 exports.Customer=customer;
 exports.ImageLibs=imageLibs;
@@ -19,3 +20,4 @@ exports.Oauth=oauth;
 exports.VerifyCode=verifyCode;
 exports.Product=product;
 exports.Album=album;
+exports.Order=order;

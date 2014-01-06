@@ -208,31 +208,6 @@ function addStudio(jsonReq,callback){
 }
 
 
-
-//给用户绑定product
-function addProductToCustomer(jsonReq,callback){
-    var database=jsonReq.database;
-    var cid=_createObjectId(jsonReq.cusInfoId);
-    var pid=_createObjectId(jsonReq.productId);
-
-    if(!(cid&&pid)){return callback("create object Id error");}
-    var col=database.collection("customerInfo");
-        col.findOne({"_id":cid,"products._id":pid},function(err,doc){
-            if(doc){
-                col.update( {"_id":cid,"products._id":pid},{ "$inc":{"products.$.count":1}},function(err,item){
-                    callback(err,item);
-                });
-            }else{
-                Product.getProductById(jsonReq,function(err,doc){
-                    var productObj=doc;
-                        productObj.count=1;
-                        col.update({"_id":cid},{$addToSet:{products:{$each:[productObj]}}},function(err,result){
-                            callback(err,result);
-                        });
-                });
-            }
-        });
-}
 function subProductFromCustomer(jsonReq,callback){
     var database=jsonReq.database;
     var cid=_createObjectId(jsonReq.cusInfoId);
@@ -322,7 +297,6 @@ exports.getImageLibsId=_getImageLibsId;
 exports.createCustomerListForUser=_createCustomerListForUser;
 exports.getUserAndCustomerRelation=getUserAndCustomerRelation;
 exports.getCustomerInfoData=_getCustomerInfoData;
-exports.addProductToCustomer=addProductToCustomer;
 exports.removeProductFromCustomer=removeProductFromCustomer;
 exports.subProductFromCustomer=subProductFromCustomer;
 exports.getProductsFromCustomer=getProductsFromCustomer;

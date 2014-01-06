@@ -348,7 +348,7 @@ function setApp(app){
                         "js_version":js_version,
                         "css_version":css_version,
                         "user":{"name":req.session.username},
-                        "orderId":cusInfoId,
+                        "cusInfoId":cusInfoId,
                         "title":"订单列表"
                     });
                 }

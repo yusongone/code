@@ -11,7 +11,7 @@
         <script src="/js/order_page.js"></script>
     </head>
     <body class="page customer">
-        <input type="hidden" value="<%=orderId%>" >
+        <input type="hidden" id="cusInfoId" value="<%=cusInfoId%>" >
         <% include ../lib/toplink%>
         <% include ../lib/nav %>
         <div class="right_area">
@@ -26,7 +26,7 @@
             </div>
             <div class="bottom_line"></div>
             <div class="content">
-                <ul class="list">
+                <ul class="orderList">
                 </ul>
             </div>
         </div>

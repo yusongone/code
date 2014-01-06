@@ -221,7 +221,6 @@ function getProductsFromCustomer(jsonReq,callback){
                 });
             }else{
                 poolMain.release(database);
-                console.log("not found");
                 callback("not found")
             }
         });
