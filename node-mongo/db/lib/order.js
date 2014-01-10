@@ -61,9 +61,21 @@ function addProductToOrder(jsonReq,callback){
         });
 }
 
+function getProductsFromOrder(jsonReq,callback){
+    var database=jsonReq.database;
+    var cid=_createObjectId(jsonReq.orderId);
+    if(!(cid)){return callback("create object Id error");}
+    var col=database.collection("order");
+        col.findOne({"_id":cid},{"products":1},function(err,result){
+            if(result){
+                return callback(err,result.products);
+            }
+            callback(err,null);
+        });
+}
 
 exports.addOrder=addOrder;
 exports.getOrderList=getOrderList;
 exports.addProductToOrder=addProductToOrder;
-
+exports.getProductsFromOrder=getProductsFromOrder;
 

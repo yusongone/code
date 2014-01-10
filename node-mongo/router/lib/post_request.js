@@ -375,14 +375,15 @@ function setApp(app){
     });
 
     //获取customerInfo下得所有模板 product
-    app.post("/ajax_getProductsFromCustomer",function(req,res){
+    app.post("/ajax_getProductsFromOrder",function(req,res){
         var userId=req.session.userId;
         var jsonReq={};
             jsonReq.userId=userId;
             jsonReq.cusInfoId=req.body.cusInfoId;
+            jsonReq.orderId=req.body.orderId;
         if(checkLogind(req,res)){
             checkStudio(req,res,"post",function(err,result){
-                 ctrl.Customer.getProductsFromCustomer(jsonReq,function(err,result){
+                 ctrl.Order.getProductsFromOrder(jsonReq,function(err,result){
                     if(err){
                         res.send({"status":"error","message":err});
                         return;

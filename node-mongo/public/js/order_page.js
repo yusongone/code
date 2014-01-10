@@ -85,12 +85,13 @@ page.ajax_bindProduct=function(json,callback){
         });
     }
 
-page.ajax_getCusProducts=function(cusInfoId,callback){
+page.ajax_getCusProducts=function(orderId,callback){
     $.ajax({
         "type":"post",
-        "url":"/ajax_getProductsFromCustomer",
+        "url":"/ajax_getProductsFromOrder",
         "dataType":"json",
         "data":{
+            "orderId":orderId,
             "cusInfoId":page.cusInfoId
         },
         "success":function(data){
@@ -101,7 +102,7 @@ page.ajax_getCusProducts=function(cusInfoId,callback){
     });
 }
 
-page.ajax_getAllProducts=function(json,callback){
+page.ajax_getAllProducts=function(callback){
     $.ajax({
         type:"post",
         url:"/getAllProduct",
@@ -159,7 +160,7 @@ page.OrderFactory=(function(){
 
 page.LibBar=(function(){
     function bar(tage,libJson){
-        this.cusId=libJson._id;
+        this.orderId=libJson._id;
         this.jsonData=libJson;
         this.initUI(tage);
     };
@@ -177,7 +178,7 @@ page.LibBar=(function(){
     bar.prototype.bindEvent=function(json){
         var that=this;
             json.setModle.click(function(){
-                ProductBox.open(that.cusId);
+                ProductBox.open(that.orderId);
             });
     };
     return bar;
@@ -186,7 +187,7 @@ page.LibBar=(function(){
 
 
 var ProductBox=(function(){
-    var cusInfoId=null;
+    var orderId=null;
     var html="<div class='product'>"+
                 "<div class='overDiv'><i class='fa fa-spinner fa-spin'></i><p>初始化...</p></div>"+
                 "<div class='allProduct'>"+
@@ -224,7 +225,8 @@ var ProductBox=(function(){
     });
     
     function _createCusProduct(data){
-        var ary=data;
+        $(body).find(".overDiv").hide();
+        var ary=data||[];
             for(var i=0,l=ary.length;i<l;i++){
                 var json=ary[i];
                 json.cusInfoId=page.cusInfoId;
@@ -232,7 +234,6 @@ var ProductBox=(function(){
                     json.tage=pList;
                     ProductFactory.createProduct(json);
             };
-        $(body).find(".overDiv").hide();
     }
 
     function _createAllProduct(data){
@@ -244,16 +245,16 @@ var ProductBox=(function(){
                     json.tage=aList;
                     ProductFactory.createProduct(json);
             };
-            page.ajax_getCusProducts(page.cusInfoId,_createCusProduct);
+            page.ajax_getCusProducts(orderId,_createCusProduct);
         }
 
     return {
         init:function(){
             _init();
         },
-        open:function(cusId){
-            cusInfoId=cusId;
-            page.ajax_getAllProducts({},_createAllProduct);
+        open:function(_orderId){
+            orderId=_orderId;
+            page.ajax_getAllProducts(_createAllProduct);
             body.dialog("open");
         },
         cList:pList,

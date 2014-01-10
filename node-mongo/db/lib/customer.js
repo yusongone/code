@@ -274,18 +274,6 @@ function getProductFromCustomerById(jsonReq,callback){
 }
 
 
-function getProductsFromCustomer(jsonReq,callback){
-    var database=jsonReq.database;
-    var cid=_createObjectId(jsonReq.cusInfoId);
-    if(!(cid)){return callback("create object Id error");}
-    var col=database.collection("customerInfo");
-        col.findOne({"_id":cid},{"products":1},function(err,result){
-            if(result){
-                return callback(err,result.products);
-            }
-            callback(err,null);
-        });
-}
 
 
 exports.bindUser=_bindUser;
@@ -299,6 +287,5 @@ exports.getUserAndCustomerRelation=getUserAndCustomerRelation;
 exports.getCustomerInfoData=_getCustomerInfoData;
 exports.removeProductFromCustomer=removeProductFromCustomer;
 exports.subProductFromCustomer=subProductFromCustomer;
-exports.getProductsFromCustomer=getProductsFromCustomer;
 exports.uploadSelectPhotoList=uploadSelectPhotoList;
 exports.addStudio=addStudio;

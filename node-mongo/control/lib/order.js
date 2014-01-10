@@ -72,6 +72,27 @@ function addProductToOrder(jsonReq,callback){
     });
 }
 
+//删除用户绑定的product
+function getProductsFromOrder(jsonReq,callback){
+    poolMain.acquire(function(err,database){
+        jsonReq.database=database;
+        db.Customer.getUserAndCustomerRelation(jsonReq,function(err,result,resJson){
+            if(err){ poolMain.release(database); return callback(err) };
+            if("creator"==result||"binder"==result){
+                jsonReq.userId=resJson.userId;
+                db.Order.getProductsFromOrder(jsonReq,function(err,res){
+                    poolMain.release(database);
+                    if(err){return callback(err);};
+                    callback(err,res);
+                });
+            }else{
+                poolMain.release(database);
+                callback("not found")
+            }
+        });
+    });
+}
 
 exports.addOrder=addOrder;
 exports.getOrderList=getOrderList;
+exports.getProductsFromOrder=getProductsFromOrder;
