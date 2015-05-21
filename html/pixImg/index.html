@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style rel="stylesheet">
+      *{margin:0;padding:0;}
+      body{background:#ddd;}
+      .page{
+        width: 800px;
+        margin: 0 auto;
+        overflow: hidden;
+        background:#fff;
+        padding: 10px;
+        float: left;
+        height: 100%;
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        left: 50%;
+        margin-left: -400px;
+      }
+      .pix{
+        width:10px;
+        height:10px;
+        background:#ddd;
+        margin:1px;
+      }
+      .pix.active{
+        background:#666;
+      }
+      .pix:hover{
+        background:#999;
+      }
+      .col{
+        float:left;
+      }
+      .sidebar{
+          float: left;
+          width: 180px;
+          height: 100%;
+          border-right: 1px solid #ddd;
+          position:relative;
+      }
+      .sidebar p{
+        margin-top: 15px;
+        padding: 0 5px;
+        text-align:center;
+      }
+      .pixBox{
+        float:left;
+      }
+      .sidebar .text{
+        width:24px;
+        text-align:center;
+      }
+      .sidebar textarea{
+        width: 100%;
+        height: 250px;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+      }
+    </style>
+    <script src="jquery-2.1.1.min.js"></script>
+    <script src="tool.js"></script>
+  </head>
+  <body>
+    <div id="page" class="page">
+      <div class="sidebar">
+        <p>
+          <label>col</label>
+          <input value="20" type="text" class="text"/>
+        </p>
+        <p>
+          <input type="button" value="获取数据" />
+        </p>
+        <p>
+          <textarea id="data">
+          </textarea>
+        </p>
+      </div>
+      <div class="pixBox" id="pixBox">
+      </div>
+    </div>
+  </body>
+</html>
