@@ -604,6 +604,21 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>BigNum.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\BigNum.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Hall.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Hall.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>screen.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\screen.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

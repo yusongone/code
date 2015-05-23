@@ -136,5 +136,7 @@
 .\build\main.o: mbed\wait_api.h
 .\build\main.o: mbed\sleep_api.h
 .\build\main.o: mbed\rtc_time.h
-.\build\main.o: ..\library\NOKIA_5110\NOKIA_5110.h
+.\build\main.o: Hall.h
+.\build\main.o: screen.h
 .\build\main.o: ..\library\PCD8544LCD\PCD8544LCD.h
+.\build\main.o: BigNum.h

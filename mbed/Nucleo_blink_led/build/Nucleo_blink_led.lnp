@@ -1,5 +1,8 @@
 --cpu Cortex-M4.fp
 ".\build\main.o"
+".\build\bignum.o"
+".\build\hall.o"
+".\build\screen.o"
 ".\build\nokia_5110.o"
 ".\build\pcd8544lcd.o"
 ".\build\font_6x8.o"
