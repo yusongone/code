@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <meta type="icon">
+    <link href="/bower_components/bootstrap/dist/css/bootstrap.css">
+    <script src="/bower_components/angularjs/angular.min.js"></script>
+    <script src="/js/controller.js"></script>
+    <script>
+        angular.module('app', []).controller('SettingsController1', PhoneListCtrl);
+    </script>
+  </head>
+  <body ng-controller="SettingsController1 as dd">
+    <div>good luck {{alert();"abc"+"bcd" + dd.name}}</div>
+    <input ng-model="dd.name" >
+  </body>
+</html>

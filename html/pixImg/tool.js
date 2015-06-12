@@ -1,16 +1,58 @@
 var page={
   row:8,
-  col:20
+  col:84,
+  keyDown:false
 };
 
 $(document).ready(function(){
-  createPix();
-  var str=getData();
-  rawToPix(str);
+
+  $(document).keydown(function(event){
+    if(17==event.keyCode){
+      page.keyDown=true;
+    }
+  });
+
+  $(document).keyup(function(event){
+    if(17==event.keyCode){
+      page.keyDown=false;
+    }
+  });
+
+  $("#clean").click(function(){
+    $(".pix").removeClass("active").attr("active",0);
+    localStorage.clear();
+  });
+
+  var r=new R(1,$("#pixBox"));
+  var r=new R(2,$("#pixBox"));
+  var r=new R(3,$("#pixBox"));
+  var r=new R(4,$("#pixBox"));
+  var r=new R(5,$("#pixBox"));
+  var r=new R(6,$("#pixBox"));
+
 });
 
 
-function tg(tag){
+
+function R(id,tag){
+ this.data;  
+ this.id=id;
+ this.body=$("<div/>",{class:"R"});
+ this.rawBox=$("<textarea/>",{})
+  $("#rowBoxList").append(this.rawBox);
+var str=localStorage.getItem("Hex"+id);
+  tag.append(this.body);
+  this.renderPix();
+ this.rawToPix(str);
+
+  var that=this;
+  this.rawBox.blur(function(){
+    var str=$(this).val();
+    that.rawToPix(str);
+  });
+}
+
+R.prototype.tg= function(tag){
   var d=tag.attr("active");
   if(d=="1"){
     tag.removeClass("active");
@@ -20,33 +62,10 @@ function tg(tag){
     tag.attr("active","1");
   }
 }
-
-
-function createPix(){
-  for(var i=0;i<page.col;i++){
-    var col=$("<div/>",{"class":"col"});
-    for(var j=0;j<page.row;j++){
-      var pix=$("<div/>",{"class":"pix"});
-      col.append(pix);
-      pix.click(function(){
-        tg($(this));
-        createRaw();
-      });
-    }
-    $("#pixBox").append(col);
-  }
-}
-
-function getData(){
-  var str=localStorage.getItem("Hex");
-  console.log(str);
-  return str;
-}
-
-function createRaw(){
+R.prototype.createRaw=function(){
   var Hex="";
   var Bin="";
-  $(".page .col").each(function(){
+  this.body.find(".col").each(function(){
     var col=$(this);
     var str="";
     col.find(".pix").each(function(){
@@ -57,18 +76,51 @@ function createRaw(){
         str+="0";
       }
     });
+    str=reSortBin(str);
+    console.log(str);
     var intNum=parseInt(str,2);
     var f="0x"+intNum.toString(16);
     Bin+=str+",";
     Hex+=f+",";
   });
-  localStorage.setItem("Hex",Hex);
-  $("#data").val(Hex);
+  localStorage.setItem("Hex"+this.id,Hex);
+  this.rawBox.val(Hex);
+}
+function reSortBin(str){
+  return str.split("").reverse().join("");
 }
 
-function rawToPix(str){
-  var tempAry=str.split(","); 
-    tempAry.length=20;
+R.prototype.renderPix=function(tag){
+  var that=this;
+  for(var i=0;i<page.col;i++){
+    var col=$("<div/>",{"class":"col"});
+    for(var j=0;j<page.row;j++){
+      var pix=$("<div/>",{"class":"pix"});
+      col.append(pix);
+      pix.click(function(){
+        that.tg($(this));
+        that.createRaw();
+        return;
+      });
+      pix.mouseout(function(){
+        if(!page.keyDown){
+          return;
+        }
+        that.tg($(this));
+        that.createRaw();
+        return;
+      });
+    }
+    this.body.append(col);
+  }
+}
+
+R.prototype.rawToPix=function(rawStr){
+  if(!rawStr){
+    return;
+  }
+  var tempAry=rawStr.split(","); 
+    tempAry.length=page.col;
     for(var i=0;i<tempAry.length;i++){
       var raw=parseInt(tempAry[i],16).toString(2);
       var subLength=8-raw.length;
@@ -78,17 +130,18 @@ function rawToPix(str){
           s+="0";
         }
       }
-      binToPix(i,s+raw);
+      var str=s+raw;
+      str=reSortBin(str);
+      this.binToPix(i,str);
     }
-    createRaw();
 }
 
-function binToPix(index,str){
+R.prototype.binToPix=function(index,str){
   for(var i=0;i<8;i++){
     if("1"==str[i]){
-      $(".page .col").eq(index).find(".pix").eq(i).addClass("active").attr("active",1); 
+      this.body.find(".col").eq(index).find(".pix").eq(i).addClass("active").attr("active",1); 
     }else{
-      $(".page .col").eq(index).find(".pix").eq(i).removeClass("active").attr("active",0); 
+      this.body.find(".col").eq(index).find(".pix").eq(i).removeClass("active").attr("active",0); 
     }
   }
 }

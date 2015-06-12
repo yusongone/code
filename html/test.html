@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      td{padding:10px 50px;background:red;}
+    </style>
+    <script src="jquery.js"></script>
+    <script >
+      $(document).ready(function(){
+        $("#test").click(function(){
+          alert("test");
+          return;
+        });
+        $("a").click(function(){
+          alert("ee");
+          return false;
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td id="test"><a href="http://www.baidu.com">asdfasdfasdfasdfasdf</a></td>
+      </tr>
+    </table>
+    <div>
+    </div>
+  </body>
+</html>

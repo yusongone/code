@@ -20,11 +20,14 @@
         margin-left: -400px;
       }
       .pix{
-        width:10px;
-        height:10px;
+        width:5px;
+        height:5px;
         background:#ddd;
         margin:1px;
       }
+      .R{
+        overflow:hidden;
+        }
       .pix.active{
         background:#666;
       }
@@ -55,10 +58,7 @@
       }
       .sidebar textarea{
         width: 100%;
-        height: 250px;
-        position: absolute;
-        left: 0;
-        bottom: 0;
+        height: 50px;
       }
     </style>
     <script src="jquery-2.1.1.min.js"></script>
@@ -72,11 +72,9 @@
           <input value="20" type="text" class="text"/>
         </p>
         <p>
-          <input type="button" value="获取数据" />
+          <input type="button" value="清空"  id="clean"/>
         </p>
-        <p>
-          <textarea id="data">
-          </textarea>
+        <p id="rowBoxList">
         </p>
       </div>
       <div class="pixBox" id="pixBox">
