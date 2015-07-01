@@ -1,9 +1,7 @@
 var express=require('express');
 var MongoClient = require('mongodb').MongoClient,
     Db= require('mongodb').Db,
-    Server=require("mongodb").Server
-  , assert = require('assert');
-process.setMaxListeners(0);
+    Server=require("mongodb").Server;
 
 
 // Connection URL
