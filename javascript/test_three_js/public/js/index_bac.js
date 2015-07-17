@@ -123,8 +123,8 @@ function createPoi(scene,ff){
     var col="#"+(parseInt(Math.random()*100000).toString(16)+"0000").substr(0,6);
     var material = new THREE.MeshLambertMaterial({color: col});
     var cube = new THREE.Mesh(geometry, material);
-
         cube.position.x=-20;
+
     scene.add(cube);
 
     return cube;

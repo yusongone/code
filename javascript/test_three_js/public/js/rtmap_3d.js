@@ -46,7 +46,7 @@ var debug=false;
         var shape= new THREE.Shape( californiaPts );
         var extrudeSettings = {
             curveSegments:5,
-            amount:parseInt(Math.random()*10)+20,
+            amount:parseInt(Math.random()*10)+100,
             steps:10,
             bevelSegments: 1,
             bevelSize: 0,
@@ -113,8 +113,8 @@ var debug=false;
         var width=window.innerWidth;
         var height=window.innerHeight;
         _scene = new THREE.Scene();
-        _camera = new THREE.PerspectiveCamera(35);
-        _camera2 = new THREE.PerspectiveCamera(35);
+        _camera = new THREE.PerspectiveCamera(55);
+        _camera2 = new THREE.PerspectiveCamera(55);
 
 //        _camera.rotation.x = 45 * (Math.PI / 180);
         _group = new THREE.Object3D();
@@ -143,13 +143,14 @@ var debug=false;
         var oldX=null;
         var oldY=null;
         function animate(){
-            mouseStatus?requestAnimationFrame(animate):"";
+            requestAnimationFrame(animate);
+            _group.rotation.z+=0.01;
             Rtmap.Room.refresh();
         }
+        animate();
         function start(events){
             events.preventDefault();
             mouseStatus=true;
-            animate();
         }
         var raycaster=new THREE.Raycaster();
         function move(events){
@@ -177,6 +178,7 @@ var debug=false;
             oldY=null;
         }
         function click(events){
+            _renderer.domElement.webkitRequestFullScreen();
             mouseV.x=(events.clientX/window.innerWidth)*2-1;
             mouseV.y=-(events.clientY/window.innerHeight)*2+1;
             raycaster.setFromCamera( mouseV, _camera );
@@ -238,17 +240,19 @@ var debug=false;
         _renderer.setViewport(0,0,width/2,height)
         _renderer.setScissor( 0, 0,width/2,height);
         _camera.aspect = width / (height*2);
-        //_camera.position.set(-50,0,1000);
+        _camera.position.set(-20,0,900);
+        _camera.far=3000;
         _camera.updateProjectionMatrix();
         _renderer.render(_scene, _camera);
     }
     function refreshRight(width,height){
         _renderer.setSize(width, height);
-        _renderer.setViewport(width/2,0,width/2,height)
+        _renderer.setViewport(width/2,0,width/2,height);
         _renderer.setScissor( width/2, 0,width/2,height);
         _camera2.aspect = width / height/2;
+        _camera2.far=3000;
         _camera2.updateProjectionMatrix();
-        _camera2.position.set(50,0,1000);
+        _camera2.position.set(20,0,900);
         _renderer.render(_scene, _camera2);
     }
     function refreshOne(width,height){
@@ -285,10 +289,9 @@ var debug=false;
         refresh:function(){
             var width=window.innerWidth;
             var height=window.innerHeight;
-            //refreshLeft(width,height);
-            //refreshRight(width,height);
-            refreshOne(width,height);
-
+            refreshLeft(width,height);
+            refreshRight(width,height);
+            //refreshOne(width,height);
         }
     }
 })();
