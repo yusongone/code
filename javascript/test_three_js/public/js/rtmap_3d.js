@@ -1,3 +1,4 @@
+
 var Rtmap=window.Rtmap||{};
 var debug=false;
 
@@ -5,6 +6,7 @@ var debug=false;
  * poi Factory
  */
 (function(){
+    "use strict";
     var Pois=[];
     var styleHash={
         4:{
@@ -46,7 +48,7 @@ var debug=false;
         var shape= new THREE.Shape( californiaPts );
         var extrudeSettings = {
             curveSegments:5,
-            amount:parseInt(Math.random()*10)+100,
+            amount:parseInt(Math.random()*10+30),
             steps:10,
             bevelSegments: 1,
             bevelSize: 0,
@@ -91,6 +93,7 @@ var debug=false;
     var _canvasBox,
         _scene,
         _camera,
+        _camera2,
         _plane,
         _group,
         _renderer;
@@ -289,9 +292,9 @@ var debug=false;
         refresh:function(){
             var width=window.innerWidth;
             var height=window.innerHeight;
-            refreshLeft(width,height);
-            refreshRight(width,height);
-            //refreshOne(width,height);
+           // refreshLeft(width,height);
+            //refreshRight(width,height);
+            refreshOne(width,height);
         }
     }
 })();

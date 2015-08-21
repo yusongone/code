@@ -1,3 +1,5 @@
+"use strict";
+
 function init(){
     THREE.DoubleSide = 2;
     Rtmap.Room.init({
