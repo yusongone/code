@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/socket.io.js"></script>
+    <script>
+      function main(){
+        setTimeout(function(){
+          //io.connect("localhost:9800");
+          var socket=new WebSocket("ws://localhost:9800");
+          socket.onopen=function(){
+            console.log("open");
+          }
+          socket.onclose=function(){
+            console.log("close");
+          }
+          socket.onmessage=function(){
+            console.log("mes");
+          }
+          socket.onerror=function(){
+            console.log("err");
+          }
+        },2000);
+      }
+    </script>
+  </head>
+  <body onload="main()">
+  </body>
+</html>
