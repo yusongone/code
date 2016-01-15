@@ -66,6 +66,7 @@ function parse(data){
             buf[startData-1]=tempByte;
             startData++; 
         }else{
+            console.log("--------------------------------------------");
             console.log("CF=1 1.0",(buf[2]<<8)+(buf[3]<<0));
             console.log("CF=1 2.5",(buf[4]<<8)+(buf[5]<<0));
             console.log("CF=1 10",(buf[6]<<8)+(buf[7]<<0));
@@ -73,11 +74,11 @@ function parse(data){
             console.log("DQ 1.0",(buf[8]<<8)+(buf[9]<<0));
             console.log("DQ 2.5",(buf[10]<<8)+(buf[11]<<0));
             console.log("DQ 10",(buf[12]<<8)+(buf[13]<<0));
+            startData=0; 
         }
     }
     if(tempByte==0x42||tempByte==0x4d){
       headString+=String.fromCharCode(tempByte);
-console.log(headString);
       if(headString=="BM"){
         startData=1;
       }
