@@ -20,6 +20,7 @@
     </style>
     <script>
       function fullScreen(){
+          return;
         var docElm = document.getElementsByClassName("page")[0];
         try{
           docElm.webkitRequestFullScreen();
@@ -30,11 +31,17 @@
       var te;
       function main(){
           te=document.getElementById("te");
-          Sensor.init();
-          Sensor.showTest();
+          te2=document.getElementById("te2");
+          R.init({
+              parentDOM:document.getElementsByClassName("page")[0]
+          });
+          //R.showTest();
+          R.onChange(function(obj){
+           //   te.innerText=obj.Angler.x;
+          });
         return;
           var left= R.getRocker({
-              parentDOM:document.getElementById("leftArea")
+              parentDOM:document.getElementsByClassName("page")[0]
           });
         setTimeout(function(){
           //io.connect("localhost:9800");
@@ -66,217 +73,11 @@
         },200);
       }
 
-
-
-      (function(_obj){
-          var _osc=(function(){
-              var canvas,ctx;
-              var lines=[];
-              var WIDTH=300,
-                  HEIGHT=500;
-              var MAX_WIDTH=WIDTH;
-
-              function _createCanvas(){
-                  canvas=document.createElement("canvas");
-                  canvas.width=WIDTH;
-                  canvas.height=HEIGHT;
-                  ctx=canvas.getContext("2d");
-                  var page=document.getElementsByClassName("page")[0];
-                  console.log(page);
-                  page.appendChild(canvas);
-              }
-              var update=false;
-
-
-              function Line(option){
-                  this.option=option;
-                  this.points=[];
-              }
-              Line.prototype.update=function(value){
-                  this.points.length>MAX_WIDTH?this.points.shift():"";
-                  this.points.push(value);
-                  update=true;
-              }
-              Line.prototype.draw=function(ctx){
-                  ctx.save();
-                  ctx.beginPath()
-                  ctx.strokeStyle=this.option.color;
-                  for(var i=0;i<this.points.length;i++){
-                      i==0?ctx.moveTo(i,this.points[i]):ctx.lineTo(i,this.points[i]);
-                  }
-                  ctx.stroke();
-                  ctx.restore();
-              }
-
-              function _loop(){
-                    _refresh();
-                 requestAnimationFrame(_loop);
-              }
-
-              function _refresh(){
-                  if(!update){
-                      return;
-                  }
-                  update=false;
-                  ctx.clearRect(0,0,WIDTH,HEIGHT);
-                  for(var i=0;i<lines.length;i++){
-                      var l=lines[i]
-                      l.draw(ctx);
-                  }
-              }
-
-
-              return {
-                  init:function(){
-                      _createCanvas();
-                      _loop();
-                  },
-                  getLine:function(option){
-                      var line=new Line(option);
-                      lines.push(line);
-                      return line;
-                  },
-                  refresh:_refresh
-              }
-          })();
-
-          var Event=(function(){
-              var _handlers=[];
-              var option={
-                  accAngle:{
-                      x:0,
-                      y:0
-                  },
-                  finalAngle:{
-                      x:0,
-                      y:0
-                  }
-              };
-              var Kalman=function(n){
-                  var C_0=0.0,
-                      Q_angle=0.001,
-                      Q_gyro=0.003,
-                      R_angle=0.5,
-                      q_bias=0.0,
-                      angle_err=0.0,
-                      PCt_0=0.0,
-                      PCt_1=0.0,
-                      E=0.0,
-                      K_0=0.0,
-                      K_1=0.0,
-                      t_0=0.0,
-                      t_1=0.0,
-                      angle=0.0,
-                      angle_dot=0.0,
-                      P=[[1.0,0.0],[0.0,1.0]];
-                      Pdot=[0.0,0.0,0.0,0.0];
-
-                  this.getAngle=function(angle_m, gyro_m,dt){
-                      angle+=(gyro_m-q_bias) * dt;
-                      angle_err = angle_m - angle;
-                      Pdot[0] = Q_angle - P[0][1] - P[1][0];
-                      Pdot[1] = -P[1][1];
-                      Pdot[2] = -P[1][1];
-                      Pdot[3] = Q_gyro;
-                      P[0][0] += Pdot[0] * dt;
-                      P[0][1] += Pdot[1] * dt;
-                      P[1][0] += Pdot[2] * dt;
-                      P[1][1] += Pdot[3] * dt;
-                      PCt_0 = C_0 * P[0][0];
-                      PCt_1 = C_0 * P[1][0];
-                      E = R_angle + C_0 * PCt_0;
-                      K_0 = PCt_0 / E;
-                      K_1 = PCt_1 / E;
-                      t_0 = PCt_0;
-                      t_1 = C_0 * P[0][1];
-                      P[0][0] -= K_0 * t_0;
-                      P[0][1] -= K_0 * t_1;
-                      P[1][0] -= K_1 * t_0;
-                      P[1][1] -= K_1 * t_1;
-                      angle += K_0 * angle_err;
-                      q_bias += K_1 * angle_err;
-                      angle_dot = gyro_m-q_bias;
-                      return angle;
-                  };
-              };
-
-              function _getACCAngle(x,y,z){
-                  if(z<0){z=-z;};
-                  var nowY=Math.sqrt(x*x+z*z);
-                  var nowX=Math.sqrt(y*y+z*z);
-                  var x=-((Math.atan(x/nowX)*57.2957786));
-                  var y=-((Math.atan(y/nowY)*57.2957786));
-                  option.accAngle.x=x;
-                  option.accAngle.y=y;
-              }
-
-
-              function _init(){
-                  var old=new Date().getTime();
-                  var KX=new Kalman();
-                  var KY=new Kalman();
-
-                  var t=0;
-                  window.addEventListener("devicemotion", function(evt){
-                      evt.preventDefault();
-                      option.acc = event.acceleration;
-                      option.accGravity = event.accelerationIncludingGravity;
-                      option.rotationRate = event.rotationRate;
-                      _getACCAngle(option.accGravity.x,option.accGravity.y,option.accGravity.z);
-
-                      option.finalAngle.x=KX.getAngle(option.accAngle.x,-option.rotationRate.beta,evt.interval);
-                      option.finalAngle.y=KY.getAngle(option.accAngle.y,option.rotationRate.alpha,evt.interval);
-
-                      _trigger(option);
-                  }, false);
-
-                  function _trigger(_option){
-                      for(var i=0;i<_handlers.length;i++){
-                          _handlers[i](_option);
-                      }
-                  }
-              }
-
-              return {
-                  init:_init,
-                  bindEvent:function(handler){
-                      _handlers.push(handler);
-                  }
-              }
-          })();
-
-
-
-
-        _obj.Sensor={
-            init:function(){
-                Event.init();
-            },
-            showTest:function(){
-                _osc.init();
-                var line1=_osc.getLine({color:"red"});
-                var line2=_osc.getLine({color:"blue"});
-                var line3=_osc.getLine({color:"black"});
-                Event.bindEvent(function(evt){
-
-                    line1.update(100+evt.accAngle.x);
-                    /*
-                    line2.update(200+evt.finalAngle.y);
-                    line3.update(300+evt.finalAngle.x);
-
-                     line1.update(100+evt.rotationRate.alpha*100/1.6);
-                     line2.update(200+evt.rotationRate.beta*100/1.6);
-                    line3.update(300+evt.rotationRate.gamma*5);
-                    line3.update(300+evt.accGravity.z*5);
-                    */
-                });
-            }
-        }
-      })(window);
     </script>
   </head>
   <body onload="main()">
         <div id="te"></div>
+        <div id="te2"></div>
       <div class="page" onclick="fullScreen()">
       </div>
   </body>
