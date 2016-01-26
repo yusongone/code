@@ -1,22 +1,36 @@
 var noble=require("noble");
 
-//noble.startScanning(); // any service UUID, no duplicates
-
-
-//noble.startScanning([], true); // any service UUID, allow duplicates
-
-
 var serviceUUIDs = []; // default: [] => all
 var allowDuplicates = false; // default: false
+var powerOn=false;
+var stateChangeHandler=function(){
+    powerOn=true;
+}
 
-noble.on('stateChange', function(e,a,b){
-  noble.startScanning(serviceUUIDs, allowDuplicates,function(err,d){
-    console.log(err,d);
-  }); // particular UUID's
+function _startScan(handler){
+    if(powerOn){
+        handler();
+    }else{
+        stateChangeHandler=handler;
+    }
+}
 
+noble.on('stateChange', function(e){
+    if(e=="poweredOn"){
+        stateChangeHandler();
+    }else{
+        powerOn=false;
+    }
 });
 
 //noble.state="poweredOn";
+
+//find peripheral(BT device)
+// -> connection peripheral(BT device)
+// -> discover service (BT service)
+// -> discover characteristics
+// -> characteristics bind on data event
+// -> turn on characteristics notify
 
 noble.on('discover',function(peripheral){
   if(peripheral.advertisement.localName=="HMSoft"){
@@ -66,7 +80,7 @@ function parse(data){
             buf[startData-1]=tempByte;
             startData++; 
         }else{
-            console.log("--------------------------------------------");
+            console.log("--------------------------------------------"+new Date().toISOString().substr(11,8));
             console.log("CF=1 1.0",(buf[2]<<8)+(buf[3]<<0));
             console.log("CF=1 2.5",(buf[4]<<8)+(buf[5]<<0));
             console.log("CF=1 10",(buf[6]<<8)+(buf[7]<<0));
@@ -87,3 +101,13 @@ function parse(data){
     }
   }
 }
+
+exports.scan=function(){
+    _startScan(function(){
+        console.log("scaning");
+        noble.startScanning(serviceUUIDs, allowDuplicates,function(err,d){
+        }); // particular UUID's
+    });
+}
+
+exports.scan();
