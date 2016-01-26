@@ -181,6 +181,7 @@ var debug=false;
             oldY=null;
         }
         function click(events){
+          alert("f");
             _renderer.domElement.webkitRequestFullScreen();
             mouseV.x=(events.clientX/window.innerWidth)*2-1;
             mouseV.y=-(events.clientY/window.innerHeight)*2+1;
@@ -292,9 +293,9 @@ var debug=false;
         refresh:function(){
             var width=window.innerWidth;
             var height=window.innerHeight;
-           // refreshLeft(width,height);
-            //refreshRight(width,height);
-            refreshOne(width,height);
+            refreshLeft(width,height);
+            refreshRight(width,height);
+            //refreshOne(width,height);
         }
     }
 })();

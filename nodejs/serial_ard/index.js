@@ -2,7 +2,8 @@ var callback;
 var serial=require("serialport").SerialPort;
 //var port="/dev/ttyAMA0";
 //var port="/dev/cu.usbmodem1411";
-var port="/dev/tty.usbserial-A9MH5RRR";
+//var port="/dev/tty.usbserial-A9MH5RRR";
+var port="/dev/tty.HC-05-DevB";
 
 var serialPort=new serial(port,{
 	baudrate:9600,
@@ -48,11 +49,14 @@ console.log(headString);
   }
 }
 serialPort.on('data', function(data) {
-    parse(data);
+  console.log(data);
+    //parse(data);
 });
+	serialPort.open(function () {
+        setInterval(function(){
+	      serialPort.write("AT");
+        },1000);
+	});
 
 exports.init=function(callback){
-	serialPort.open(function () {
-		callback();
-	});
 }
