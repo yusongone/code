@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+    <meta name="viewport" content="width=device-width,user-scalable=no" >
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <style rel="stylesheet">
+      .page{
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+      }
+      .page:-webkit-full-screen{
+        background:black;
+      }
+    </style>
+    <script>
+      function main(){
+        setTimeout(function(){
+          //io.connect("localhost:9800");
+          var socket=new WebSocket("ws://localhost:9900");
+          window.socket=socket;
+          socket.onopen=function(){
+            console.log("open");
+          }
+          socket.onclose=function(){
+            console.log("close");
+          }
+          socket.onmessage=function(res){
+            console.log(res);
+            var arrayBuffer;
+            var u8i;
+            var fileReader = new FileReader();
+            fileReader.onload = function() {
+              arrayBuffer = this.result;
+              u8i=new Uint8Array(arrayBuffer);
+              console.log(u8i);
+            };
+            fileReader.readAsArrayBuffer(res.data);
+            console.log(fileReader.result);
+          }
+
+          socket.onerror=function(){
+            console.log("err");
+          }
+
+          var arrayBuffer=new ArrayBuffer(3);
+          var u8i=new Uint8Array(arrayBuffer);
+              u8i[0]=100;
+              u8i[1]=90;
+              u8i[2]=80;
+
+          setInterval(function(){
+            socket.send(u8i);
+          },1000)
+        },200);
+
+
+      }
+
+    </script>
+  </head>
+  <body onload="main()">
+        <div id="te"></div>
+        <div id="te2"></div>
+      <div class="page" onclick="fullScreen()">
+      </div>
+  </body>
+</html>
