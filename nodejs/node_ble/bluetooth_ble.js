@@ -39,12 +39,10 @@ noble.on('discover',function(peripheral){
     peripheral.connect(function(){
       console.log("connected");
       peripheral.discoverServices([],function(err,services){
-        console.log(services);
         for(var i=0;i<services.length;i++){
           var service=services[i];
           if(service.uuid=="ffe0"){
             service.on('characteristicsDiscover', function(charaAry){
-              console.log("--------------------------a",charaAry);
               for(var j=0;j<charaAry.length;j++){
                 var chara=charaAry[j];
                 chara.on("data",function(data,isNotification){
@@ -79,17 +77,11 @@ function parse(data){
             startData++; 
         }else{
             for(var i=0;i<onDataHandlers.length;i++){
+                console.log("======",buf.length);
                 onDataHandlers[i](buf);
             }
-            console.log("--------------------------------------------"+new Date().toISOString().substr(11,8));
-            console.log("CF=1 1.0",(buf[2]<<8)+(buf[3]<<0));
-            console.log("CF=1 2.5",(buf[4]<<8)+(buf[5]<<0));
-            console.log("CF=1 10",(buf[6]<<8)+(buf[7]<<0));
 
-            console.log("DQ 1.0",(buf[8]<<8)+(buf[9]<<0));
-            console.log("DQ 2.5",(buf[10]<<8)+(buf[11]<<0));
-            console.log("DQ 10",(buf[12]<<8)+(buf[13]<<0));
-            startData=0; 
+            startData=0;
         }
     }
     if(tempByte==0x42||tempByte==0x4d){
@@ -113,3 +105,14 @@ exports.scan=function(handler){
 }
 
 //exports.scan();
+/*
+*
+ console.log("---------------------------"+new Date().toISOString().substr(11,8));
+ console.log("CF=1 1.0",(buf[2]<<8)+(buf[3]<<0));
+ console.log("CF=1 2.5",(buf[4]<<8)+(buf[5]<<0));
+ console.log("CF=1 10",(buf[6]<<8)+(buf[7]<<0));
+
+ console.log("DQ 1.0",(buf[8]<<8)+(buf[9]<<0));
+ console.log("DQ 2.5",(buf[10]<<8)+(buf[11]<<0));
+ console.log("DQ 10",(buf[12]<<8)+(buf[13]<<0));
+* */
