@@ -1,0 +1,16 @@
+{
+  "name": "lightning",
+  "description": "Test Serial port and Ble.",
+  "version": "0.1",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": ["main.js"]
+    }
+  },
+  "bluetooth": {
+    "uuids": [ "180D", "1809", "180F" ],
+    "low_energy": true
+  },
+  "icons": { "16": "img/logo.png", "128": "img/logo.png" }
+}
