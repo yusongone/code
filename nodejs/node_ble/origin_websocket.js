@@ -1,8 +1,25 @@
 var sha1=require("sha1");
 var crypto=require("crypto");
 var net = require('net');
-var HOST = 'localhost';
 var _connectHandlers=[];
+var os=require("os");
+var fs=require("fs");
+
+var ifaces=os.networkInterfaces();
+
+var HOST;
+
+for(var i in ifaces){
+    var ary=ifaces[i];
+    for(var j in ary){
+        if(ary[j].mac=="c8:69:cd:9a:07:1a"&&ary[j].family=="IPv4"){
+            HOST=ary[j].address;
+        };
+    }
+    //var stream=fs.createWriteStream("./a.js");
+    //stream.write("var HOST='"+HOST+"';");
+    //stream.end('');
+}
 
 var _SocketHouse=(function(){
     var _all_sockets=[];
@@ -13,7 +30,7 @@ var _SocketHouse=(function(){
         var haveMASK=data[1]>>7;
         var payloadlen=data[1]&127;
         var MASKAry=new Uint8Array(4)
-        console.log(fin,opcode,haveMASK,payloadlen);
+        //console.log(fin,opcode,haveMASK,payloadlen);
         if(payloadlen<126){
             for(var i=0;i<MASKAry.length;i++){
                 MASKAry[i]=data[i+2];
@@ -41,8 +58,8 @@ var _SocketHouse=(function(){
             var accept=crypto.createHash("sha1").update(key+magicStr).digest("base64");
             var resStr="HTTP/1.1 101 Switching Protocols\r\n" +
                 "Upgrade: websocket\r\n"+
-                "Connection: Upgrade\r\n"+
-                "Sec-WebSocket-Accept: "+accept+" \r\n\r\n";
+                "Sec-WebSocket-Accept: "+accept+"\r\n"+
+                "Connection: Upgrade\r\n\r\n";
             callback({
                 status:"HANDSHAKE",
                 msg:resStr
@@ -140,9 +157,14 @@ var _SocketHouse=(function(){
 
         socket.on('close',function(){
             _removeSocket(self);
+            self.socket=null;
             for(var i=0;i<self.onCloseHandlers.length;i++){
                 self.onCloseHandlers[i](data.msg);
             }
+        });
+        socket.on('error',function(){
+            console.error("Socket have a error")
+
         });
 
 
@@ -158,7 +180,7 @@ var _SocketHouse=(function(){
 
     MySocket.prototype.send=function(msg){
         var buf=_packMsg(msg);
-        this.socket.write(buf);
+        this.socket?this.socket.write(buf):"";
     }
 
     return{
@@ -166,6 +188,11 @@ var _SocketHouse=(function(){
             var socket=new MySocket(socket);
             _all_sockets.push(socket);
             return socket;
+        },
+        broadcast:function(msg){
+            for(var i=0;i<_all_sockets.length;i++){
+                _all_sockets[i].send(msg);
+            };
         }
     };
 })();
@@ -195,6 +222,9 @@ exports.start=function(PORT,callback){
 
 exports.connected=function(handler){
     _connectHandlers.push(handler);
+}
+exports.broadcast=function(msg){
+    _SocketHouse.broadcast(msg);
 }
 
 //exports.start(9900)

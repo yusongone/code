@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,user-scalable=no" >
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script src="./a.js"></script>
     <style rel="stylesheet">
       .page{
         position:absolute;
@@ -12,16 +13,55 @@
         left:0;
         width:100%;
         height:100%;
+        background:#243D52;
+        color: #fff;
+        text-shadow: 0 0 3px #fff;
+        text-align: center;
+      }
+      .DQ_BOX,
+      .CF_BOX{
+        text-align: center;
+        margin:30px 0;
+      }
+      .card{
+        background: rgba(250,250,250,0.15);
+        padding: 10px;
+        border-radius: 3px;
+        width: 50px;
+        height: 54px;
+        text-align: center;
+        margin: 0 5px;
+        display: inline-block;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      .item_title{
+        font-size:12px;
+      }
+      .item{
+        font-size: 28px;
+        margin-top: 12px;
       }
       .page:-webkit-full-screen{
         background:black;
       }
     </style>
     <script>
+      var Page=window.Page||{};
       function main(){
+        var box=document.body.getElementsByClassName("page")[0];
+        Page.Dashboard.init(box);
+        Page.OSC.init(box);
+        var line1=Page.OSC.getLine({color:"#fff",step:10});
+
+        Page.cmd.on("sensorDataUpdate",function(data){
+          Page.Dashboard.update(data);
+          line1.update(data.DQ2_5);
+          Page.OSC.refresh();
+        });
+
         setTimeout(function(){
           //io.connect("localhost:9800");
-          var socket=new WebSocket("ws://localhost:9900");
+          var socket=new WebSocket("ws://"+HOST+":9900");
           window.socket=socket;
           socket.onopen=function(){
             console.log("open");
@@ -30,17 +70,15 @@
             console.log("close");
           }
           socket.onmessage=function(res){
-            console.log(res);
             var arrayBuffer;
             var u8i;
             var fileReader = new FileReader();
             fileReader.onload = function() {
               arrayBuffer = this.result;
               u8i=new Uint8Array(arrayBuffer);
-              console.log(u8i);
+              Page.protocol.parse(u8i);
             };
             fileReader.readAsArrayBuffer(res.data);
-            console.log(fileReader.result);
           }
 
           socket.onerror=function(){
@@ -53,20 +91,231 @@
               u8i[1]=90;
               u8i[2]=80;
 
-          setInterval(function(){
-            socket.send(u8i);
-          },1000)
+            //socket.send(u8i);
         },200);
-
-
       }
+      (function(){
+        Page.WS={
+        }
+      })();
+
+      (function(){
+        var cf1_0,cf2_5,cf10,dq1_0,dq2_5,dq10;
+        function _init(parentDOM){
+          var box=document.createElement("div");
+          box.innerHTML="" +
+                  "<div class='CF_BOX'>" +
+                    "<div class='card'><div class='item_title'>CF=1 1.0</div><div class='item cf1_0'></div></div>" +
+                    "<div class='card'><div class='item_title'>CF=1 2.5</div><div class='item cf2_5'></div></div>" +
+                    "<div class='card'><div class='item_title'>CF=1 10</div><div class='item cf10'></div></div>" +
+                  "</div>"+
+                  "<div class='DQ_BOX'>" +
+                      "<div class='card'><div class='item_title'>1.0</div><div class='item dq1_0'></div></div>" +
+                      "<div class='card'><div class='item_title'>2.5</div><div class='item dq2_5'></div></div>" +
+                      "<div class='card'><div class='item_title'>10</div><div class='item dq10'></div></div>" +
+                  "</div>";
+          cf1_0=box.getElementsByClassName("cf1_0")[0];
+          cf2_5=box.getElementsByClassName("cf2_5")[0];
+          cf10=box.getElementsByClassName("cf10")[0];
+          dq1_0=box.getElementsByClassName("dq1_0")[0];
+          dq2_5=box.getElementsByClassName("dq2_5")[0];
+          dq10=box.getElementsByClassName("dq10")[0];
+          parentDOM.appendChild(box);
+        }
+
+        Page.Dashboard={
+          init:_init,
+          update:function(data){
+            cf1_0.innerText=data.CF1_0;
+            cf2_5.innerText=data.CF2_5;
+            cf10.innerText=data.CF10;
+            dq1_0.innerText=data.DQ1_0;
+            dq2_5.innerText=data.DQ2_5;
+            dq10.innerText=data.DQ10;
+          }
+        }
+      })();
+      (function(){
+        var canvas,ctx;
+        var lines=[];
+        var WIDTH=300,
+                HEIGHT=200;
+        var MAX_WIDTH=WIDTH;
+
+        function _createCanvas(parentDOM){
+          canvas=document.createElement("canvas");
+          canvas.width=WIDTH;
+          canvas.height=HEIGHT;
+          ctx=canvas.getContext("2d");
+          parentDOM.appendChild(canvas);
+        }
+        var update=false;
+
+
+        function Line(option){
+          this.option=option;
+          this.points=[];
+          this.step=option.step||1;
+        }
+        Line.prototype.update=function(value){
+          this.points.length>MAX_WIDTH/this.step?this.points.shift():"";
+          this.points.push(value);
+          update=true;
+        }
+        Line.prototype.draw=function(ctx){
+          ctx.save();
+          ctx.beginPath()
+          ctx.strokeStyle=this.option.color;
+          for(var i=0;i<this.points.length;i++){
+            i==0?ctx.moveTo(i*this.step,this.points[i]):ctx.lineTo(i*this.step,this.points[i]);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+
+        function _refresh(){
+          if(!update){
+            return;
+          }
+          update=false;
+          ctx.clearRect(0,0,WIDTH,HEIGHT);
+          for(var i=0;i<lines.length;i++){
+            var l=lines[i]
+            l.draw(ctx);
+          }
+        }
+
+
+        Page.OSC={
+          init:function(parentDOM){
+            _createCanvas(parentDOM);
+          },
+          getLine:function(option){
+            var line=new Line(option);
+            lines.push(line);
+            return line;
+          },
+          refresh:_refresh
+        }
+      })();
+
+      (function(){
+        var _Events={
+          _fire:function(action,arg){
+            for(var i=0;i<_Events[action].length;i++){
+              _Events[action][i].apply(this,arg);
+            }
+          }
+        }
+
+
+        function _sensorData(buf){
+          var option={
+              CF1_0:(buf[4]<<8)+(buf[5]<<0),
+              CF2_5:(buf[6]<<8)+(buf[7]<<0),
+              CF10:(buf[8]<<8)+(buf[9]<<0),
+              DQ1_0:(buf[10]<<8)+(buf[11]<<0),
+              DQ2_5:(buf[12]<<8)+(buf[13]<<0),
+              DQ10:(buf[14]<<8)+(buf[15]<<0)
+          }
+          _Events._fire("sensorDataUpdate",[option]);
+        };
+
+
+
+        Page.cmd={
+          trigger:function(cmd,buf){
+            this[cmd](buf);
+          },
+          on:function(action,handler){
+            if(!_Events[action]){
+              _Events[action]=[];
+            }
+            _Events[action].push(handler);
+          },
+          10:_sensorData
+        }
+      })();
+
+      (function(){
+        var headString="",dataLength=-1,startData= 0,subIndex= 0,msgId,buf=[];
+        function _parse(data){
+            var dl=data.length;
+            while(dl--){
+              var tempByte=data[data.length-dl-1]
+              if(startData==1){//get dataLength;
+                dataLength=tempByte;
+                buf[subIndex++]=dataLength;
+                startData++;
+              }else if(startData==2){//get msgId
+                msgId=tempByte;
+                buf[subIndex++]=msgId;
+                startData++;
+              }else if(startData>2){
+                  dataLength--;
+                  buf[subIndex++]=tempByte;
+                if(dataLength==-1){
+                  if(checkSum(buf)){
+                    switchCMD(buf);
+                  };
+                  startData=0;
+                  subIndex=0;
+                }
+              }
+              var str=String.fromCharCode(tempByte);
+              if(str=='$'||str=='M'||str=='>'){
+                headString+=str;
+                if(headString=="$M>"){
+                  startData=1;
+                }
+              }else{
+                headString="";
+              }
+            }
+        }
+
+        function switchCMD(buf){
+          var datalength=buf[0];
+          var cmdId=buf[1];
+          Page.cmd.trigger(cmdId,buf);
+        }
+
+        function getSum(buf){
+          if(buf[0]==0){
+            return buf[1];
+          }else{
+            var z=buf[0];
+            for(var i=1;i<buf.length;i++){
+              z=z^(buf[i]&0xff);
+            }
+            return z;
+          }
+        }
+
+        function checkSum(buf){
+          var c=buf[2];
+          for(var i=3;i<=subIndex-2;i++){
+            c^=buf[i]&0xff;
+          };
+          if(c==buf[subIndex-1]){
+            return true;
+          }
+          return false;
+        }
+
+
+
+
+        Page.protocol={
+          parse:_parse,
+        }
+      })();
 
     </script>
   </head>
   <body onload="main()">
-        <div id="te"></div>
-        <div id="te2"></div>
-      <div class="page" onclick="fullScreen()">
+      <div class="page">
       </div>
   </body>
 </html>
