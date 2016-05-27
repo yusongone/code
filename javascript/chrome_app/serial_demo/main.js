@@ -10,5 +10,11 @@ chrome.app.runtime.onLaunched.addListener(function() {
         createdWindow.contentWindow.addEventListener('load', function () {
             createdWindow.contentWindow.main(new Date().getTime());
         });
+        createdWindow.onClosed.addListener(function () {
+            chrome.bluetooth.stopDiscovery(function() {});
+        });
     });
 });
+
+
+
