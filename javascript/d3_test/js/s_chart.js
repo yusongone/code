@@ -29,10 +29,10 @@
                 .attr("x2",0)
                 .attr("y2",1);
             var stop1=l.append("stop");
-            stop1.attr("style","stop-color:rgb(119,202,202);stop-opacity: 0.01;");
+            stop1.attr("style","stop-color:rgb(119,202,202);stop-opacity: 0.1;");
             stop1.attr("offset","0%");
             var stop2=l.append("stop");
-            stop2.attr("style","stop-color:rgb(119,202,202);stop-opacity: 0.05;");
+            stop2.attr("style","stop-color:rgb(119,202,202);stop-opacity: 0.5;");
             stop2.attr("offset","100%");
         }
     }
@@ -51,6 +51,7 @@
             this.svg.attr("height",this.height);
 
             this.viewOffset=options.viewOffset||[0,0];
+
 
             this.viewArea=this.svg.append("g");
             this.viewArea.attr('transform',"translate("+this.viewOffset[0]+","+this.viewOffset[1]+")");
@@ -161,24 +162,139 @@
 
         function _drawRuler(){
             var leftCreator=this.viewArea.append("g");
-            var rulerSoul=d3.svg.axis().scale(this.VScale).orient("left");
-                leftCreator.call(rulerSoul);
-                leftCreator.attr("transform", "translate("+this.leftRulerSize+",0)");
-                leftCreator.attr("stroke-width","1px");
-                leftCreator.attr("stroke","#666");
-                leftCreator.attr("fill","none");
+            var lRulerSoul=d3.svg.axis().scale(this.VScale).orient("left");
+                lRulerSoul.tickFormat(function(a,b,c){
+                    return (a/100)+"百";
+                });
+                lRulerSoul.innerTickSize(10);
+                lRulerSoul.ticks(this.leftRuler.ticks);
+
+                leftCreator.call(lRulerSoul);
+                leftCreator.attr("transform", "translate("+this.leftRuler.size+",0)");
+                leftCreator.attr("fill-width","1px");
+                leftCreator.attr("stroke","none");
+                leftCreator.attr("fill","#999");
+                leftCreator.select(".domain").attr("style","display:none;");
+                leftCreator.selectAll("line").attr("style","display:none;");
 
             var bottomCreator=this.viewArea.append("g");
-            var rulerSoul=d3.svg.axis().scale(this.HScale).orient("bottom");
-            bottomCreator.call(rulerSoul);
-            bottomCreator.attr("transform", "translate("+this.leftRulerSize+"," +(this.height-this.bottomRulerSize-this.viewOffset[1])+ ")");
-            bottomCreator.attr("stroke-width","1px");
-            bottomCreator.attr("stroke","#666");
-            bottomCreator.attr("fill","none");
+            var bRulerSoul=d3.svg.axis().scale(this.HScale).orient("bottom");
+                bRulerSoul.tickFormat(function(a,b,c){
+                    return a+"个";
+                });
+                bRulerSoul.innerTickSize(10);
+                bRulerSoul.ticks(this.bottomRuler.ticks);
+                bottomCreator.attr("transform", "translate("+this.leftRuler.size+"," +(this.finalheight)+ ")");
+                bottomCreator.attr("fill-width","1px");
+                bottomCreator.attr("stroke","none");
+                bottomCreator.attr("fill","#999");
+                bottomCreator.call(bRulerSoul);
+                bottomCreator.select(".domain").attr("style","display:none;");
+                bottomCreator.selectAll("line").attr("style","display:none;");
+        }
+
+        function _drawBackLine(){
+            var self=this;
+            var lineBox=this.viewArea.append("g");
+
+            var h=this.height-this.bottomRuler.size-this.viewOffset[1];
+            var count=this.leftRuler.ticks;
+            var step=h/count;
+            var tempAry=[];
+            for(var i=0;i<count;i++){
+                tempAry.push( [ {x:0,y:i} , {x:this.domainH[1],y:i} ] );
+            }
+            var VScale=this.VScale;
+            var HScale=this.HScale;
+
+            var lineSoul= d3.svg.line();
+                lineSoul.x(function(item,index){
+                    var t=HScale(item.x);
+                    return t;
+                });
+                lineSoul.y(function(item,index){
+                    return item.y*step;
+                });
+
+            var allLine=lineBox.selectAll("path").data(tempAry).enter().append("path");
+                allLine.attr("transform","translate("+this.leftRuler.size+",0)");
+                allLine.attr("d",lineSoul);
+                allLine.attr("stroke-width","1px");
+                allLine.attr("stroke","#ddd");
+                allLine.attr("fill","none");
+        }
+
+        function _drawTip(data){
+            var self=this;
+            if(!this.tipBox){
+                var tipBox=this.viewArea.append("g");
+                tipBox.attr("transform","translate("+this.leftRuler.size+",0)");
+                this.tipBox=tipBox;
+            }else{
+                var tipBox=this.tipBox;
+            }
+
+            tipBox.attr("transform",function(d){
+                var x=self.HScale(d.x)+20;
+                var y=self.VScale(d.y)+5;
+                if(x>self.finalWidth-(size+50)){
+                    x-=(size+20);
+                }
+                return "translate("+x+","+y+")";//计算每个弧形的中心点（几何中心）
+            });
+
+
+            var bg=tipBox.append("rect");
+                bg.attr({
+                    fill:"#fff",
+                    width:120,
+                    height:200
+                });
+            var info=tipBox.append("text");
+            info.datum(data);
+            info.text(data.y);
+            var size=data.y.toString().length*14;
+            info.style("font-size",12);
+            info.attr("fill","#000");
+            info.attr("text-anchor","left");//or middle
+            return info;
+        }
+
+        function _drawCircle(){
+            var tempTip=null;
+            var self=this;
+            var VScale=this.VScale;
+            var HScale=this.HScale;
+            var circleBox=this.viewArea.append("g");
+            circleBox.attr("transform","translate("+this.leftRuler.size+",0)");
+            var circles=circleBox.selectAll("circle").data(this._AryData).enter().append("circle");
+                circles.attr("r",5);
+                circles.attr("stroke-width","3px");
+                circles.attr("stroke","rgb(57,113,231)");
+                circles.attr("fill","#fff");
+                circles.attr("cx",function(item,index){
+                    return HScale(item.x);
+                });
+                circles.attr("cy",function(item,index){
+                    return VScale(item.y);
+                });
+                circles.on("mouseover",function(item,index){
+                    var tempD=d3.select(this);
+                        tempD.attr("fill","rgb(57,113,231)");
+                    tempTip=_drawTip.call(self,item[index]);
+                });
+                circles.on("mouseout",function(item,index){
+                    d3.select(tempTip[0][0]).remove();
+                    var tempD=d3.select(this);
+                    tempD.attr("fill","#fff");
+                });
+            this.circles=circles;
+            this.circles.datum(self._AryData);
         }
 
         function _draw(){
             var self=this;
+                _drawBackLine.call(this)
                 _drawRuler.call(this)
 
             var waveSoul= d3.svg.line();
@@ -189,7 +305,6 @@
                 waveSoul.interpolate( 'linear' );
                 waveSoul.x(function(item,index){
                     return HScale(item.x);
-                    //return index*(self.width-self.leftRulerSize-self.viewOffset[0])/self._AryData.length;
                 });
                 waveSoul.y(function(item,index){
                     return VScale(item.y);
@@ -200,7 +315,6 @@
                 area.interpolate( 'linear' );
                 area.x( function(item,index ){
                     return HScale(item.x);
-                    //return index*(self.width-self.leftRulerSize-self.viewOffset[0])/self._AryData.length;
                 });
                 area.y0(VScale(0));
                 area.y1(function(item ) {
@@ -212,7 +326,7 @@
                 wave.attr("stroke-width","2px");
                 wave.attr("stroke","rgb(57,113,231)");
                 wave.attr("fill","none");
-                wave.attr("transform","translate("+this.leftRulerSize+",0)");
+                wave.attr("transform","translate("+this.leftRuler.size+",0)");
                 wave.attr("d",waveSoul);
                 wave.__Soul=waveSoul;
 
@@ -220,11 +334,12 @@
                 bg.datum(this._AryData);
                 bg.attr("stroke","none");
                 bg.attr("fill","red");
-                bg.attr("transform","translate("+this.leftRulerSize+",0)");
+                bg.attr("transform","translate("+this.leftRuler.size+",0)");
                 bg.attr("d",area);
                 bg.attr("fill","url(#linearColor)");
                 bg.__Soul=area;
 
+            _drawCircle.call(this)
             this.wave=wave;
             this.bg=bg;
         };
@@ -233,6 +348,8 @@
             //this.datum(data);
             var self=this;
             var soul=this.wave.__Soul;
+            this.wave.transition().duration(1000).attr("d",soul(data))
+            /*
             this.wave.transition().duration(1000).attrTween("d",function(ary,index){
                 var fun=d3.interpolateArray(ary,data);
                 function comm(t){
@@ -244,6 +361,7 @@
             }).each("end",function(ary,index){
                 self.wave.datum(data);
             });
+            */
 
             var bgSoul=this.bg.__Soul;
             this.bg.transition().duration(1000).attrTween("d",function(ary,index){
@@ -257,37 +375,65 @@
             }).each("end",function(ary,index){
                 self.bg.datum(data);
             });
+
+
+
+            this.circles.transition().duration(1000).attrTween("cy",function(ary,index){
+                var fun=d3.interpolateArray(ary,data);
+                function comm(t){
+                    var y=fun(t)[index]?fun(t)[index].y:0;
+                    return y;
+                }
+                return function(t){
+                    return self.VScale(comm(t));
+                }
+            }).each("end",function(ary,index){
+                if(self._AryData.length==index+1){
+                    self.circles.datum(data);
+                }
+            });
+
         }
 
         function _LineChart(options){
             _ChartObj.call(this,options);
             DefsFactory.getLinearColor(this.svg);
-            this.leftRulerSize=options.leftRulerSize||50;
-            this.bottomRulerSize=options.bottomRulerSize||20;
+            this.leftRuler={size:50,ticks:5};//default
+            for(var i in options.leftRuler){
+                this.leftRuler[i]=options.leftRuler[i];
+            }
+            this.bottomRuler={size:50,ticks:5};//default
+            for(var i in options.leftRuler){
+                this.bottomRuler[i]=options.bottomRuler[i];
+            }
             this._AryData=this.getFilterData(options.data);
             this.initScale();
             _draw.call(this);
         }
         _ChartObj.extends(_LineChart);
         _LineChart.prototype.initScale=function(){
-            var aryRange=d3.extent(this._AryData,function(d,index){
-                return d;
+            this.finalWidth=this.width-this.leftRuler.size-this.viewOffset[0]-20,
+            this.finalheight=this.height-this.bottomRuler.size-this.viewOffset[1];
+
+            var domainV=d3.extent(this._AryData,function(item,index){
+                return item.y;
             });
             this.VScale=d3.scale.linear();
-            this.VScale.domain(this.range||[aryRange[1],0]);
-            this.VScale.range([(this.height-this.bottomRulerSize-this.viewOffset[1]),0]);
+            this.VScale.domain(this.range||[0,domainV[1]]);
+            this.VScale.range([this.finalheight,0]);
 
             var domainH=d3.extent(this._AryData,function(item,index){
                 return item.x;
             });
+            this.domainH=domainH;
 
             this.HScale=d3.scale.linear();
             this.HScale.domain([0,domainH[1]]);
-            //this.HScale.range([0,(this.width-this.leftRulerSize-this.viewOffset[0])]);
-            this.HScale.range([0,(this.width-this.leftRulerSize-this.viewOffset[0]-20)]);
+            this.HScale.range([0,this.finalWidth]);
         }
         _LineChart.prototype.updateData=function(data){
-            _animateUpdate.call(this,data);
+            this._AryData=this.getFilterData(data)
+            _animateUpdate.call(this,this._AryData);
         }
 
         return _LineChart;
@@ -335,8 +481,13 @@ function init(){
         parentDom:document.getElementById("speedBox"),
         data:zeroAry,
         viewOffset:[10,30],
-        leftRulerSize:50,
-        bottomRulerSize:30,
+        leftRuler:{
+            size:50,
+            count:5
+        },
+        bottomRuler:{
+            size:50
+        },
         range:[0,1000],
         width:600,
         height:300,
@@ -349,9 +500,8 @@ function init(){
     setInterval(function(){
         var temp=_temp_getRandom();
         var tempAry=bchart.getFilterData(temp);
-        bchart.updateData(tempAry);
-        var tempAry=lineChart.getFilterData(temp);
-        lineChart.updateData(tempAry);
+        //bchart.updateData(tempAry);
+        lineChart.updateData(temp);
     },3000);
 }
 

@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <script src="timer.js"></script>
+        <script >
+            function main(){
+                var timeCanvas=document.getElementById("timeCanvas");
+
+
+                var timer=Timer.createTimer({
+                    totalTime:"10:34:05",
+                });
+                timer.onFrame(function(t){
+                    timeCanvas.innerHTML=t;
+                });
+                timer.onFrame(function(t){
+                    console.log("remain time :"+t);
+                });
+
+                timer.onEnd(function(){
+                    timeCanvas.innerHTML="GO!";
+                    console.log("time out1");
+                });
+                timer.onEnd(function(){
+                    console.log("time out2");
+                });
+            }
+        </script>
+
+    </head>
+    <body onload="main()">
+        <div id="timeCanvas" style="text-align: center;font-size: 40px;"></div>
+    </body>
+</html>

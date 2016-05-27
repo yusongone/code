@@ -1,16 +1,32 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html>
   <head>
     <meta type="icon">
     <link href="/bower_components/bootstrap/dist/css/bootstrap.css">
-    <script src="/bower_components/angularjs/angular.min.js"></script>
-    <script src="/js/controller.js"></script>
+    <!--script src="/bower_components/angularjs/angular.min.js"></script-->
+    <script src="http://localhost:9000/vendor/angular/angular.min.js"></script>
     <script>
-        angular.module('app', []).controller('SettingsController1', PhoneListCtrl);
+
+        function main(){
+                            var app=angular.module('appfe',[])
+                                app.controller('baseA',function($scope){
+                                    $scope.name=0;
+                                    $scope.test=function(){
+
+                                        
+                                    }
+
+
+                                    this.ttt=0;
+
+                                });
+            angular.bootstrap(document.body,["appfe"]);
+        }
+
     </script>
   </head>
-  <body ng-controller="SettingsController1 as dd">
-    <div>good luck {{alert();"abc"+"bcd" + dd.name}}</div>
-    <input ng-model="dd.name" >
+  <body onload="main()" ng-controller="baseA as b">
+    <div ng-click="test()">{{name}}</div>
+    <input ng-model="b.ttt" >
   </body>
 </html>

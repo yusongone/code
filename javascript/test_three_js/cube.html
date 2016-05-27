@@ -2,9 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="public/js/three.min.js"></script>
+    <script src="public/js/cube.js"></script>
     <title>Title</title>
-</head>
-<body>
+    <style rel="stylesheet">
+        body{
+            padding:0;
+            margin:0;
+        }
+    </style>
+    <script>
+        THREE.DoubleSide = 2;
 
+        function main(){
+            Page.Context.init();
+            var scene=Page.Context.getScene();
+            Page.Cube.init({
+                scene:scene
+            });
+
+            return;
+            var cube=Page.Cube.getCube(0,0,0);
+            var cube2=Page.Cube.getCube(0,10,0);
+            var cube3=Page.Cube.getCube(0,-10,0);
+            var x=0,y= 0,z=0;
+            x=cube2.position.x;
+            y=cube2.position.y;
+            z=cube2.position.z;
+            cube.position.set( x, y, z );
+            cube.geometry.applyMatrix(new THREE.Matrix4().makeTranslation( -x, -y, -z ) );
+
+
+            var i=0;
+            setInterval(function(){
+                if(i==60*3){
+                    x=cube3.position.x;
+                    y=cube3.position.y;
+                    z=cube3.position.z;
+                    var suby=cube.position.y-y;
+                    var subx=cube.position.x-x;
+                    var subz=cube.position.z-z;
+                    cube.position.set( x, y, z );
+                    //cube.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-subx, -suby, -subz ) );
+                    cube.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-Math.abs(subx), -Math.abs(suby), -Math.abs(subz) ) );
+                }else if(i==60*6){
+                    x=cube2.position.x;
+                    y=cube2.position.y;
+                    z=cube2.position.z;
+                    var suby=cube.position.y-y;
+                    var subx=cube.position.x-x;
+                    var subz=cube.position.z-z;
+                    cube.position.set( x, y, z );
+                    cube.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-Math.abs(subx), -Math.abs(suby), -Math.abs(subz) ) );
+                }
+                i++;
+                cube.rotateZ(1 * (Math.PI / 180));
+            },16);
+
+            Page.Context.getMainGroup().add(cube,cube2,cube3);
+
+        };
+    </script>
+</head>
+<body onload="main()">
 </body>
 </html>

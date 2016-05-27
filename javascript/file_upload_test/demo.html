@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script>
+            $(document).ready(function(){
+                var file=document.getElementById("file");
+
+                file.addEventListener("change",function(){
+                    var file=this.files[0];
+                    upload({
+                        url:"http://localhost:8800",
+                        files:[file]
+                    });
+                },false)
+            });
+
+            function upload(options){
+                var fd = new FormData(options);
+                fd.append("files",options.files[0]);
+                var xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener("progress", progress, false);
+                xhr.addEventListener("load", done, false);
+                xhr.addEventListener("error", error, false);
+                xhr.addEventListener("abort", abort, false);
+                xhr.open("POST",options.url);
+                xhr.send(fd);
+                function progress(evt){
+                    console.log("pro",evt);
+
+                }
+                function done(evt){
+                    console.log("donw",evt);
+                }
+                function error(evt){
+                    console.log("pro",evt);
+                }
+                function abort(evt){
+                    console.log("pro",evt);
+                }
+            }
+        </script>
+    </head>
+    <body onload="main()">
+        <input id="file" type="file"/>
+    </body>
+</html>

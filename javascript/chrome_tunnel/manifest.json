@@ -1,0 +1,33 @@
+{
+"manifest_version": 2,
+"name":"偷天换日",
+"version": "0.0.1",
+"description": "线上开发",
+"icons": 
+  { 
+    "16": "/images/logo.png"
+  },  
+"permissions":[
+    "webRequest",
+    "webRequestBlocking",
+    "tabs",
+    "activeTab",
+    "contextMenus",
+    "http://*/",
+    "https://*/"
+    ],
+"background": {
+    "scripts": ["/js/vendor/jquery-2.1.1.min.js","background.js"]
+},
+"web_accessible_resources":[
+      "/css/content.css"
+],
+"browser_action": {
+    "default_icon": "/images/logo.png",
+    "default_title": "头天换日",
+    "default_popup": "popup.html"
+  }
+}
+
+
+
