@@ -8,6 +8,7 @@
     "16": "/images/logo.png"
   },  
 "permissions":[
+    "webNavigation",
     "webRequest",
     "webRequestBlocking",
     "tabs",
@@ -17,10 +18,11 @@
     "https://*/"
     ],
 "background": {
-    "scripts": ["/js/vendor/jquery-2.1.1.min.js","background.js"]
+    "scripts": ["/js/vendor/jquery-2.1.1.min.js","/js/storage.js","background.js"]
 },
 "web_accessible_resources":[
-      "/css/content.css"
+      "/css/content.css",
+      "/js/page_content.js"
 ],
 "browser_action": {
     "default_icon": "/images/logo.png",

@@ -1,74 +1,33 @@
 window.$View=(function(){
 
-    var Mock={
-        Groups:[
-            {
-                "groupName":"粉丝趴1",
-                "checked":false,
-                childs:[
-                    {
-                        "name":"main.js",
-                        "originLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bundle.js",
-                        "proxyLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bundle.js",
-                        "checked":true
-                    },
-                    {
-                        "name":"node.js",
-                        "originLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bundle.js",
-                        "proxyLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bfefeundle.js",
-                        "checked":true
-                    }
-                ]
-            },
-            {
-                "groupName":"粉丝趴1",
-                "checked":true,
-                childs:[
-                    {
-                        "name":"main.js",
-                        "originLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bundle.js",
-                        "proxyLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bundle.js",
-                        "checked":true
-                    },
-                    {
-                        "name":"node.js",
-                        "originLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bundle.js",
-                        "proxyLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bfefeundle.js",
-                        "checked":true
-                    }
-                ]
-            },
-            {
-                "groupName":"粉丝趴2",
-                "checked":true,
-                childs:[
-                    {
-                        "name":"main.js",
-                        "proxyLink":"http://g.assets.daily.taobao.net/base-tech-fe/ysf-fansparty/bundle.js"
-                    }
-                ]
-            }
-
-        ]
-
-    }
-    localStorage.time=new Date();
-
     var Item=React.createClass({
         getInitialState:function(){
             return {
-                checked:this.props.data.checked,
-                name:this.props.data.name,
-                proxyLink:this.props.data.proxyLink
+                name:this.props.link.name,
+                proxyLink:this.props.link.proxyLink
             }
         },
         render(){
+            var self=this;
+            var link=self.props.link;
             return <li className="item">
                                 <span>
-                                    <input type="checkbox" className="checkbox"/>
+                                    <input type="checkbox" className="checkbox"
+                                        onChange={function(){
+                                            Page.Storage.updateLinkData({
+                                                group:self.props.group,
+                                                link:link,
+                                                data:{
+                                                    checked:!!!link.checked
+                                                }
+                                            });
+                                        }}
+                                        checked={link.checked}
+                                    />
                                 </span>
-                <span className="itemName">{this.state.name}</span>
-                <span className="itemProxyLink">{this.state.proxyLink}</span>
+                <span className="itemName">{link.name}</span>
+                <span className="itemOriginLink">{link.origin}</span>
+                <span className="itemProxyLink">{link.target}</span>
             </li>
         }
     });
@@ -76,11 +35,6 @@ window.$View=(function(){
     var GroupItem=React.createClass({
         getInitialState:function(){
             return {
-                data:{
-                    checked:this.props.data.checked,
-                    childs:this.props.data.childs,
-                    name:this.props.data.groupName
-                },
                 status:{
                     hideArea:true
                 }
@@ -91,30 +45,35 @@ window.$View=(function(){
         },
         render(){
             var self=this;
-            var items=this.state.data.childs.map(function(item,index){
-                return <Item data={item} key={index}></Item>
+            var items=this.props.group.links.map(function(item,index){
+                return <Item group={self.props.group} link={item} key={index}></Item>
             });
             var hide=this.state.status.hideArea?"hidden":"";
             var className="hideArea "+hide;
             return <li className="group">
-                <div className="bar" onClick={function(){
-                    self.state.status.hideArea=!self.state.status.hideArea;
-                    self.setState(self.state,function(){ });
-                    return false;
-                }}>
+                <div className="bar"
+                     onClick={function(){
+                        self.state.status.hideArea=!self.state.status.hideArea;
+                        self.setState(self.state,function(){ });
+                        return false;
+                     }}
+                >
                     <input type="checkbox" className="checkbox"
                         onClick={function(e){
                             e.stopPropagation()
                         }}
 
                         onChange={function(e,a,b){
-                            self.state.data.checked=!self.state.data.checked;
-                            self.setState(self.state,function(){ });
-                        }}
-                        checked={self.state.data.checked}
-                    />
+                            Page.Storage.setGroupChecked({
+                                group:self.props.group,
+                                checked:!self.props.group.checked
+                            },function(){
 
-                    {this.state.data.name}
+                            });
+                        }}
+                        checked={this.props.group.checked} />
+
+                    {this.props.group.name}
                     <div className="drop">v</div>
                     <div className="checkedCount">1/2</div>
                 </div>
@@ -129,41 +88,35 @@ window.$View=(function(){
 
     var Group=React.createClass({
         getInitialState:function(){
+            var self=this;
+            var groups=Page.Storage.getData().groups;
+
+            Page.Storage.onChange(function(jsonData){
+                self.setState({
+                    groups:jsonData.groups
+                });
+            });
+
             return {
-                groups:Mock.Groups
+                groups:groups
             }
         },
         getDefaultProps(){
-            return {
-                Groups:Mock.Groups
-            }
         },
         componentWillReceiveProps(){
 
         },
         render(){
-            var GroupItems=this.state.groups.map(function(item,index){
-                return <GroupItem data={item} key={index}/>
-            });
+            var GroupItems=[];
+            for(var i in this.state.groups){
+                var item=this.state.groups[i];
+                GroupItems.push(<GroupItem group={item} key={i}/>);
+            }
 
 
-            return <ul className="groupList">
-                {GroupItems}
-                <li className="groupItem">
-                    <div className="bar">
-                        <input type="checkbox" className="checkbox"/>
-                        奇门接入
-                        <div className="drop">v</div>
-                        <div className="checkedCount">1/2</div>
-                    </div>
-                    <div className="hideArea">
-                        <ul>
-
-                        </ul>
-
-                    </div>
-                </li>
-            </ul>
+            return  <ul className="groupList">
+                        {GroupItems}
+                    </ul>
 
         }
     });
