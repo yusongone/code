@@ -1,26 +1,27 @@
 var staticData={
 }
-var page={};
+var Page=window.Page||{};
 var cache={};
 var nowTabId;
-var newLoading=false;
 
-var cc=[];
+var hited=[];
 
 
 
 function checkHit(originLink,requestLink){
-    var ol=new URL(originLink);
-    var rl=new URL(requestLink);
-    if(ol.protocol==rl.protocol&&ol.hostname==rl.hostname&&ol.pathname==rl.pathname){
-        return true;
+    try{
+        var ol=new URL(originLink);
+        var rl=new URL(requestLink);
+        if(ol.protocol==rl.protocol&&ol.hostname==rl.hostname&&ol.pathname==rl.pathname){
+            return true;
+        }
+    }catch(e){
+        return false;
     }
     return false;
 }
 
 function requestCallback (details) {
-    console.log(details.url);
-
     var groups=Page.Storage.getData().groups;
         for(var i in groups){
             var group=groups[i];
@@ -28,8 +29,8 @@ function requestCallback (details) {
                 for(j=0;j<groups[i].links.length;j++){
                     var link=groups[i].links[j];
                     if(link.checked&&checkHit(link.origin,details.url)){
-                        console.log("=================================",new Date().getTime());
-                        cc.push(link.name);
+                        console.log("hit",new Date().getTime());
+                        Page.ChangezhengFive.checkLaunch(link.name);
                         return {redirectUrl: link.target};
                     };
                 }
@@ -40,16 +41,66 @@ function requestCallback (details) {
 
 chrome.webRequest.onBeforeRequest.addListener(requestCallback,{urls:["<all_urls>"]},["blocking"]);
 
+function checkHitPool(){
+    if(hited.length>0){
+        var tempAry=hited.concat([]);
+        hited=[];
+    }
+}
+
+
+//长征
+(function(){
+    var Q={
+        _cacheInfo:function(tabId,info){
+            if(!Q[tabId]){Q[tabId]=[]};
+            Q[tabId].push(info);
+        },
+        _readInfo:function(tabId,handler){
+            var tempInfo=Q[tabId].concat([]);
+            var length=Q[tabId].length;
+            for(var i=0;i<length;i++){
+                var info=Q[tabId].shift(0);
+                handler(info);
+            };
+        }
+    };
+
+    Page.ChangezhengFive={
+        conquerTab:{},
+        launch:function(info){
+            chrome.tabs.sendMessage(nowTabId,{links:info},function(){
+            });
+        },
+        checkLaunch:function(info){
+            var self=this;
+            if(!self.conquerTab[nowTabId]||self.conquerTab[nowTabId].status=="revolt"){
+                self.conquerTab[nowTabId]={
+                    status:"conquering" //unConquer, conquering, conquered
+                };
+                Q._cacheInfo(nowTabId,info);
+                goConquer(nowTabId,function(){
+                    self.conquerTab[nowTabId].status="conquered";
+                    Q._readInfo(nowTabId,function(item){
+                        self.launch(item);
+                    });
+                });
+            }else{
+                if(self.conquerTab[nowTabId].status=="conquering"){
+                    Q._cacheInfo(nowTabId,info);
+                }else if(self.conquerTab[nowTabId].status=="conquered"){
+                    self.launch(info);
+                }
+            }
+        }
+    }
+})();
+
 chrome.tabs.onUpdated.addListener(function(tabid,changeInfo,tab){
     if(changeInfo.status=="loading"){
-        console.log("--------------------------------------",nowTabId);
-        newLoading=true;
-
-        getTrans(nowTabId,function(){
-            chrome.tabs.sendMessage(nowTabId,{linkName:cc},function(){
-                console.log(";asdlkfj;alsdkfj;alsdf",details.tabId,nowTabId);
-            });
-        });
+        if(Page.ChangezhengFive.conquerTab[tabid]){
+            Page.ChangezhengFive.conquerTab[tabid].status="revolt";
+        };
     }else if(changeInfo.status=="complete"){
 
     }
@@ -104,7 +155,7 @@ chrome.contextMenus.create({
     console.log(err);
 });
 
-function getTrans(tab,callback){
+function goConquer(tab,callback){
     chrome.tabs.insertCSS(nowTabId,{file:"/css/content.css"});
     chrome.tabs.executeScript(nowTabId, {file: "/js/page_content.js"},function(){
         callback();

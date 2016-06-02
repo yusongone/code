@@ -1,10 +1,6 @@
-console.log(new Date().getTime());
-
+console.log("偷天换日正在为您代理...");
 chrome.extension.onMessage.addListener(function(request, sender, response) {
-    console.log(request,sender,response);
-    satellite.info.innerText=
-    console.warn("偷天换日;"+request.linkName+"命中!");
-
+    console.warn("偷天换日命中 : "+request.links+"!");
 });
 
 

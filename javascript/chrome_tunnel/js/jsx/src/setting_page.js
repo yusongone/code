@@ -28,7 +28,6 @@ Page.App=(function(){
                     desc:this.state.inputDesc
                 },function(result){
                     if(result.err){
-                        console.log(result.errMsg);
                         self.setState({
                             errMsg:result.errMsg
                         });
@@ -116,6 +115,7 @@ Page.App=(function(){
                                             callback(result);
                                             if(!result.err){
                                                 self.DialogElement.style.display="none";
+                                                self.props.onNewGroup(result.group);
                                             }
                                         });
                                     }}
@@ -136,15 +136,16 @@ Page.App=(function(){
     var Groups=(function(){
         var list=React.createClass({
             getInitialState(){
-                var tempGroup="";
-                for(var i in this.props.groups){
-                    tempGroup=this.props.groups[i];
-                    break;
-                }
+                var tempGroup=this.props.selectedGroup;
                 return {
                    selectedGroup:tempGroup,
                     groups:this.props.groups
                 }
+            },
+            componentWillReceiveProps(newProps){
+                this.setState({
+                    selectedGroup:newProps.selectedGroup
+                });
             },
             componentDidMount() {
                 this.props.onSelected(this.state.selectedGroup);
@@ -184,6 +185,17 @@ Page.App=(function(){
                                     }
                                 })()}/>
                             <label> {tempGroup.name} </label>
+                            <i className="fa fa-times icon removeIcon"
+                                onClick={(function(){
+                                   var g=tempGroup;
+                                    return function(e){
+                                        e.stopPropagation();
+                                        if(confirm("确认要删除"+g.name+"分组?")){
+                                            Page.Storage.removeGroup(g.name);
+                                        }
+                                    }
+                                })()}
+                            ></i>
                     </li>)
                 }
                 return  <div className="scrollBox">
@@ -199,102 +211,114 @@ Page.App=(function(){
     })();
 
 
-    var ListToolBar=(function(){
-
-        var Dialog=React.createClass({
-            getInitialState(){
-                return{
-                    show:true,
-                    name:"",
-                    errMsg:"",
-                    origin:"",
-                    target:""
-                }
-            },
-            close(){
-                this.props.onClose();
-                this.state.show=false;
-                this.setState(this.state);
-            },
-            ok(){
-                var self=this;
-                if(""==this.state.inputName){return}
-                this.props.onOk({
-                    link:{
-                        name:self.state.name,
-                        origin:self.state.origin,
-                        target:self.state.target
-                    }
-                },function(result){
-                    if(result.err){
-                        console.log(result.errMsg);
-                        self.setState({
-                            errMsg:result.errMsg
-                        });
-                    }else{
-                        self.setState({
-                            errMsg:""
-                        });
-                    }
+    var LinkDialog=React.createClass({
+        getInitialState(){
+            return{
+                show:true,
+                errMsg:"",
+                name:this.props.data?this.props.data.name:null,
+                origin:this.props.data?this.props.data.origin:null,
+                target:this.props.data?this.props.data.target:null
+            }
+        },
+        close(){
+            this.props.onClose();
+            this.state.show=false;
+            this.setState(this.state);
+        },
+        ok(){
+            var self=this;
+            if( !self.state.name|| !self.state.origin||!self.state.target){
+                self.setState({
+                    errMsg:"不能为空"
                 });
-            },
-            componentWillReceiveProps(newProps){
-                if(newProps.show==true){
-                    this.state.show=true;
-                    this.setState(this.state);
+                return;
+            }
+            if(""==this.state.inputName){return}
+            this.props.onOk({
+                link:{
+                    name:self.state.name,
+                    origin:self.state.origin,
+                    target:self.state.target
                 }
-            },
-            render(){
-                var self=this;
-                if(!this.state.show){
-                    return null;
+            },function(result){
+                if(result.err){
+                    self.setState({
+                        errMsg:result.errMsg
+                    });
+                }else{
+                    self.setState({
+                        errMsg:""
+                    });
                 }
-                var errMsg=null;
-                if(this.state.errMsg!=""){
-                    errMsg=<p className="errMsg">{this.state.errMsg}</p>;
-                }
-                return  <div className="dialog createLink">
-                    <div className="statusBar" >
-                        <label className="title">组:{this.props.title}</label>
-                        <div className="closeBtn" onClick={this.close} >&times;</div>
-                    </div>
-                    <div className="container">
-                        <p>
-                            <label>名称 :</label>
-                            <input type="text" className="name" value={this.state.name} onChange={function(event){
+            });
+        },
+        componentWillReceiveProps(newProps){
+            this.setState({
+                show:newProps.show,
+                name:newProps.data?newProps.data.name:null,
+                origin:newProps.data?newProps.data.origin:null,
+                target:newProps.data?newProps.data.target:null
+            });
+        },
+        render(){
+            var self=this;
+            if(!this.state.show){
+                return null;
+            }
+            var errMsg=null;
+            if(this.state.errMsg!=""){
+                errMsg=<p className="errMsg">{this.state.errMsg}</p>;
+            }
+
+            var name=this.state.name;
+            var origin=this.state.origin;
+            var target=this.state.target;
+
+            return  <div className="dialog createLink">
+                <div className="statusBar" >
+                    <label className="title">{this.props.title}</label>
+                    <div className="closeBtn" onClick={this.close} >&times;</div>
+                </div>
+                <div className="container">
+                    <p>
+                        <label>名称 :</label>
+                        <input type="text" className="name" value={name} onChange={function(event){
                                 event.preventDefault();
                                 self.setState({
                                     name:event.target.value
                                 });
                             }}/>
-                        </p>
-                        <p>
-                            <label>原生 :</label>
-                            <input type="text" value={this.state.origin} onChange={function(event){
+                    </p>
+                    <p>
+                        <label>原生 :</label>
+                        <input type="text" value={origin} onChange={function(event){
                                 event.preventDefault();
                                         self.setState({
                                             origin:event.target.value
                                         });
                                     }}/>
-                        </p>
-                        <p>
-                            <label>代理 :</label>
-                            <input type="text" value={this.state.target} onChange={function(event){
+                    </p>
+                    <p>
+                        <label>代理 :</label>
+                        <input type="text" value={target} onChange={function(event){
                                 event.preventDefault();
                                         self.setState({
                                             target:event.target.value
                                         });
                             }} />
-                        </p>
-                        {errMsg}
-                    </div>
-                    <div className="btnBar">
-                        <div className="btn" onClick={this.close} >取消</div>
-                        <div className="btn ok" onClick={this.ok} >确定</div>
-                    </div>
+                    </p>
+                    {errMsg}
                 </div>
-            }
-        });
+                <div className="btnBar">
+                    <div className="btn" onClick={this.close} >取消</div>
+                    <div className="btn ok" onClick={this.ok} >确定</div>
+                </div>
+            </div>
+        }
+    });
+    var ListToolBar=(function(){
+
 
         var toolBar=React.createClass({
             getInitialState(){
@@ -321,7 +345,7 @@ Page.App=(function(){
             createDialog(){
                 var self=this;
                 this.DialogElement.style.display="block";
-                ReactDOM.render(<Dialog
+                ReactDOM.render(<LinkDialog
                                     show={true} title={this.state.group.name}
 
                                     onClose={function(){
@@ -337,7 +361,7 @@ Page.App=(function(){
                                             }
                                         });
                                     }}
-                ></Dialog>,this.DialogElement);
+                ></LinkDialog>,this.DialogElement);
             },
             render(){
                 var self=this;
@@ -352,9 +376,52 @@ Page.App=(function(){
     var Links=(function(){
 
         var links=React.createClass({
+            componentDidMount() {
+                var p = this.props.modalBoxId&& document.getElementById(this.props.modalBoxId);
+                if (!p) {
+                    var p = document.createElement('div');
+                    p.setAttribute("class","overflow_layer");
+                    p.style.display="none";
+                    this.props.modalBoxId&&(p.id = this.props.modalBoxId);
+                    document.body.appendChild(p);
+                }
+                this.DialogElement= p;
+            },
+            createDialog(item){
+                var self=this;
+                this.DialogElement.style.display="block";
+                ReactDOM.render(<LinkDialog
+                                    show={true} title={"编辑 : "+item.name}
+
+                                    data={item}
+
+                                    onClose={function(){
+                                        self.DialogElement.style.display="none";
+                                    }}
+
+                                    onOk={function(jsonData,callback){
+                                        Page.Storage.updateLinkData({
+                                            group:self.props.group,
+                                            link:item,
+                                            data:{
+                                                origin:jsonData.link.origin,
+                                                target:jsonData.link.target,
+                                                name:jsonData.link.name,
+                                            }
+                                        },function(res){
+                                            if(res.err){
+                                                alert(res.errMsg);
+                                            }else{
+                                                self.DialogElement.style.display="none";
+                                            }
+                                        });
+                                    }}
+                ></LinkDialog>,this.DialogElement);
+            },
             render(){
                 var self=this;
-                var ary=this.props.group.links||[];
+                var ary=this.props.group.links;
+                if(!ary){return null;}
                 var li=ary.map(function(item,index){
                     return  <li key={index} className="linkItem">
                                 <div className="name">
@@ -367,10 +434,23 @@ Page.App=(function(){
                                                 data:{
                                                     checked:!!!item.checked
                                                 }
-                                            });
+                                            },function(){});
                                         }} />
                                     <label>名称 :</label>{item.name}
-                                    <i className="fa fa-pencil editIcon"></i>
+                                    <i className="fa fa-pencil-square-o icon editIcon"
+                                       onClick={(function(){
+                                        return function(){
+                                            self.createDialog(item);
+                                        }
+                                    })()}></i>
+                                    <i className="fa fa-times icon removeIcon"
+                                       onClick={(function(){
+                                        return function(){
+                                            if(confirm("确认要删除"+item.name+"映射?")){
+                                                Page.Storage.removeLink(self.props.group,item);
+                                            }
+                                        }
+                                    })()}></i>
                                 </div>
                                 <div className="origin">
                                     <p>
@@ -407,10 +487,16 @@ Page.App=(function(){
                 });
             });
 
+            var tempGroup="";
+            for(var i in groups){
+                tempGroup=groups[i];
+                break;
+            }
 
+            console.log(tempGroup);
             return {
                 groups:groups,
-                selectedGroup:{}
+                selectedGroup:tempGroup
             }
         },
         render(){
@@ -418,9 +504,15 @@ Page.App=(function(){
             return  <div className="pageContent">
                         <div className="catalog">
                             <div className="list">
-                                <GroupsToolBar></GroupsToolBar>
+                                <GroupsToolBar onNewGroup={function(group){
+                                    self.setState({
+                                        selectedGroup:group
+                                    });
+                                }}
+                                ></GroupsToolBar>
                                 <Groups
                                     groups={this.state.groups}
+                                    selectedGroup={self.state.selectedGroup}
                                     onSelected={function(group){
                                         self.setState({
                                             selectedGroup:group

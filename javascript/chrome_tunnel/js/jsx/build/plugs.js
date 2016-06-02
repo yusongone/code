@@ -20,6 +20,8 @@ window.$View=(function(){
                                                 data:{
                                                     checked:!!!link.checked
                                                 }
+                                            },function(){
+
                                             });
                                         }, 
                                         checked: link.checked}

@@ -19,6 +19,22 @@ Page.Storage=(function(){
         }
     }
 
+    function getLinkByName(group,name){
+        for(var i=0;i<group.links.length;i++) {
+            if (group.links[i].name == name) {
+                return group.links[i];
+            }
+        }
+    }
+
+    function removeLinkByName(group,name){
+        for(var i=0;i<group.links.length;i++) {
+            if (group.links[i].name == name) {
+                return group.links.splice(i,1);
+            }
+        }
+    }
+
     return {
         addGroup(jsonData,callback){
             if(!_storage.groups[jsonData.name]){
@@ -28,10 +44,14 @@ Page.Storage=(function(){
                     desc:jsonData.desc,
                     links:[]
                 };
-                callback({err:false});
+                callback({err:false,group:_storage.groups[jsonData.name]});
             }else{
                 callback({err:true,errMsg:"分组已经存在!"});
             }
+            updateLocalStorage();
+        },
+        removeGroup(groupName){
+            delete _storage.groups[groupName];
             updateLocalStorage();
         },
         addLink(json,callback){
@@ -40,24 +60,32 @@ Page.Storage=(function(){
             updateLocalStorage();
             callback({err:false});
         },
-        setGroupChecked(json,callback){
-            _storage.groups[json.group.name].checked=json.checked;
-            console.log(_storage);
+        removeLink(group,link){
+            var group=_storage.groups[group.name];
+            removeLinkByName(group,link.name)
             updateLocalStorage();
-            //callback({err:false});
+        },
+        setGroupChecked(json){
+            _storage.groups[json.group.name].checked=json.checked;
+            updateLocalStorage();
         },
         updateLinkData(json,callback){
             var group=_storage.groups[json.group.name];
-            for(var i=0;i<group.links.length;i++){
-                if(group.links[i].name==json.link.name){
-                    for(var j in json.data){
-                        group.links[i][j]=json.data[j]
-                        console.log(group.links[i]);
-                    }
-                }
+            var link=getLinkByName(group,json.link.name);
+            if(!link){
+                return callback({err:true,errMsg:"库中不存在此映射"});
+            }
+
+            var bool1=link.name!=json.data.name;//要更改的名字和自己旧的名字不一样
+            if(bool1&&getLinkByName(group,json.data.name)){
+                return callback({err:true,errMsg:"名称已经存在"});
+            }
+
+            for(var j in json.data){
+                link[j]=json.data[j]
             }
             updateLocalStorage();
-            //callback({err:false});
+            callback({err:false});
         },
         onChange(handler){
             changeHandlers.push(handler);
