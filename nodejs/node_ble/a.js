@@ -1,1 +1,1 @@
-var HOST='10.0.0.14';
+var HOST='undefined';

@@ -78,7 +78,7 @@ function parse(data){
             startData++; 
         }else{
             for(var i=0;i<onDataHandlers.length;i++){
-                onDataHandlers[i](buf);
+//                onDataHandlers[i](buf);
                 console.log("======",buf.length);
                 console.log("---------------------------"+new Date().toISOString().substr(11,8));
                 console.log("CF=1 1.0",(buf[2]<<8)+(buf[3]<<0));
@@ -112,7 +112,7 @@ exports.scan=function(handler){
     });
 }
 
-//exports.scan();
+exports.scan();
 /*
 *
 * */
