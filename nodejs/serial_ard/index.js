@@ -47,6 +47,7 @@ console.log(headString);
     }
   }
 }
+
 serialPort.on('data', function(data) {
     parse(data);
 });

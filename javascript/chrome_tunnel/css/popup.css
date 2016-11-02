@@ -61,10 +61,11 @@ html,body{
 .groupList .item .itemName{
     margin-right:10px;
 }
+.groupList .item .itemOriginLink,
 .groupList .item .itemProxyLink{
     width: 100%;
     padding-left: 20px;
-    margin: 5px 0;
+    margin: 5px 0 0;
     line-height:18px;
     /* white-space: nowrap; */
 }
