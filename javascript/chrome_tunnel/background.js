@@ -10,15 +10,18 @@ var hited=[];
 
 function checkHit(originLink,requestLink){
     try{
-        var ol=new URL(originLink);
+        var ol=new URL(originLink.origin);
         var rl=new URL(requestLink);
-        if(ol.protocol==rl.protocol&&ol.hostname==rl.hostname&&ol.pathname==rl.pathname){
-            return true;
+        var sameProtocol=ol.protocol==rl.protocol;
+        var sameHostName=ol.hostname==rl.hostname;
+        var includePath=rl.pathname.indexOf(ol.pathname)==0;
+        if(sameProtocol&&sameHostName&&includePath){
+            return originLink.target+rl.pathname.substr(ol.pathname.length,rl.pathname.length-ol.pathname.length);
         }
     }catch(e){
-        return false;
+        return null;
     }
-    return false;
+    return null;
 }
 
 function requestCallback (details) {
@@ -28,10 +31,10 @@ function requestCallback (details) {
             if(group.checked&&group.links){
                 for(j=0;j<groups[i].links.length;j++){
                     var link=groups[i].links[j];
-                    if(link.checked&&checkHit(link.origin,details.url)){
-                        console.log("hit",new Date().getTime());
-                        Page.ChangezhengFive.checkLaunch(link.name);
-                        return {redirectUrl: link.target};
+                    var mergeLink=checkHit(link,details.url);
+                    if(link.checked&&mergeLink){
+                        Page.ChangezhengFive.checkLaunch({info:link.name,group:group});
+                        return {redirectUrl: mergeLink};
                     };
                 }
             }
@@ -68,28 +71,28 @@ function checkHitPool(){
 
     Page.ChangezhengFive={
         conquerTab:{},
-        launch:function(info){
-            chrome.tabs.sendMessage(nowTabId,{links:info},function(){
+        launch:function(data){
+            chrome.tabs.sendMessage(nowTabId,{data:data},function(){
             });
         },
-        checkLaunch:function(info){
+        checkLaunch:function(jsonObj){
             var self=this;
             if(!self.conquerTab[nowTabId]||self.conquerTab[nowTabId].status=="revolt"){
                 self.conquerTab[nowTabId]={
                     status:"conquering" //unConquer, conquering, conquered
                 };
-                Q._cacheInfo(nowTabId,info);
+                Q._cacheInfo(nowTabId,jsonObj);
                 goConquer(nowTabId,function(){
                     self.conquerTab[nowTabId].status="conquered";
                     Q._readInfo(nowTabId,function(item){
-                        self.launch(item);
+                        self.launch(jsonObj);
                     });
                 });
             }else{
                 if(self.conquerTab[nowTabId].status=="conquering"){
-                    Q._cacheInfo(nowTabId,info);
+                    Q._cacheInfo(nowTabId,jsonObj);
                 }else if(self.conquerTab[nowTabId].status=="conquered"){
-                    self.launch(info);
+                    self.launch(jsonObj);
                 }
             }
         }

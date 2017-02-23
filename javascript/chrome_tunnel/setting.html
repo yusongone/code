@@ -18,11 +18,12 @@
         label{margin:0 5px;}
         textarea,
         input[type=text]{
-            padding: 0 5px;
-            line-height: 24px;
-            height: 24px;
-            border:1px solid #ccc;
+            line-height: 31px;
+            height: 32px;
+            border: 1px solid #ddd;
             border-radius: 3px;
+            padding: 10px;
+            color: #666;
         }
         textarea{
             vertical-align: top;
@@ -32,7 +33,7 @@
             width:100%;
             height:100%;
             color:#666;
-            background:#ddd;
+            background:#efefef;
         }
         .overflow_layer{
             display: block;
@@ -46,35 +47,30 @@
         .btn{
             float: right;
             height: 28px;
-            border-radius: 1px;
             font-size: 12px;
             color: #333;
             margin: 0 5px;
-            margin-top: 10px;
+            margin-top: 8px;
             cursor: pointer;
             line-height: 24px;
-            border-top: 2px solid #bbb;
-            border-left: 2px solid #bbb;
-            border-bottom: 2px solid #666;
-            border-right: 2px solid #666;
+            border:1px solid #ccc;
             padding: 0 9px;
-            background: #999;
-            color: #fff;
+            background: #fff;
+            color: #333;
+            border-radius:3px;
             font-weight: normal;
             font-size: 14px;
         }
         .btn.ok{
             background: #00BCE6;
             color: #fff;
-            border-top: 2px solid #00D0FF;
-            border-left: 2px solid #00D0FF;
-            border-bottom: 2px solid #008DAD;
-            border-right: 2px solid #008DAD;
+            border-top: 1px solid #00D0FF;
+            border-left: 1px solid #00D0FF;
+            border-bottom: 1px solid #008DAD;
+            border-right: 1px solid #008DAD;
         }
         .btn:hover{
-            line-height: 26px;
-            padding: 0 10px;
-            border-width: 1px;
+            border:1px solid #888;
         }
         .pageContent{
             width: 100%;
@@ -101,11 +97,11 @@
         }
         .toolBar{
             height: 46px;
-            background: #ddd;
+            background: #efefef;
+            border-bottom:1px solid #bbb;
             line-height: 46px;
             padding: 0 5px;
             margin-top:-46px;
-            border-bottom:1px solid #ccc;
         }
         .dialog.createLink,
         .dialog.createGroup{
@@ -130,14 +126,13 @@
         .dialog.createLink .statusBar,
         .dialog.createGroup .statusBar{
             height: 36px;
-            background: #cecece;
+            background: #ddd;
             border-top-left-radius: 5px;
             border-top-right-radius: 5px;
             float: left;
             width: 100%;
             margin-top:-36px;
-            border: 1px solid #cecece;
-            border-bottom: 1px solid #aaa;
+            border: 1px solid #ccc;
             color:#666;
         }
         .dialog.createGroup .errMsg{
@@ -171,20 +166,17 @@
         }
         .dialog.createLink .container,
         .dialog.createGroup .container{
-            background:#ddd;
+            background:#efefef;
             float: left;
             width: 100%;
-            border: 1px solid #cecece;
             padding:10px;
-            border-top: 1px solid #eee;
         }
         .dialog.createLink .btnBar,
         .dialog.createGroup .btnBar{
-            border: 1px solid #cecece;
             float: left;
             width: 100%;
             padding: 10px;
-            background: #ddd;
+            background: #efefef;
             border-top: 1px solid #eee;
         }
         .dialog .btnBar .btn{
@@ -196,7 +188,7 @@
             height:100%;
         }
         .groups{
-            border-right: 1px solid #aaa;
+            border-right: 1px solid #ccc;
             min-height: 100%;
         }
         .list .icon{
@@ -206,36 +198,43 @@
             cursor:pointer;
         }
         .icon.removeIcon{
-            color:#c30000;
+            color:#666;
         }
         .groups .group{
-            padding: 10px 10px;
-            border-top: 1px solid #eee;
+            padding: 12px 10px;
             border-bottom: 1px solid #cecece;
             cursor:pointer;
             font-size:14px;
+
         }
-        .groups .group:hover{
+        .groups .icon.removeIcon{
+            display:none;
+        }
+        .groups .group:hover {
             background:#ccc;
-            border-top: 1px solid #eee;
-            border-bottom: 1px solid #999;
+        }
+        .groups .group:hover .removeIcon{
+            display:block;
         }
         .groups .group.selected{
-            border-bottom: 1px solid #eee;
-            border-top: 1px solid #999;
-            background: #cfcfcf;
+            background: #fff;
             border-right: none;
             margin-right:-2px;
             padding-left:12px;
         }
+        .groups .group.selected .icon.removeIcon{
+            display:none;
+        }
+
         .linkItem{
             margin: 0 20px;
             font-size: 14px;
-            padding: 10px 0;
+            padding: 15px 15px;
             font-size: 14px;
             border-top: 1px solid #cecece;
-            color: #333;
-            border-bottom: 1px solid #aaa;
+            color: #666;
+            font-family: initial;
+            line-height: 20px;
         }
         .linkItem:first-child{
             border-top:none;
@@ -244,15 +243,24 @@
             border-bottom: none;
         }
         .bg{
+            padding:20px 0;
             min-height: 100%;
             width: 100%;
-            background: #cfcfcf;
-            border-top: 1px solid #999;
+            background: #fff;
         }
+        .linkItem:hover{
+            background:#f8f8f8;
+         }
 
         .linkItem p{
             display:inline-block;
         }
+        .linkItem .icon{
+            display:none;
+        }
+        .linkItem:hover .icon{
+            display:block;
+         }
 
         .linkItem .name{
             margin:10px 0;

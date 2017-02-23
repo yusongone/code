@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width,user-scalable=no" >
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script src="./a.js"></script>
+    <script>
+        function main(){
+            var img=document.createElement("img");
+            var str="http://"+HOST+":4433";
+            img.src="http://tool.oschina.net/action/qrcode/generate?data="+str+"&output=image%2Fgif&error=L&type=0&margin=0&size=4&1453892599856"
+            document.body.appendChild(img)
+        }
+    </script>
+    <style rel="stylesheet">
+        body{text-align: center;}
+        img{
+            min-width:100px;
+            margin:100px auto;
+        }
+
+    </style>
+</head>
+<body onload="main()">
+
+</body>
+</html>

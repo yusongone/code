@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            function test1(){
+                setTimeout(function(){
+                    console.log("a");
+                    setTimeout(function(){
+                        console.log("aa");
+                    });
+                });
+                test4(function(){
+                    console.log(5);
+                });
+                console.log(1);
+            }
+            function test2(){
+                setTimeout(function(){
+                    console.log("b");
+                    setTimeout(function(){
+                        console.log("bb");
+                    });
+                });
+                console.log(2);
+            }
+            function test3(){
+                console.log(3);
+
+            }
+            function test4(fun){
+                function doIt(){
+                    requestAnimationFrame(function(){
+                        fun();
+                        doIt();
+                    });
+                }
+                doIt();
+            }
+            test1();
+            test2();
+            test3();
+        </script>
+    </head>
+</html>

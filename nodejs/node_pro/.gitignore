@@ -1,4 +1,3 @@
-*.idea
 .idea/*
 .idea/.name
 .idea/misc.xml
@@ -8,6 +7,4 @@
 .idea/youdao.iml
 .idea/encodings.xml
 public/js/jsx/build/.module-cache/*
-*/node_modules
-*/bower_components
 *.swp
