@@ -218,7 +218,8 @@ Page.App=(function(){
                 errMsg:"",
                 name:this.props.data?this.props.data.name:null,
                 origin:this.props.data?this.props.data.origin:null,
-                target:this.props.data?this.props.data.target:null
+                target:this.props.data?this.props.data.target:null,
+                type:0    //0: normal 只对比host+path 1:force 将按照字符串匹配
             }
         },
         close(){
@@ -239,7 +240,8 @@ Page.App=(function(){
                 link:{
                     name:self.state.name,
                     origin:self.state.origin,
-                    target:self.state.target
+                    target:self.state.target,
+                    type:self.state.type
                 }
             },function(result){
                 if(result.err){
@@ -258,7 +260,8 @@ Page.App=(function(){
                 show:newProps.show,
                 name:newProps.data?newProps.data.name:null,
                 origin:newProps.data?newProps.data.origin:null,
-                target:newProps.data?newProps.data.target:null
+                target:newProps.data?newProps.data.target:null,
+                type:newProps.data?newProps.data.type:0    //0: normal 只对比host+path 1:force 将按照字符串匹配
             });
         },
         render(){
@@ -311,6 +314,18 @@ Page.App=(function(){
                     errMsg
                 ), 
                 React.createElement("div", {className: "btnBar"}, 
+                    React.createElement("div", {className: "force"}, 
+                      React.createElement("input", {type: "checkbox", 
+                          checked: this.state.type==1, 
+                          onChange: function(){
+                              const type=self.state.type;
+                              self.setState({
+                                  type:!type
+                              });
+                          }}), 
+                      React.createElement("label", null, " 强制匹配 "), 
+                      React.createElement("p", {className: "info"}, " 选中后将把原生链接作为字符串匹配,任何一个字符都会影响匹配结果")
+                    ), 
                     React.createElement("div", {className: "btn", onClick: this.close}, "取消"), 
                     React.createElement("div", {className: "btn ok", onClick: this.ok}, "确定")
                 )
@@ -407,6 +422,7 @@ Page.App=(function(){
                                                 origin:jsonData.link.origin,
                                                 target:jsonData.link.target,
                                                 name:jsonData.link.name,
+                                                type:jsonData.link.type,
                                             }
                                         },function(res){
                                             if(res.err){
@@ -492,8 +508,6 @@ Page.App=(function(){
                 tempGroup=groups[i];
                 break;
             }
-
-            console.log(tempGroup);
             return {
                 groups:groups,
                 selectedGroup:tempGroup

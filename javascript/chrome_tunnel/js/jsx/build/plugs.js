@@ -28,6 +28,7 @@ window.$View=(function(){
                                     )
                                 ), 
                 React.createElement("span", {className: "itemName"}, link.name), 
+                React.createElement("div", {className: "statusIcon"}), 
                 React.createElement("span", {className: "itemOriginLink"}, link.origin), 
                 React.createElement("span", {className: "itemProxyLink"}, link.target)
             )

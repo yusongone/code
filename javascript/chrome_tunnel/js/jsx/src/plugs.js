@@ -28,6 +28,7 @@ window.$View=(function(){
                                     />
                                 </span>
                 <span className="itemName">{link.name}</span>
+                <div className="statusIcon"></div>
                 <span className="itemOriginLink">{link.origin}</span>
                 <span className="itemProxyLink">{link.target}</span>
             </li>

@@ -9,30 +9,38 @@ var hited=[];
 
 
 function checkHit(originLink,requestLink){
-    try{
-        var ol=new URL(originLink.origin);
-        var rl=new URL(requestLink);
-        var sameProtocol=ol.protocol==rl.protocol;
-        var sameHostName=ol.hostname==rl.hostname;
-        var includePath=rl.pathname.indexOf(ol.pathname)==0;
-        if(sameProtocol&&sameHostName&&includePath){
-            return originLink.target+rl.pathname.substr(ol.pathname.length,rl.pathname.length-ol.pathname.length);
+    if(originLink.type){ //强制比对
+        if(requestLink==originLink.origin){
+            console.log(originLink.target);
+            return originLink.target;
         }
-    }catch(e){
-        return null;
+    }else{
+        try{
+            var ol=new URL(originLink.origin);
+            var rl=new URL(requestLink);
+            var sameProtocol=ol.protocol==rl.protocol;
+            var sameHostName=ol.hostname==rl.hostname;
+            var includePath=rl.pathname.indexOf(ol.pathname)==0;
+            if(sameProtocol&&sameHostName&&includePath){
+                return originLink.target+rl.pathname.substr(ol.pathname.length,rl.pathname.length-ol.pathname.length);
+            }
+        }catch(e){
+            return null;
+        }
     }
     return null;
 }
 
 function requestCallback (details) {
+    console.log(details);
     var groups=Page.Storage.getData().groups;
         for(var i in groups){
             var group=groups[i];
             if(group.checked&&group.links){
                 for(j=0;j<groups[i].links.length;j++){
                     var link=groups[i].links[j];
-                    var mergeLink=checkHit(link,details.url);
-                    if(link.checked&&mergeLink){
+                    var mergeLink=link.checked?checkHit(link,details.url):null;
+                    if(mergeLink){
                         Page.ChangezhengFive.checkLaunch({info:link.name,group:group});
                         return {redirectUrl: mergeLink};
                     };
@@ -42,7 +50,29 @@ function requestCallback (details) {
     return {cancel: false};
 }
 
+chrome.webRequest.onHeadersReceived.addListener(function(details){
+    var origin=false,credentials=false;
+    details.responseHeaders.forEach(function(item){
+        if(item.name=="Access-Control-Allow-Origin"){
+            var u=new URL(staticData.pageUrl);
+            item.value=u.origin;
+            origin=true;
+        }else if(item.name=="Access-Control-Allow-Credentials"){
+            item.value="true";
+            credentials=true;
+        };
+    });
+    if(!credentials){
+        details.responseHeaders.push({"name":"Access-Control-Allow-Credentials","value":"true"});
+
+    }
+    //details.responseHeaders.push({"name":"Access-Control-Allow-Headers","value":"*, X-Requested-With, Content-Type"});
+    return {responseHeaders:details.responseHeaders};
+
+},{urls:["<all_urls>"]},["responseHeaders","blocking"]);
+
 chrome.webRequest.onBeforeRequest.addListener(requestCallback,{urls:["<all_urls>"]},["blocking"]);
+
 
 function checkHitPool(){
     if(hited.length>0){
@@ -99,6 +129,7 @@ function checkHitPool(){
     }
 })();
 
+
 chrome.tabs.onUpdated.addListener(function(tabid,changeInfo,tab){
     if(changeInfo.status=="loading"){
         if(Page.ChangezhengFive.conquerTab[tabid]){
@@ -113,9 +144,10 @@ chrome.tabs.onCreated.addListener(function(tab){
 });
 chrome.tabs.onActivated.addListener(function(tab){
     nowTabId=tab.tabId;
+    chrome.tabs.getSelected(null,function(tab) {
+        staticData.pageUrl=tab.url;
+    });
 });
-chrome.webRequest.onCompleted.addListener(function(details){
-},{urls:["<all_urls>"]},["responseHeaders"]);
 
 /*
 
