@@ -1,17 +1,95 @@
 var staticData={
-}
+};
 var Page=window.Page||{};
-var cache={};
 var nowTabId;
 
-var hited=[];
 
 
 
-function checkHit(originLink,requestLink){
+var requestWatcher=(function(){
+    var requests={};
+    var redirectRuquest={};
+
+    function SelfRequest(id){
+        this.id=id;
+        this.url=null;
+    }
+
+    setInterval(function(){
+        var d=new Date().getTime();
+        for(var i in requests){
+            var time=requests[i].time;
+            if(d-time>30000){
+                delete requests[i];
+            }
+        }
+    },30000);
+
+    return {
+        see(details,mergeLink,link){
+            const id=details.requestId;
+            requests[id]=new SelfRequest(id);
+            requests[id].targetLink=mergeLink;
+        },
+        addReferer(details){
+            for(var id in requests) {
+                if (requests[id].targetLink == details.url) {
+                    if (requests[id]) {
+                        var referer = null;
+                        details.requestHeaders.forEach(function (item) {
+                            if (item.name == "Referer") {
+                                referer = item.value;
+                            }
+                        });
+                        requests[id].referer = referer;
+                    }
+                }
+            }
+        },
+        addResponeseHeader(details){
+            console.log(details.url);
+            var origin=false,credentials=false;
+            for(var id in requests){
+                if(requests[id].targetLink==details.url){
+                    details.responseHeaders.forEach(function(item){
+                        if(item.name=="Access-Control-Allow-Origin"){
+                            var u=new URL(requests[id].referer);
+                            item.value=u.origin;
+                            origin=true;
+                        }else if(item.name=="Access-Control-Allow-Credentials"){
+                            item.value="true";
+                            credentials=true;
+                        };
+                    });
+                    if(!credentials){
+                        details.responseHeaders.push({"name":"Access-Control-Allow-Credentials","value":"true"});
+                    }
+                    //details.responseHeaders.push({"name":"Access-Control-Allow-Headers","value":"*, X-Requested-With, Content-Type"});
+                    delete requests[id];
+                }
+            }
+            return {responseHeaders:details.responseHeaders};
+        }
+    }
+})();
+
+function activeLinkFilter(callback){
+    var groups=Page.Storage.getData().groups;
+    for(var i in groups) {
+        var group = groups[i];
+        if (group.checked && group.links) {
+            group.links.forEach(function(link){
+                if(link.checked) {
+                    callback(link, group);
+                }
+            });
+        }
+    }
+};
+
+function checkHitAndMergeLink(originLink,requestLink){
     if(originLink.type){ //强制比对
         if(requestLink==originLink.origin){
-            console.log(originLink.target);
             return originLink.target;
         }
     }else{
@@ -22,7 +100,8 @@ function checkHit(originLink,requestLink){
             var sameHostName=ol.hostname==rl.hostname;
             var includePath=rl.pathname.indexOf(ol.pathname)==0;
             if(sameProtocol&&sameHostName&&includePath){
-                return originLink.target+rl.pathname.substr(ol.pathname.length,rl.pathname.length-ol.pathname.length);
+                var url=originLink.target+rl.pathname.substr(ol.pathname.length,rl.pathname.length-ol.pathname.length)+rl.search;
+                return url;
             }
         }catch(e){
             return null;
@@ -31,56 +110,48 @@ function checkHit(originLink,requestLink){
     return null;
 }
 
-function requestCallback (details) {
-    console.log(details);
-    var groups=Page.Storage.getData().groups;
-        for(var i in groups){
-            var group=groups[i];
-            if(group.checked&&group.links){
-                for(j=0;j<groups[i].links.length;j++){
-                    var link=groups[i].links[j];
-                    var mergeLink=link.checked?checkHit(link,details.url):null;
-                    if(mergeLink){
-                        Page.ChangezhengFive.checkLaunch({info:link.name,group:group});
-                        return {redirectUrl: mergeLink};
-                    };
-                }
-            }
-        }
-    return {cancel: false};
+const A={};
+function add(id,key){
+    if(!A[id]){
+        A[id]=[];
+    }
+    A[id].push(key);
 }
 
-chrome.webRequest.onHeadersReceived.addListener(function(details){
-    var origin=false,credentials=false;
-    details.responseHeaders.forEach(function(item){
-        if(item.name=="Access-Control-Allow-Origin"){
-            var u=new URL(staticData.pageUrl);
-            item.value=u.origin;
-            origin=true;
-        }else if(item.name=="Access-Control-Allow-Credentials"){
-            item.value="true";
-            credentials=true;
-        };
+//发起请求前 1
+chrome.webRequest.onBeforeRequest.addListener(function(details){
+    add(details.requestId,"OBR");
+    let mergeLink=null;
+    var redirectUrl;
+      activeLinkFilter(function(checkedLink,group){
+        mergeLink=checkHitAndMergeLink(checkedLink,details.url);
+        if(mergeLink){//命中匹配项
+            Page.ChangezhengFive.checkLaunch({info:checkedLink.name,group:group});//通知浏览器命中
+            requestWatcher.see(details,mergeLink);
+            redirectUrl={redirectUrl: mergeLink};
+        }
     });
-    if(!credentials){
-        details.responseHeaders.push({"name":"Access-Control-Allow-Credentials","value":"true"});
-
+    if(redirectUrl){
+        return redirectUrl;
     }
-    //details.responseHeaders.push({"name":"Access-Control-Allow-Headers","value":"*, X-Requested-With, Content-Type"});
-    return {responseHeaders:details.responseHeaders};
+    return {cancel: false}
+},{urls:["<all_urls>"]},["blocking"]);
+
+
+//发起Header前 2
+chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
+    add(details.requestId,"OBSH"+":"+details.url);
+
+    requestWatcher.addReferer(details);
+
+},{urls:["<all_urls>"]},["requestHeaders"]);
+
+//接收Header前 3
+chrome.webRequest.onHeadersReceived.addListener(function(details){
+    add(details.requestId,"OHR");
+    return requestWatcher.addResponeseHeader(details);
 
 },{urls:["<all_urls>"]},["responseHeaders","blocking"]);
-
-chrome.webRequest.onBeforeRequest.addListener(requestCallback,{urls:["<all_urls>"]},["blocking"]);
-
-
-function checkHitPool(){
-    if(hited.length>0){
-        var tempAry=hited.concat([]);
-        hited=[];
-    }
-}
-
 
 //长征
 (function(){
@@ -115,7 +186,7 @@ function checkHitPool(){
                 goConquer(nowTabId,function(){
                     self.conquerTab[nowTabId].status="conquered";
                     Q._readInfo(nowTabId,function(item){
-                        self.launch(jsonObj);
+                        self.launch(item);
                     });
                 });
             }else{
