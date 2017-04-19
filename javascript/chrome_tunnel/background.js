@@ -33,27 +33,26 @@ var requestWatcher=(function(){
         },
         addReferer(details){
             for(var id in requests) {
-                if (requests[id].targetLink == details.url) {
-                    if (requests[id]) {
-                        var referer = null;
-                        details.requestHeaders.forEach(function (item) {
-                            if (item.name == "Referer") {
-                                referer = item.value;
-                            }
-                        });
-                        requests[id].referer = referer;
-                    }
+                if (requests[id].targetLink == details.url&&details.type=="xmlhttprequest") {
+                    var referer = null;
+                    details.requestHeaders.forEach(function (item) {
+                        if (item.name == "Origin") {
+                            referer = item.value;
+                        }
+                    });
+                    requests[id].referer = referer;
+                    break;
                 }
             }
         },
         addResponeseHeader(details){
-            console.log(details.url);
             var origin=false,credentials=false;
             for(var id in requests){
-                if(requests[id].targetLink==details.url){
+                if(requests[id].targetLink==details.url&&details.type=="xmlhttprequest"){ //只对 xmlHttpRequest 增加头信息
+                    const ref=requests[id].referer;
+                    var u=ref!="null"?new URL(ref):{"origin":"null"};
                     details.responseHeaders.forEach(function(item){
                         if(item.name=="Access-Control-Allow-Origin"){
-                            var u=new URL(requests[id].referer);
                             item.value=u.origin;
                             origin=true;
                         }else if(item.name=="Access-Control-Allow-Credentials"){
@@ -61,11 +60,15 @@ var requestWatcher=(function(){
                             credentials=true;
                         };
                     });
+                    if(!origin){
+                        details.responseHeaders.push({"name":"Access-Control-Allow-Origin","value":u.origin});
+                    }
                     if(!credentials){
                         details.responseHeaders.push({"name":"Access-Control-Allow-Credentials","value":"true"});
                     }
                     //details.responseHeaders.push({"name":"Access-Control-Allow-Headers","value":"*, X-Requested-With, Content-Type"});
                     delete requests[id];
+                    break;
                 }
             }
             return {responseHeaders:details.responseHeaders};
