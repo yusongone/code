@@ -28,6 +28,7 @@ window.$View=(function(){
                                     />
                                 </span>
                 <span className="itemName">{link.name}</span>
+                <div className="statusIcon"></div>
                 <span className="itemOriginLink">{link.origin}</span>
                 <span className="itemProxyLink">{link.target}</span>
             </li>
@@ -47,7 +48,9 @@ window.$View=(function(){
         },
         render(){
             var self=this;
+            var checkedCount=0;
             var items=this.props.group.links.map(function(item,index){
+                item.checked?checkedCount++:"";
                 return <Item group={self.props.group} link={item} key={index}></Item>
             });
             var hide=this.state.status.hideArea?"hidden":"";
@@ -76,8 +79,15 @@ window.$View=(function(){
                         checked={this.props.group.checked} />
 
                     {this.props.group.name}
-                    <div className="drop">v</div>
-                    <div className="checkedCount">1/2</div>
+                    <div className="drop">
+                        {
+                            self.state.status.hideArea?
+                                <i className="fa fa-chevron-down"></i>
+                            :
+                                <i className="fa fa-chevron-up"></i>
+                        }
+                    </div>
+                    <div className="checkedCount">{checkedCount+"/"+this.props.group.links.length}</div>
                 </div>
                 <div className={className}>
                     <ul>

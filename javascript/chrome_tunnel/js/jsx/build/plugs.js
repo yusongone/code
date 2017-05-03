@@ -28,6 +28,7 @@ window.$View=(function(){
                                     )
                                 ), 
                 React.createElement("span", {className: "itemName"}, link.name), 
+                React.createElement("div", {className: "statusIcon"}), 
                 React.createElement("span", {className: "itemOriginLink"}, link.origin), 
                 React.createElement("span", {className: "itemProxyLink"}, link.target)
             )
@@ -47,7 +48,9 @@ window.$View=(function(){
         },
         render(){
             var self=this;
+            var checkedCount=0;
             var items=this.props.group.links.map(function(item,index){
+                item.checked?checkedCount++:"";
                 return React.createElement(Item, {group: self.props.group, link: item, key: index})
             });
             var hide=this.state.status.hideArea?"hidden":"";
@@ -76,8 +79,15 @@ window.$View=(function(){
                         checked: this.props.group.checked}), 
 
                     this.props.group.name, 
-                    React.createElement("div", {className: "drop"}, "v"), 
-                    React.createElement("div", {className: "checkedCount"}, "1/2")
+                    React.createElement("div", {className: "drop"}, 
+                        
+                            self.state.status.hideArea?
+                                React.createElement("i", {className: "fa fa-chevron-down"})
+                            :
+                                React.createElement("i", {className: "fa fa-chevron-up"})
+                        
+                    ), 
+                    React.createElement("div", {className: "checkedCount"}, checkedCount+"/"+this.props.group.links.length)
                 ), 
                 React.createElement("div", {className: className}, 
                     React.createElement("ul", null, 
