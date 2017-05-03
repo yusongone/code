@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+  <head>
+      <style rel="stylesheet">
+        .resetBox{
+              padding: 24px 0;
+                    text-align: center;
+        }
+        .reset{
+          font-size:30px;
+          border-radius:5px;
+          border: 1px solid #000;
+                padding: 10px;
+                      background: #fff;
+                            color: #000;
+        }
+        *{
+            padding:0;
+            margin:0;
+        }
+        body{
+          background:#333;
+            color:#fff;
+        }
+        .abc{
+          width:280px;
+          height:150px;
+            margin:0 auto;
+              position:relative;
+        }
+        .abc .box{
+          width:100%;
+          height:100%;
+          position:absolute;
+        }
+
+        .inputBox{}
+      .leftLine,
+      .rightLine{
+        border-left:1px solid #fff;
+          height:500px;
+            width:1px;
+      }
+      .leftLine{
+        float:left;
+      }
+      .rightLine{
+        float:right;
+      }
+      .red{
+        height:100%;
+          width:20px;
+            background:#fff;
+              opacity:1;
+                position:absolute;
+                  top:0;
+      }
+      .red.a{
+        left:-20px;
+    }
+      .red.b{
+        right:-19px;
+        float:right;
+    }
+      .innerBox{
+        width: 100%;
+              position: absolute;
+                    height: 100%;
+      }
+      .subBox{
+        position:relative;
+        width:33.1%;
+          height:100%;
+            float:left;
+      }
+      .subBox .red{
+        position:absolute;
+          right:-10px;
+      }
+      .centerLine{
+            height: 300px;
+                  border-right: 2px solid red;
+                        margin-right: 8px;
+      }
+      .textBox{
+        xtext-indent: -10px;
+        font-size:28px;
+            border-bottom: 3px solid red;
+                  z-index: 999999;
+                        position: relative;
+                              text-align: center;
+                                    margin-top: 30px;
+                                          padding-bottom: 10px;
+      }
+      .textBox.center{
+        margin-top:70px;
+      }
+      .inputBox{
+        width:100%;
+        height:100%;
+          position:absolute;
+            z-index:999999999999999999;
+
+          background:rgba(0,0,0,0.8);
+            text-align: center;
+                  padding-top: 120px;
+      }
+      .inputBox .inputText{
+        font-size:28px;
+        width: 180px;
+              height: 28px;
+                    line-height: 28px;
+      }
+      .inputBox .btn{
+        height:32px;
+        line-height:30px;
+          display:inline-block;
+            border-radius:5px;
+              background:#fff;
+                color:#000;
+                  padding:0 10px;
+                    margin-top:-10px;
+              vertical-align: 6px;
+      }
+      .textBox.totalSub{
+            margin-left: -7.5px;
+                  margin-right: -7.5px;
+                    border-bottom:1px solid #fff;
+      }
+      .a1{
+            width: 30%;
+                  display: inline-block;
+                        text-align: center;
+                              margin-top: 40px;
+      }
+
+
+
+      </style>
+    <script type="text/javascript">
+      function init(){
+        var ok=document.getElementById("ok");
+        var input =document.getElementById("input");
+        var a=document.getElementById("a");
+        var b=document.getElementById("b");
+        var c=document.getElementById("c");
+        var a1=document.getElementById("a11");
+        var b2=document.getElementById("a12");
+        var c3=document.getElementById("a13");
+        var inputArea=document.getElementById("inputArea");
+        var reset=document.getElementById("reset");
+        ok.addEventListener("click",function(){
+          var width=input.value;
+          var valWidth=parseInt((parseInt(width)+150)/3);
+          var oneWidth=parseInt(((parseInt(width)+150)/3)-75);
+          a.innerText=oneWidth;
+          b.innerText=width-2*oneWidth;
+          c.innerText=oneWidth;
+
+          a1.innerText=valWidth;
+          b2.innerText=valWidth;
+          c3.innerText=valWidth;
+          inputArea.style.display="none"
+        },false);
+        reset.addEventListener("click",function(){
+          input.value="";
+          a1.innerText="----";
+          b2.innerText="----";
+          c3.innerText="----";
+          a.innerText="----";
+          b.innerText="----";
+          c.innerText="----";
+          inputArea.style.display="block"
+        });
+      }
+    </script>
+  </head>
+  <body onload="init()">
+    <div class="inputBox" id="inputArea">
+      <input id="input" class="inputText"/>
+      <div id="ok" class="btn"  >确定</div>
+    </div>
+    <div class="abc">
+      <div class="resetBox">
+        <div id="reset" class="reset"  >复位</div>
+      </div>
+      <div class="box">
+        <div class="leftLine"> 
+        </div>
+        <div class="rightLine"> </div>
+        <div class="red a">
+              <div class="centerLine"></div>
+        </div>
+        <div class="red b">
+              <div class="centerLine"></div>
+        </div>
+        <div class="innerBox">
+          <div class="subBox">
+            <div class="red">
+              <div class="centerLine"></div>
+            </div>
+            <div class="textBox" id="a">
+              --
+            </div>
+          </div>
+          <div class="subBox">
+            <div class="red"> 
+              <div class="centerLine"></div>
+            </div>
+            <div class="textBox center" id="b">
+              --
+            </div>
+          </div>
+          <div class="subBox">
+            <div class="textBox"  id="c">
+              --
+            </div>
+          </div>
+            <div class="textBox totalSub"  id="c">
+              <div class="a1" id="a11">
+                --
+              </div>
+              <div class="a1" id="a12">
+                --
+              </div>
+              <div class="a1" id="a13">
+                --
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
