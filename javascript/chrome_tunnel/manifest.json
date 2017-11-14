@@ -1,8 +1,8 @@
 {
 "manifest_version": 2,
 "name":"偷天换日",
-"version": "0.0.2",
-"description": "线上开发",
+"version": "1.0.3",
+"description": "资源，接口代理",
 "icons": 
   { 
     "16": "/images/logo_2.png",

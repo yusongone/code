@@ -216,10 +216,12 @@ Page.App=(function(){
             return{
                 show:true,
                 errMsg:"",
+                showAdvance:false,
                 name:this.props.data?this.props.data.name:null,
                 origin:this.props.data?this.props.data.origin:null,
                 target:this.props.data?this.props.data.target:null,
-                type:0    //0: normal 只对比host+path 1:force 将按照字符串匹配
+                type:this.props.data?this.props.data.type:false,    //false: normal 只对比host+path true:force 将按照字符串匹配
+                domainLimit:this.props.data?this.props.data.domainLimit:null 
             }
         },
         close(){
@@ -241,7 +243,8 @@ Page.App=(function(){
                     name:self.state.name,
                     origin:self.state.origin,
                     target:self.state.target,
-                    type:self.state.type
+                    type:self.state.type,
+                    domainLimit:self.state.domainLimit
                 }
             },function(result){
                 if(result.err){
@@ -261,7 +264,8 @@ Page.App=(function(){
                 name:newProps.data?newProps.data.name:null,
                 origin:newProps.data?newProps.data.origin:null,
                 target:newProps.data?newProps.data.target:null,
-                type:newProps.data?newProps.data.type:0    //0: normal 只对比host+path 1:force 将按照字符串匹配
+                type:newProps.data?newProps.data.type:false, //false: normal 只对比host+path true:force 将按照字符串匹配
+                domainLimit:newProps.data?newProps.data.domainLimit:null 
             });
         },
         render(){
@@ -311,21 +315,46 @@ Page.App=(function(){
                                         });
                             }})
                     ), 
-                    errMsg
+                    errMsg, 
+                  React.createElement("div", {className: "advancedArea"}, 
+                    React.createElement("div", {className: "advancedBtn", onClick: function(){
+
+                        self.setState({
+                          showAdvance:!self.state.showAdvance
+                        });
+
+                    }}, "高级设置"), 
+                    React.createElement("div", {className: this.state.showAdvance?"dropList":"dropList hide"}, 
+                      React.createElement("div", {className: "advancedItem"}, 
+                        React.createElement("input", {type: "checkbox", 
+                            checked: this.state.type, 
+                            onChange: function(){
+                                const type=self.state.type;
+                                self.setState({
+                                    type:!type
+                                });
+                            }}), 
+                        React.createElement("label", null, " 强制匹配 "), 
+                        React.createElement("p", {className: "info"}, " 选中后将把原生链接作为字符串匹配,任何一个字符都会影响匹配结果")
+                      ), 
+                      React.createElement("div", {className: "advancedItem"}, 
+                        React.createElement("label", null, " 匹配域名 "), 
+                        React.createElement("input", {
+                            style: {width:680}, 
+                            type: "text", 
+                            value: this.state.domainLimit, 
+                            onChange: function(event){
+                                event.preventDefault();
+                                self.setState({
+                                    domainLimit:event.target.value
+                                });
+                            }}), 
+                        React.createElement("p", {className: "info"}, " 本规则会在此域名下生效，如果保持空值会在所有域名下生效.")
+                      )
+                    )
+                  )
                 ), 
                 React.createElement("div", {className: "btnBar"}, 
-                    React.createElement("div", {className: "force"}, 
-                      React.createElement("input", {type: "checkbox", 
-                          checked: this.state.type==1, 
-                          onChange: function(){
-                              const type=self.state.type;
-                              self.setState({
-                                  type:!type
-                              });
-                          }}), 
-                      React.createElement("label", null, " 强制匹配 "), 
-                      React.createElement("p", {className: "info"}, " 选中后将把原生链接作为字符串匹配,任何一个字符都会影响匹配结果")
-                    ), 
                     React.createElement("div", {className: "btn", onClick: this.close}, "取消"), 
                     React.createElement("div", {className: "btn ok", onClick: this.ok}, "确定")
                 )
@@ -333,7 +362,6 @@ Page.App=(function(){
         }
     });
     var ListToolBar=(function(){
-
 
         var toolBar=React.createClass({displayName: "toolBar",
             getInitialState(){
@@ -361,7 +389,8 @@ Page.App=(function(){
                 var self=this;
                 this.DialogElement.style.display="block";
                 ReactDOM.render(React.createElement(LinkDialog, {
-                                    show: true, title: this.state.group.name, 
+                                    show: true, 
+                                    title: this.state.group.name, 
 
                                     onClose: function(){
                                                         self.DialogElement.style.display="none";
@@ -406,10 +435,9 @@ Page.App=(function(){
                 var self=this;
                 this.DialogElement.style.display="block";
                 ReactDOM.render(React.createElement(LinkDialog, {
-                                    show: true, title: "编辑 : "+item.name, 
-
+                                    show: true, 
+                                    title: "编辑 : "+item.name, 
                                     data: item, 
-
                                     onClose: function(){
                                         self.DialogElement.style.display="none";
                                     }, 
@@ -423,6 +451,7 @@ Page.App=(function(){
                                                 target:jsonData.link.target,
                                                 name:jsonData.link.name,
                                                 type:jsonData.link.type,
+                                                domainLimit:jsonData.link.domainLimit
                                             }
                                         },function(res){
                                             if(res.err){

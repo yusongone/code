@@ -1,17 +1,18 @@
 var Page=window.Page||{};
 Page.Storage=(function(){
     var changeHandlers=[];
+    if(!localStorage.Data){
+        localStorage.Data=JSON.stringify({
+            groups:{}
+        });
+    };
+    var _storage=JSON.parse(localStorage.Data);
+
     function updateLocalStorage(){
         var str=JSON.stringify(_storage);
         localStorage.Data=str;
         fireChange();
     }
-    if(!localStorage.Data){
-        localStorage.Data=JSON.stringify({
-            groups:{}
-        });
-    }
-    var _storage=JSON.parse(localStorage.Data);
 
     function fireChange(){
         for(var i=0;i<changeHandlers.length;i++){

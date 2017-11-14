@@ -33,7 +33,7 @@ var requestWatcher=(function(){
         },
         addReferer(details){
             for(var id in requests) {
-                if (requests[id].targetLink == details.url&&details.type=="xmlhttprequest") {
+                if (requests[id].referer==undefined&&requests[id].targetLink == details.url&&details.type=="xmlhttprequest") {
                     var referer = null;
                     details.requestHeaders.forEach(function (item) {
                         if (item.name == "Origin") {
@@ -41,9 +41,9 @@ var requestWatcher=(function(){
                         }
                     });
                     requests[id].referer = referer;
-                    break;
                 }
             }
+            return {requestHeaders:details.requestHeaders};
         },
         addResponeseHeader(details){
             var origin=false,credentials=false;
@@ -66,7 +66,6 @@ var requestWatcher=(function(){
                     if(!credentials){
                         details.responseHeaders.push({"name":"Access-Control-Allow-Credentials","value":"true"});
                     }
-                    //details.responseHeaders.push({"name":"Access-Control-Allow-Headers","value":"*, X-Requested-With, Content-Type"});
                     delete requests[id];
                     break;
                 }
@@ -90,7 +89,29 @@ function activeLinkFilter(callback){
     }
 };
 
-function checkHitAndMergeLink(originLink,requestLink){
+function _getDomainLimitHost(domain){
+  try{
+    return new URL(domain).hostname;
+  }catch(e){
+    return ""
+  }
+}
+function _getOriginHost(tabId){
+  try{
+  const t=tabUrlHandler.getUrl(tabId); 
+  return new URL(t).hostname;
+  }catch(e){
+    return ""
+  }
+}
+
+function checkHitAndMergeLink(originLink,details){
+  const requestLink=details.url;
+  const domainLimit=originLink.domainLimit;
+    if(domainLimit&&_getDomainLimitHost(domainLimit)&&(_getDomainLimitHost(domainLimit)!=_getOriginHost(details.tabId))){
+      console.log("domainLimit");
+      return null;
+    }
     if(originLink.type){ //强制比对
         if(requestLink==originLink.origin){
             return originLink.target;
@@ -121,13 +142,17 @@ function add(id,key){
     A[id].push(key);
 }
 
+chrome.webRequest.onErrorOccurred.addListener(function(details){
+  console.log("error--------------",details)
+},{urls:["<all_urls>"]});
+
 //发起请求前 1
 chrome.webRequest.onBeforeRequest.addListener(function(details){
-    add(details.requestId,"OBR");
+//    add(details.requestId,"OBR"+":"+details.url);
     let mergeLink=null;
     var redirectUrl;
       activeLinkFilter(function(checkedLink,group){
-        mergeLink=checkHitAndMergeLink(checkedLink,details.url);
+        mergeLink=checkHitAndMergeLink(checkedLink,details);
         if(mergeLink){//命中匹配项
             Page.ChangezhengFive.checkLaunch({info:checkedLink.name,group:group});//通知浏览器命中
             requestWatcher.see(details,mergeLink);
@@ -143,15 +168,15 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 
 //发起Header前 2
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
-    add(details.requestId,"OBSH"+":"+details.url);
+//    add(details.requestId,"OBSH"+":"+details.url);
 
-    requestWatcher.addReferer(details);
+    return requestWatcher.addReferer(details);
 
 },{urls:["<all_urls>"]},["requestHeaders"]);
 
 //接收Header前 3
 chrome.webRequest.onHeadersReceived.addListener(function(details){
-    add(details.requestId,"OHR");
+    //add(details.requestId,"OHR");
     return requestWatcher.addResponeseHeader(details);
 
 },{urls:["<all_urls>"]},["responseHeaders","blocking"]);
@@ -252,6 +277,46 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 
 
 */
+var tabUrlHandler = (function() {
+   // All opened urls
+   var urls = {},
+
+   queryTabsCallback = function(allTabs) {
+      allTabs && allTabs.forEach(function(tab) {
+          urls[tab.id] = tab.url;
+      });
+   },
+
+   updateTabCallback = function(tabId, changeinfo, tab) {
+       urls[tabId] = tab.url;
+   },
+
+   removeTabCallback = function(tabId, removeinfo) {
+       delete urls[tabId]; 
+   };
+
+   // init
+   //chrome.tabs.query({ active: true }, queryTabsCallback);
+   chrome.tabs.query({}, queryTabsCallback);
+   chrome.tabs.onUpdated.addListener(updateTabCallback);
+   chrome.tabs.onRemoved.addListener(removeTabCallback);
+
+   return {
+     getUrl(tabId){
+       return urls[tabId];
+     },
+     contains: function(url) {
+        for (var urlId in urls) {
+           if (urls[urlId] == url) {
+              return true;
+           }
+        }
+
+        return false;
+     }
+   };
+
+}());
 
 chrome.contextMenus.create({
     "id":"chrome_tunnel",

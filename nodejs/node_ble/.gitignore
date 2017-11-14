@@ -7,4 +7,5 @@
 .idea/youdao.iml
 .idea/encodings.xml
 public/js/jsx/build/.module-cache/*
+node_modules/
 *.swp

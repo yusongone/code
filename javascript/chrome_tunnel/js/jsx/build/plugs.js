@@ -10,9 +10,10 @@ window.$View=(function(){
         render(){
             var self=this;
             var link=self.props.link;
-            return React.createElement("li", {className: "item"}, 
+            return React.createElement("li", {className: link.checked?"item checked":"item"}, 
                                 React.createElement("span", null, 
-                                    React.createElement("input", {type: "checkbox", className: "checkbox", 
+                                    React.createElement("input", {
+                                        type: "checkbox", className: "checkbox", 
                                         onChange: function(){
                                             Page.Storage.updateLinkData({
                                                 group:self.props.group,
@@ -28,7 +29,8 @@ window.$View=(function(){
                                     )
                                 ), 
                 React.createElement("span", {className: "itemName"}, link.name), 
-                React.createElement("div", {className: "statusIcon"}), 
+                link.type?React.createElement("div", {title: "此规则按照字符串规则对比。", className: "statusIcon force"}, "强"):"", 
+                link.domainLimit?React.createElement("div", {title: "此规则在固定域名下生效。", className: "statusIcon domainLimit"}, "域"):"", 
                 React.createElement("span", {className: "itemOriginLink"}, link.origin), 
                 React.createElement("span", {className: "itemProxyLink"}, link.target)
             )

@@ -10,9 +10,10 @@ window.$View=(function(){
         render(){
             var self=this;
             var link=self.props.link;
-            return <li className="item">
+            return <li className={link.checked?"item checked":"item"}>
                                 <span>
-                                    <input type="checkbox" className="checkbox"
+                                    <input
+                                        type="checkbox" className="checkbox"
                                         onChange={function(){
                                             Page.Storage.updateLinkData({
                                                 group:self.props.group,
@@ -28,7 +29,8 @@ window.$View=(function(){
                                     />
                                 </span>
                 <span className="itemName">{link.name}</span>
-                <div className="statusIcon"></div>
+                {link.type?<div title="此规则按照字符串规则对比。" className="statusIcon force">强</div>:""}
+                {link.domainLimit?<div title="此规则在固定域名下生效。" className="statusIcon domainLimit">域</div>:""}
                 <span className="itemOriginLink">{link.origin}</span>
                 <span className="itemProxyLink">{link.target}</span>
             </li>

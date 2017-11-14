@@ -36,13 +36,14 @@ noble.on('stateChange', function(e){
 
 var a=0;
 noble.on('discover',function(peripheral){
-  console.log(peripheral.advertisement.manufacturerData);
-  if(peripheral.advertisement.localName=="HMSoft"){
+	  console.log(peripheral);
+  if(peripheral.advertisement.localName=="SK-C067"){
     peripheral.connect(function(){
       console.log("connected");
       peripheral.discoverServices([],function(err,services){
         for(var i=0;i<services.length;i++){
           var service=services[i];
+		  console.log(service.uuid);
           if(service.uuid=="ffe0"){
             service.on('characteristicsDiscover', function(charaAry){
               for(var j=0;j<charaAry.length;j++){

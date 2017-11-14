@@ -44,13 +44,16 @@ html,body{
     border-top: 1px solid #ddd;
 }
 .groupList .hideArea .item{
-    color:#888;
+    color:#aaa;
     padding: 10px 10px;
     overflow: hidden;
     border-bottom: 1px solid #ddd;
 }
-.groupList .hideArea .item:hover{
+.groupList .hideArea .item.checked{
     color:#333;
+}
+.groupList .hideArea .item:hover{
+    background:#eee;
 }
 .groupList .hideArea .item:last-child{
     border-bottom:0;
@@ -69,6 +72,16 @@ html,body{
     line-height:18px;
     /* white-space: nowrap; */
 }
+.groupList .item .statusIcon{
+    width: 18px;
+    height: 18px;
+    background: #dcdcdc;
+    float: right;
+    border-radius: 3px;
+    text-align: center;
+    line-height: 18px;
+}
+
 
 .groupList {
 
