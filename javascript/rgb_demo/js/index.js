@@ -17,17 +17,14 @@ class LED{
     let power=0;
     let dir=1;
     let loopCount=0;
+    let index=0;
     this.updateHandler=()=>{
-
-      if(loopCount==1){
+      power=(128-(255/2*Math.cos((index/255)*Math.PI*2)));
+      if(index==255){
         this.stop();
-      }else if(power>255){
-        dir=dir*-1;
-      }else if(power<0){
-        loopCount++;
-        dir=Math.abs(dir);
       }
-      power+=dir;
+      index+=0.5;
+
       if(rgb.r){
         this.value.r=power*rgb.r;
       }
@@ -75,7 +72,7 @@ var factory=(function(){
     let index=0;
     return ()=>{
       t++;
-      if(t>50){
+      if(t>40){
         if(index>=count){index=0}
         LEDList[index].breathe({r:1,g:1,b:1});
         t=0;
@@ -138,7 +135,47 @@ var factory=(function(){
   }
 })();
 
+function testSine(obj){
+  const ary=obj.t;
+  const ary1=obj.f;
+
+  const canvas=document.getElementById("canvas");
+  const ctx=canvas.getContext("2d");
+
+  ctx.moveTo(0,0);
+  ary.forEach((item,index)=>{
+    ctx.lineTo(index,200+item);
+  });
+  ctx.stroke();
+
+  ctx.moveTo(0,0);
+  ary1.forEach((item,index)=>{
+    ctx.lineTo(index,200+item);
+  });
+  ctx.stroke();
+
+  function drawLine(){
+
+  }
+}
+
+function createPointer(){
+  const t=[];
+  const f=[];
+  for(var i=0;i<255;i++){
+    t.push(128-(255/2*Math.cos((i/255)*Math.PI*2)));
+    //t.push(255/2*Math.atan((i/255)*Math.PI));
+    f.push(255-2*Math.abs(127-i));
+  }
+  console.log(t);
+  return {t,f};
+}
+
 function main(){
-  factory.init(36);
-  factory.run(BREATHE);
+  const t=createPointer();
+  testSine(t);
+  
+  //factory.init(36);
+  //factory.run(BREATHE);
+
 }
