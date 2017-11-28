@@ -19,11 +19,17 @@ class LED{
     let loopCount=0;
     let index=0;
     this.updateHandler=()=>{
-      power=(128-(255/2*Math.cos((index/255)*Math.PI*2)));
+      //power=(128-(255/2*Math.cos((index/255)*Math.PI*2)));
+
+      const zz=128-(255/2*Math.cos((index/255)*Math.PI*2));
+
+      const e=255-2*Math.abs(127-index);
+
+      power=zz*e/255;
       if(index==255){
         this.stop();
       }
-      index+=0.5;
+      index+=1;
 
       if(rgb.r){
         this.value.r=power*rgb.r;
@@ -72,7 +78,7 @@ var factory=(function(){
     let index=0;
     return ()=>{
       t++;
-      if(t>40){
+      if(t>10){
         if(index>=count){index=0}
         LEDList[index].breathe({r:1,g:1,b:1});
         t=0;
@@ -87,14 +93,6 @@ var factory=(function(){
 
     }
   }
-
-  function getRotate(){
-    return ()=>{
-
-    }
-  }
-
-  
 
   function loop(){
     requestAnimationFrame(()=>{
@@ -143,16 +141,24 @@ function testSine(obj){
   const ctx=canvas.getContext("2d");
 
   ctx.moveTo(0,0);
+  ctx.beginPath();
+  ctx.strokeStyle="black";
   ary.forEach((item,index)=>{
-    ctx.lineTo(index,200+item);
+    const t=255-(item);
+    ctx.lineTo(index,t);
   });
   ctx.stroke();
+  ctx.closePath();
 
   ctx.moveTo(0,0);
+  ctx.beginPath();
+  ctx.strokeStyle="red";
   ary1.forEach((item,index)=>{
-    ctx.lineTo(index,200+item);
+    const t=355-item;
+    ctx.lineTo(20+index/6,t);
   });
   ctx.stroke();
+  ctx.closePath();
 
   function drawLine(){
 
@@ -163,19 +169,50 @@ function createPointer(){
   const t=[];
   const f=[];
   for(var i=0;i<255;i++){
-    t.push(128-(255/2*Math.cos((i/255)*Math.PI*2)));
+    const zz=128-(255/2*Math.cos((i/255)*Math.PI*2));
+    const ee=128-(255/2*Math.sin((i/255)*Math.PI*2));
+    const e=(255-2*Math.abs(127-i));
+    //t.push(zz*e/255);
+    //t.push(zz*e/255);
     //t.push(255/2*Math.atan((i/255)*Math.PI));
-    f.push(255-2*Math.abs(127-i));
+    //f.push(255-2*Math.abs(127-i));
+    //f.push((zz+e)/2);
+    //t.push(zz);
+    //f.push(zz*e/255*e/255);
+    //console.log(Math.cos((i/255)*Math.PI*2));
   }
-  console.log(t);
+  function getR(i){
+    let t=[0,0,1,255,255,-1];
+    i=i/360*6;
+    var index=parseInt(i)%6;
+    if(index<0){
+      index=6+index;
+    }
+    var type=t[index];
+    let temp;
+    if(type==1){
+      temp=255+i%255;
+    }else if(type==-1){
+      temp=255-Math.abs(i)%255;
+    }else{
+      temp=type;
+    }
+    return temp;
+  }
+
+  for(var i=-360;i<=360;i++){
+    f.push(getR(i));
+  }
   return {t,f};
 }
 
 function main(){
   const t=createPointer();
+
+
   testSine(t);
   
-  //factory.init(36);
-  //factory.run(BREATHE);
+  factory.init(36);
+  factory.run(BREATHE);
 
 }
